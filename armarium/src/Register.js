@@ -33,19 +33,27 @@ function Register() {
     */
     const [password, setPassword] = useState('');
 
+    /**
+     * This variable here is for confirming your password. 
+     */
+    const [confirmPassword, setConfirmPassword] = useState('');
+
   /**
    * Used for navigating to other pages.
    */
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
 
   /**
-   * This is gives the functionally of the login basically
-   * the button. 
+   * This is gives the functionally of the register button
    * @param {*}} e 
    */
-  const handleLoginSubmit = (e) => {
+  const handleRegisterSubmit = (e) => {
     e.preventDefault();
-    //navigate('/');
+    if (password !== confirmPassword) {
+      alert("Passwords don't match");
+      return;
+    }
+
   };
 
 
@@ -101,12 +109,23 @@ function Register() {
           />
         </label>
         <br />
-      <button type="submit">Login</button>
+        <label>
+          Confirm Password:
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+        <button type="submit" onClick={handleRegisterSubmit}>Register</button>
       <br />
     </div>
   );
 }
 
 // TODO: Still have to format phone number & include the confirm password.
+// This is mostly just the setup.
 
 export default Register;
