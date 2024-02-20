@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Register from './Register';
+import ForgotPassword from './ForgotPassowrd';
+import NewPassword from './NewPassowrd';
 
 /**
  * This will be the login page as of now. 
@@ -60,7 +62,8 @@ function App() {
         <br />
         <button type="submit" onClick={handleLoginSubmit}>Login</button>
         <br />
-        <p>Forgot Password</p>
+        <Link to="/forgot-password">Forgot Password</Link>
+        <br />
         <Link to="/register">Register</Link>
       </div>
   );
@@ -77,6 +80,8 @@ function Routers() {
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />}/>
+        <Route path="/new-password" element={<NewPassword />}/>
       </Routes>
     </Router>
   );
