@@ -39,7 +39,7 @@ function App() {
 
   return (
       <div className="App">
-        <h2>Armarium</h2>
+        <h2>ARMARIUM</h2>
         <label>
           Email:
           <input

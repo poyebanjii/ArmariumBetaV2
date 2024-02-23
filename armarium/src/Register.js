@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import './Register.css';
 
 /**
  * The Register page where users can create their accounts.
