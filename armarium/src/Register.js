@@ -58,7 +58,7 @@ function Register() {
 
   return (
     <div className="App">
-      <h2>Armarium</h2>
+      <h2>ARMARIUM</h2>
       <label>
           Username:
           <input
