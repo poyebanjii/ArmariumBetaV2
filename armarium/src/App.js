@@ -5,6 +5,7 @@ import './App.css';
 import Register from './Register';
 import ForgotPassword from './ForgotPassowrd';
 import NewPassword from './NewPassowrd';
+import Tinder from './Tinder';
 
 /**
  * This will be the login page as of now. 
@@ -24,7 +25,7 @@ function App() {
   /**
    * Used for navigating to other pages.
    */
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
 
   /**
    * This is gives the functionally of the login basically
@@ -33,7 +34,7 @@ function App() {
    */
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    //navigate('/');
+    navigate('/clothes-swipe');
   };
 
 
@@ -82,6 +83,7 @@ function Routers() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />}/>
         <Route path="/new-password" element={<NewPassword />}/>
+        <Route path="/clothes-swipe" element={<Tinder />}/>
       </Routes>
     </Router>
   );
