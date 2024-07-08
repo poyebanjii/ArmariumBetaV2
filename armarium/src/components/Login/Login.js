@@ -29,7 +29,7 @@ function Login() {
    */
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    navigate('/outfits');
+    navigate('/suggestions');
   };
 
 

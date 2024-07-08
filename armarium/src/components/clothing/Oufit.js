@@ -69,7 +69,7 @@ const SwipeableImage = ({ image, handleSwipe, isLocked  }) => {
           opacity: opacityValue
         }}
         onDragEnd={(event, info) => { 
-            if (Math.abs(info.point.x) <= 150) { 
+            if (Math.abs(info.point.x) <= 10) { 
                 animControls.start({ x: 0, rotate: 0, opacity: 1 });
             } 
             else { 
@@ -152,9 +152,14 @@ function Outfit() {
           />
         </div>
       </div>
+      <br>
+      </br>
       <button onClick={toggleLockBottom}>
             {isLocked.bottom ? 'Unlock Bottom' : 'Lock Bottom'}
-          </button>
+      </button>
+      <br>
+      </br>
+      <button>Save Outfit</button>
     </div> 
   ); 
 }

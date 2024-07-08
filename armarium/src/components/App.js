@@ -7,6 +7,8 @@ import ForgotPassword from './Login/ForgotPassowrd';
 import NewPassword from './Login/NewPassowrd';
 import Tinder from './clothing/Tinder';
 import Outfit from './clothing/Oufit';
+import Suggestions from './clothing/Suggestions';
+import ProfileSettings from './profile/ProfileSettings';
 
 /**
  * The routers for linking to different pages.
@@ -22,6 +24,8 @@ function App() {
         <Route path="/new-password" element={<NewPassword />}/>
         <Route path="/clothes-swipe" element={<Tinder />}/>
         <Route path="/outfits" element={<Outfit />}/>
+        <Route path="/suggestions" element={<Suggestions />}/>
+        <Route path="/profileSettings" element={<ProfileSettings />}/>
       </Routes>
     </Router>
   );
