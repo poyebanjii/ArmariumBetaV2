@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 
 /**
  * The Register page where users can create their accounts.
@@ -46,20 +49,40 @@ function Register() {
    * This is gives the functionally of the register button
    * @param {*}} e 
    */
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert("Passwords don't match");
       return;
     }
 
-  };
+    const auth = getAuth();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
+      // Store additional user details in Firestore
+      await setDoc(doc(db, 'Users', user.uid), {
+        username,
+        email,
+        dateOfBirth,
+        phoneNumber
+      });
+
+      console.log('User registered successfully');
+      alert('User registered successfully!');
+      navigate('/'); // Redirect to home page or another page after registration
+    } catch (error) {
+      console.error('Error registering user:', error);
+      alert('Error registering user. Please try again.');
+    }
+  };
 
   return (
     <div className="App">
       <h2>ARMARIUM</h2>
-      <label>
+      <form onSubmit={handleRegisterSubmit}>
+        <label>
           Username:
           <input
             type="text"
@@ -69,10 +92,10 @@ function Register() {
           />
         </label>
         <br />
-      <label>
+        <label>
           Email:
           <input
-            type="text"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -90,15 +113,15 @@ function Register() {
         </label>
         <br />
         <label>
-          Phone Number optional:
+          Phone Number (optional):
           <input
-            type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{2}-[0-9]{3}"
+            type="tel"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
           />
         </label>
         <br />
-      <label>
+        <label>
           Password:
           <input
             type="password"
@@ -118,13 +141,11 @@ function Register() {
           />
         </label>
         <br />
-        <button type="submit" onClick={handleRegisterSubmit}>Register</button>
+        <button type="submit">Register</button>
+      </form>
       <br />
     </div>
   );
 }
-
-// TODO: Still have to format phone number & include the confirm password.
-// This is mostly just the setup.
 
 export default Register;
