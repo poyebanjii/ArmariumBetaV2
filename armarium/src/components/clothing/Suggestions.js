@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import '../styles/App.css';
-
+import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 
 function Suggestions() {
   const [event, setEvent] = useState('');
@@ -9,14 +11,37 @@ function Suggestions() {
   const [color, setColor] = useState('');
   const navigate = useNavigate();
 
-  const handleConfirmSubmit = (e) => {
+  const handleConfirmSubmit = async (e) => {
     e.preventDefault();
-    navigate('/outfits');
+    
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+      alert('Please log in to submit suggestions.');
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'suggestions'), {
+        userId: user.uid,
+        event,
+        theme,
+        color,
+        timestamp: new Date()
+      });
+      console.log('Suggestion submitted successfully');
+      alert('Suggestion submitted successfully!');
+      navigate('/outfits');
+    } catch (error) {
+      console.error('Error submitting suggestion:', error);
+      alert('Error submitting suggestion. Please try again.');
+    }
   };
 
   return (
-      <div className="App">
-        <h2>What to wear?</h2>
+    <div className="App">
+      <h2>What to wear?</h2>
+      <form onSubmit={handleConfirmSubmit}>
         <label>
           What is the event?
           <input
@@ -28,7 +53,7 @@ function Suggestions() {
         </label>
         <br />
         <label>
-          What is the theme?:
+          What is the theme?
           <input
             type="text"
             value={theme}
@@ -36,8 +61,9 @@ function Suggestions() {
             required
           />
         </label>
+        <br />
         <label>
-          What is color?:
+          What is the color?
           <input
             type="text"
             value={color}
@@ -46,11 +72,11 @@ function Suggestions() {
           />
         </label>
         <br />
-        <button className="confirmButton" onClick={handleConfirmSubmit}>Submit</button>
-        <br />
-      </div>
+        <button type="submit" className="confirmButton">Submit</button>
+      </form>
+      <br />
+    </div>
   );
 }
-
 
 export default Suggestions;
