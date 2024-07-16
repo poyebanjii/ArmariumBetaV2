@@ -22,7 +22,7 @@ function Suggestions() {
     }
 
     try {
-      await addDoc(collection(db, 'suggestions'), {
+      await addDoc(collection(db, 'Suggestions'), {
         userId: user.uid,
         event,
         theme,
