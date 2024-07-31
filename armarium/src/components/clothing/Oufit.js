@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation } from "framer-motion"; 
+import {Camera} from "react-camera-pro";
 import '../styles/Outfits.css';
 
 /**
@@ -97,6 +98,8 @@ function Outfit() {
   const [topIndex, setTopIndex] = useState(0);
   const [bottomIndex, setBottomIndex] = useState(0);
   const [isLocked, setIsLocked] = useState({ top: false, bottom: false });
+  const camera = useRef(null);
+  const [camImage, setCamImage] = useState(null);
 
   const handleSwipeTop = (direction) => {
     if (!isLocked.top) {
@@ -159,7 +162,12 @@ function Outfit() {
       </button>
       <br>
       </br>
-      <button>Save Outfit</button>
+      <div>
+        <Camera ref={camera} />
+        <button onClick={() => setCamImage(camera.current.takePhoto())}>Take photo</button>
+        <img src={camImage} alt='Taken photo'/>
+        <button>Save Outfit</button>
+      </div>
     </div> 
   ); 
 }
