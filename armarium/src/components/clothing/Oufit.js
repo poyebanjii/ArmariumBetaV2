@@ -142,7 +142,7 @@ function Outfit() {
     }
 
     try {
-      
+      //Rewrite to save itemid instead of url to user's outfits collection
       // Upload top image
       const topImage = tops[topIndex];
       const topImageRef = ref(storage, `Users/${user.uid}/tops/${Date.now()}_${topIndex}.jpg`);
