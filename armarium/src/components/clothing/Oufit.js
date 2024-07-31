@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
-import { motion, useMotionValue, useTransform, useAnimation } from "framer-motion"; 
+import { motion, useMotionValue, useTransform, useAnimation } from 'framer-motion'; 
+import { getAuth } from 'firebase/auth';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import '../styles/Outfits.css';
+import { db, storage } from '../backend/firebaseConfig';
 
 /**
  * Function to import all images from a directory
@@ -128,12 +132,56 @@ function Outfit() {
     setIsLocked(prevState => ({ ...prevState, bottom: !prevState.bottom }));
   };
 
+  const saveOutfit = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert('Please log in to save your outfit.');
+      return;
+    }
+
+    try {
+      
+      // Upload top image
+      const topImage = tops[topIndex];
+      const topImageRef = ref(storage, `Users/${user.uid}/tops/${Date.now()}_${topIndex}.jpg`);
+      await uploadBytes(topImageRef, await fetch(topImage).then(r => r.blob()));
+      const topImageUrl = await getDownloadURL(topImageRef);
+      
+      
+      
+      // Upload bottom image
+      const bottomImage = bottoms[bottomIndex];
+      const bottomImageRef = ref(storage, `Users/${user.uid}/bottoms/${Date.now()}_${bottomIndex}.jpg`);
+      await uploadBytes(bottomImageRef, await fetch(bottomImage).then(r => r.blob()));
+      const bottomImageUrl = await getDownloadURL(bottomImageRef);
+
+      await addDoc(collection(db, `Users/${user.uid}/Outfits`), {
+        topImageUrl,
+        bottomImageUrl,
+        timestamp: new Date()
+      });
+
+      console.log('Top Image URL:', topImageUrl);
+      console.log('Bottom Image URL:', bottomImageUrl);
+    
+      // Store URLs in Firestore
+    
+      console.log('Outfit saved successfully');
+      alert('Outfit saved successfully!');
+    } catch (error) {
+      console.error('Error saving outfit:', error);
+      alert('Error saving outfit. Please try again.');
+    }
+  };
+
   return ( 
     <div className='App'> 
       <h1>Outfits</h1>
       <button onClick={toggleLockTop}>
-            {isLocked.top ? 'Unlock Top' : 'Lock Top'}
-          </button>
+        {isLocked.top ? 'Unlock Top' : 'Lock Top'}
+      </button>
       <div className="outfit-card">
         <div className="swipeable-container top">
           <SwipeableImage 
@@ -152,14 +200,12 @@ function Outfit() {
           />
         </div>
       </div>
-      <br>
-      </br>
+      <br />
       <button onClick={toggleLockBottom}>
-            {isLocked.bottom ? 'Unlock Bottom' : 'Lock Bottom'}
+        {isLocked.bottom ? 'Unlock Bottom' : 'Lock Bottom'}
       </button>
-      <br>
-      </br>
-      <button>Save Outfit</button>
+      <br />
+      <button onClick={saveOutfit}>Save Outfit</button>
     </div> 
   ); 
 }
