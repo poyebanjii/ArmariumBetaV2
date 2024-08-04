@@ -6,6 +6,7 @@ import { db, storage } from '../backend/firebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useRef } from 'react';
 /**
  * Function to import all images from a directory
  * @param {String} r 
