@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; // Import Firebase Auth
 import '../styles/App.css';
 
 /**
@@ -25,21 +26,31 @@ function Login() {
   /**
    * This is gives the functionally of the login basically
    * the button. 
-   * @param {*}} e 
+   * @param {*} e 
    */
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    navigate('/suggestions');
+    
+    const auth = getAuth();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log('User logged in successfully');
+      alert('Login successful!');
+      navigate('/suggestions'); // Redirect to the suggestions page upon successful login
+    } catch (error) {
+      console.error('Error logging in:', error);
+      alert('Error logging in. Please check your email and password.');
+    }
   };
 
-
   return (
-      <div className="App">
-        <h2>ARMARIUM</h2>
+    <div className="App">
+      <h2>ARMARIUM</h2>
+      <form onSubmit={handleLoginSubmit}>
         <label>
           Email:
           <input
-            type="text"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -56,12 +67,13 @@ function Login() {
           />
         </label>
         <br />
-        <button type="submit" onClick={handleLoginSubmit}>Login</button>
-        <br />
-        <Link to="/forgot-password">Forgot Password</Link>
-        <br />
-        <Link to="/register">Register</Link>
-      </div>
+        <button type="submit">Login</button>
+      </form>
+      <br />
+      <Link to="/forgot-password">Forgot Password</Link>
+      <br />
+      <Link to="/register">Register</Link>
+    </div>
   );
 }
 
