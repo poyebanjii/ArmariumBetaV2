@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { motion, useMotionValue, useTransform, useAnimation } from 'framer-motion'; 
+import { motion, useMotionValue, useTransform, useAnimation } from "framer-motion"; 
+import '../styles/Outfits.css';
+import {Camera} from "react-camera-pro";
+import { db, storage } from '../backend/firebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import '../styles/Outfits.css';
-import { db, storage } from '../backend/firebaseConfig';
-
 /**
  * Function to import all images from a directory
  * @param {String} r 
@@ -101,6 +101,8 @@ function Outfit() {
   const [topIndex, setTopIndex] = useState(0);
   const [bottomIndex, setBottomIndex] = useState(0);
   const [isLocked, setIsLocked] = useState({ top: false, bottom: false });
+  const camera = useRef(null);
+  const [camImage, setCamImage] = useState(null);
 
   const handleSwipeTop = (direction) => {
     if (!isLocked.top) {
@@ -204,8 +206,14 @@ function Outfit() {
       <button onClick={toggleLockBottom}>
         {isLocked.bottom ? 'Unlock Bottom' : 'Lock Bottom'}
       </button>
-      <br />
-      <button onClick={saveOutfit}>Save Outfit</button>
+      <br>
+      </br>
+      <div>
+        <Camera ref={camera} />
+        <button onClick={() => setCamImage(camera.current.takePhoto())}>Take photo</button>
+        <img src={camImage} alt='Taken photo'/>
+        <button>Save Outfit</button>
+      </div>
     </div> 
   ); 
 }
