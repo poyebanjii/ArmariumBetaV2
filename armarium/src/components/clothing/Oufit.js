@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation } from "framer-motion"; 
 import {Camera} from "react-camera-pro";
 import '../styles/Outfits.css';
+import Navbar from '../Navbar';
 
 /**
  * Function to import all images from a directory
@@ -165,7 +166,9 @@ function Outfit() {
   };
 
   return ( 
-    <div className='App'> 
+    <div>
+      <Navbar />
+      <div className='App'> 
       <h1>Outfits</h1>
       <button onClick={toggleOneLock}>
         {isLocked.all ? 'Unlock All' : 'Lock All'}
@@ -205,6 +208,7 @@ function Outfit() {
         <button>Save Outfit</button>
       </div>
     </div> 
+    </div>
   ); 
 }
 

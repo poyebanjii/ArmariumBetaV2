@@ -4,6 +4,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import '../styles/App.css';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
+import Navbar from '../Navbar';
 
 function Suggestions() {
   const [event, setEvent] = useState('');
@@ -39,7 +40,9 @@ function Suggestions() {
   };
 
   return (
-    <div className="App">
+    <div>
+      <Navbar />
+      <div className="App">
       <h2>What to wear?</h2>
       <form onSubmit={handleConfirmSubmit}>
         <label>
@@ -75,6 +78,7 @@ function Suggestions() {
         <button type="submit" className="confirmButton">Submit</button>
       </form>
       <br />
+    </div>
     </div>
   );
 }
