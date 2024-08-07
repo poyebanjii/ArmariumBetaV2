@@ -11,6 +11,7 @@ import Suggestions from './clothing/Suggestions';
 import ProfileSettings from './profile/ProfileSettings';
 import ImageUpload from './clothing/imageUpload';
 import ItemUpload from './clothing/itemUpload';
+import CameraUpload from './clothing/CameraUpload';
 
 /**
  * The routers for linking to different pages.
@@ -30,6 +31,7 @@ function App() {
         <Route path="/profileSettings" element={<ProfileSettings />}/>
         <Route path="/imageUpload" element={<ImageUpload />}/>
         <Route path="/itemUpload" element={<ItemUpload />}/>
+        <Route path="/cameraUpload" element={<CameraUpload />}/>
 
       </Routes>
     </Router>
