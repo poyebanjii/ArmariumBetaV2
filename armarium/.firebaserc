@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "armarium-e6655"
-  }
+    "default": "armarium-e6655",
+    "armarium": "armarium-e6655"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
