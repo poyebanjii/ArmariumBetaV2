@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation } from "framer-motion"; 
-import {Camera} from "react-camera-pro";
 import '../styles/Outfits.css';
 import Navbar from '../Navbar';
+import { db } from '../backend/firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
+
+
 
 /**
  * Function to import all images from a directory
@@ -15,10 +18,10 @@ function importAll(r) {
   return Object.values(images);
 }
 
-const tops = importAll(require.context('../photos/tops', false, /\.(png|jpe?g|svg)$/));
+/*const tops = importAll(require.context('../photos/tops', false, /\.(png|jpe?g|svg)$/));
 const bottoms = importAll(require.context('../photos/bottoms', false, /\.(png|jpe?g|svg)$/));
 console.log('Tops:', tops);
-console.log('Bottoms:', bottoms);
+console.log('Bottoms:', bottoms);*/
 
 /**
  * The swipeable component for tops and bottoms
@@ -77,7 +80,7 @@ const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipe
             else { 
                 const direction = info.offset.x < 0 ? "left" : "right";
                 animControls.start({ 
-                  x: direction === "left" ? -5000 : 1000, 
+                  x: direction === "left" ? -1000 : 1000, 
                   rotate: direction === "left" ? -20 : 20, 
                   opacity: 0 
                 }).then(() => {
@@ -102,10 +105,28 @@ const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipe
 function Outfit() {
   const [topIndex, setTopIndex] = useState(0);
   const [bottomIndex, setBottomIndex] = useState(0);
+  const [tops, setTops] = useState([]);
+  const [bottoms, setBottoms] = useState([]);
   const [isLocked, setIsLocked] = useState({ top: false, bottom: false, all: false });
-  const camera = useRef(null);
-  const [camImage, setCamImage] = useState(null);
-  const [hasWebcam, setHasWebcam] = useState(false);
+
+  useEffect(() => {
+    // Fetching tops from Firestore
+    const fetchTops = async () => {
+      const topsCollection = await getDocs(collection(db, 'ItemsCollection/top/items'));
+      const topsData = topsCollection.docs.map(doc => doc.data().url); 
+      setTops(topsData);
+    };
+  
+    // Fetching bottoms from Firestore
+    const fetchBottoms = async () => {
+      const bottomsCollection = await getDocs(collection(db, 'ItemsCollection/bottom/items'));
+      const bottomsData = bottomsCollection.docs.map(doc => doc.data().url); 
+      setBottoms(bottomsData);
+    };
+  
+    fetchTops();
+    fetchBottoms();
+  }, []);
 
   const handleSwipeTop = (direction) => {
     if (!isLocked.top && !isLocked.all) {
