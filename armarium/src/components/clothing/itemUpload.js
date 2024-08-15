@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { storage, db, auth } from '../backend/firebaseConfig';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import Navbar from '../Navbar';
 
 const ItemUpload = () => {
   const [image, setImage] = useState(null);
@@ -57,6 +58,7 @@ const ItemUpload = () => {
 
   return (
     <div>
+      <Navbar />
       <h2>Upload an Item</h2>
       <progress value={progress} max="100" />
       <br />
