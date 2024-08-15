@@ -72,7 +72,7 @@ function Login() {
       <br />
       <Link to="/forgot-password">Forgot Password</Link>
       <br />
-      <Link to="/register">Register</Link>
+      <Link to="/userInfo">Register</Link>
     </div>
   );
 }
