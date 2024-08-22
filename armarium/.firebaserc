@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "armarium-e6655",
-    "armarium": "armarium-e6655"
+    "armarium": "armarium-e6655",
+    "arm": "armarium-website"
   },
   "targets": {},
   "etags": {},
