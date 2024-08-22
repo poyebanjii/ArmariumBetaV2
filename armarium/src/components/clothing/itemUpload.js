@@ -11,6 +11,7 @@ const ItemUpload = () => {
   const [tags, setTags] = useState("");
   const [color, setColor] = useState("");
   const [itemType, setItemType] = useState("top");
+  const [bgRemove, setBgRemove] = useState(null);
 
   const handleChange = (e) => {
     if (e.target.files[0]) {
@@ -42,17 +43,60 @@ const ItemUpload = () => {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((url) => {
             setUrl(url);
-            const itemId = `${itemType}-${new Date().getTime()}`;
-            addDoc(collection(db, `ItemsCollection/${itemType}/items`), {
-              url: url,
-              tags: tags.split(',').map(tag => tag.trim()),
-              color: color,
-              itemId: itemId,
-              createdAt: serverTimestamp(),
-            });
+            removeBackground(url).then((bgRemoveUrl) => {
+              const itemId = `${itemType}-${new Date().getTime()}`;
+              addDoc(collection(db, `ItemsCollection/${itemType}/items`), {
+                url: bgRemoveUrl || url,
+                tags: tags.split(',').map(tag => tag.trim()),
+                color: color,
+                itemId: itemId,
+                createdAt: serverTimestamp(),
+              });
+            })
           });
         }
       );
+    }
+  };
+
+  const removeBackground = async (imageUrl) => {
+    const apiKey = "izMQbubK4NUk3p24uQn9kBvP"; // At some point this should be in a hidden place. 
+    const apiUrl = "https://api.remove.bg/v1.0/removebg";
+
+    const formData = new FormData();
+    formData.append("image_url", imageUrl);
+    formData.append("size", "auto");
+
+    try {
+      const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+              'X-Api-Key': apiKey
+          },
+          body: formData
+      });
+
+      const data = await res.blob();
+      const bgRemovedImageUrl = URL.createObjectURL(data);
+      setBgRemove(bgRemovedImageUrl);
+
+      const storageRef = ref(storage, `images/bg-removed-${image.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, data);
+
+      return new Promise((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          null,
+          (error) => reject(error),
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then(resolve).catch(reject);
+          }
+        );
+      });
+
+    } catch (error) {
+      console.log(error);
+      return null;
     }
   };
 
@@ -85,7 +129,7 @@ const ItemUpload = () => {
       <br />
       <button onClick={handleUpload}>Upload</button>
       <br />
-      {url && <img src={url} alt="Uploaded" style={{ width: "300px" }} />}
+      {url && <img src={bgRemove || url} alt="Uploaded" style={{ width: "300px" }} />}
     </div>
   );
 };
