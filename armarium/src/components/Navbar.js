@@ -45,6 +45,11 @@ function Navbar() {
                 Upload
               </NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/wardrobe" end>
+                Wardrobe
+              </NavLink>
+            </li>
           </ul>
         </div>
       </div>

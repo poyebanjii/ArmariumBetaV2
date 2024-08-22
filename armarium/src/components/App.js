@@ -12,6 +12,7 @@ import ProfileSettings from './profile/ProfileSettings';
 import ImageUpload from './clothing/imageUpload';
 import ItemUpload from './clothing/itemUpload';
 import UserInfo from './Login/userInfo';
+import Wardrobe from './clothing/Wardrobe';
 
 /**
  * The routers for linking to different pages.
@@ -32,6 +33,7 @@ function App() {
         <Route path="/imageUpload" element={<ImageUpload />}/>
         <Route path="/itemUpload" element={<ItemUpload />}/>
         <Route path="/userInfo" element={<UserInfo />}/>
+        <Route path="/wardrobe" element={<Wardrobe />}/>
 
       </Routes>
     </Router>
