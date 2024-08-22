@@ -5,24 +5,6 @@ import Navbar from '../Navbar';
 import { db } from '../backend/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 
-
-
-/**
- * Function to import all images from a directory
- * @param {String} r 
- * @returns {Array} list of imported images
- */
-function importAll(r) {
-  let images = {};
-  r.keys().map((item, index) => { images[item.replace('./', '')] = r(item); });
-  return Object.values(images);
-}
-
-/*const tops = importAll(require.context('../photos/tops', false, /\.(png|jpe?g|svg)$/));
-const bottoms = importAll(require.context('../photos/bottoms', false, /\.(png|jpe?g|svg)$/));
-console.log('Tops:', tops);
-console.log('Bottoms:', bottoms);*/
-
 /**
  * The swipeable component for tops and bottoms
  * @param {Image to display} image 
