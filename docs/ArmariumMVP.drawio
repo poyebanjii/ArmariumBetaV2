@@ -61,9 +61,6 @@
         <mxCell id="QwA7imb9_G3cZJTcEvYQ-17" value="&lt;font color=&quot;#ffffff&quot;&gt;Frontend&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
           <mxGeometry x="-523" y="-472" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="QwA7imb9_G3cZJTcEvYQ-19" value="&lt;font color=&quot;#ffffff&quot;&gt;Backend&lt;/font&gt;" style="text;strokeColor=none;fillColor=none;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
-          <mxGeometry x="80" y="-375" width="60" height="30" as="geometry" />
-        </mxCell>
         <mxCell id="QwA7imb9_G3cZJTcEvYQ-20" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=mxgraph.basic.rect;fillColor2=none;strokeWidth=1;size=20;indent=5;strokeColor=#FFFFFF;fillColor=#999999;rotation=0;rectStyle=rounded;" vertex="1" parent="1">
           <mxGeometry x="-617" y="-420" width="129" height="57" as="geometry">
             <mxPoint x="-1" y="-1" as="offset" />
