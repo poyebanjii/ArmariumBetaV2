@@ -31,7 +31,7 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <NavLink className="nav-link" to="/homepage" end>
+              <NavLink className="nav-link" to="/outfits" end>
                 Home
               </NavLink>
             </li>
