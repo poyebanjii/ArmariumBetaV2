@@ -13,6 +13,7 @@ import ImageUpload from './clothing/imageUpload';
 import ItemUpload from './clothing/itemUpload';
 import UserInfo from './Login/userInfo';
 import Wardrobe from './clothing/Wardrobe';
+import Brands from './Questionare/Brands';
 
 /**
  * The routers for linking to different pages.
@@ -34,7 +35,8 @@ function App() {
         <Route path="/itemUpload" element={<ItemUpload />}/>
         <Route path="/userInfo" element={<UserInfo />}/>
         <Route path="/wardrobe" element={<Wardrobe />}/>
-
+        <Route path="/brands" element={<Brands />}/>
+        
       </Routes>
     </Router>
   );

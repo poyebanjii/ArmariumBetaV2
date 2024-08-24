@@ -36,7 +36,7 @@ function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('User logged in successfully');
       alert('Login successful!');
-      navigate('/suggestions'); // Redirect to the suggestions page upon successful login
+      navigate('/outfits'); // Redirect to the suggestions page upon successful login
     } catch (error) {
       console.error('Error logging in:', error);
       alert('Error logging in. Please check your email and password.');
