@@ -4,6 +4,7 @@ import '../styles/App.css';
 
 function Ocassions() {
   const [selectedOcassions, setSelectedOcassions] = useState([]);
+  const [customOcassion, setCustomOcassion] = useState('');
   const navigate = useNavigate();
 
   const ocassionsList = ['Formal', 'Party', 'Casual', 'Business'];
@@ -14,6 +15,13 @@ function Ocassions() {
         ? prevOcassions.filter((o) => o !== ocassion)
         : [...prevOcassions, ocassion]
     );
+  };
+
+  const handleCustomOcassionAdd = () => {
+    if (customOcassion && !selectedOcassions.includes(customOcassion)) {
+      setSelectedOcassions((prevOcassions) => [...prevOcassions, customOcassion]);
+      setCustomOcassion('');
+    }
   };
 
   const handleNext = () => {
@@ -38,6 +46,19 @@ function Ocassions() {
             {ocassion}
           </button>
         ))}
+      </div>
+
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <input
+          type="text"
+          value={customOcassion}
+          onChange={(e) => setCustomOcassion(e.target.value)}
+          placeholder="Insert your favorite occasions"
+          style={{ padding: '10px', width: '200px', marginRight: '10px' }}
+        />
+        <button onClick={handleCustomOcassionAdd} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+          Add
+        </button>
       </div>
 
       <button onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>

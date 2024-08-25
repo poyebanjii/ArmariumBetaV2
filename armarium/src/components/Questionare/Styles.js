@@ -4,6 +4,7 @@ import '../styles/App.css';
 
 function Styles() {
   const [selectedStyles, setSelectedStyles] = useState([]);
+  const [customStyle, setCustomStyle] = useState('');
   const navigate = useNavigate();
 
   const stylesList = ['Classic', 'Grunge', 'Goth', 'Preppy', 'Athletic', 'Comfy'];
@@ -16,8 +17,15 @@ function Styles() {
     );
   };
 
+  const handleCustomStyleAdd = () => {
+    if (customStyle && !selectedStyles.includes(customStyle)) {
+      setSelectedStyles((prevStyles) => [...prevStyles, customStyle]);
+      setCustomStyle(''); // Clear the input field after adding
+    }
+  };
+
   const handleNext = () => {
-    navigate('/ocassions');
+    navigate('/occasions');
   };
 
   return (
@@ -38,6 +46,19 @@ function Styles() {
             {style}
           </button>
         ))}
+      </div>
+
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <input
+          type="text"
+          value={customStyle}
+          onChange={(e) => setCustomStyle(e.target.value)}
+          placeholder="Insert your favorite styles"
+          style={{ padding: '10px', width: '200px', marginRight: '10px' }}
+        />
+        <button onClick={handleCustomStyleAdd} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+          Add
+        </button>
       </div>
 
       <button onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>

@@ -41,7 +41,7 @@ function App() {
         <Route path="/heightAndWeight" element={<HeightAndWeight />}/>
         <Route path="/brands" element={<Brands />}/>
         <Route path="/styles" element={<Styles />}/>
-        <Route path="/ocassions" element={<Ocassions />}/>
+        <Route path="/occasions" element={<Ocassions />}/>
       </Routes>
     </Router>
   );
