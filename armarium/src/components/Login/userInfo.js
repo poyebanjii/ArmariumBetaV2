@@ -9,8 +9,8 @@ function UserInfo() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (gender === "male" || gender === "female") {
-            navigate("/register");
+        if (gender === "male" || gender === "female" && skin === "skin1" || skin === "skin2") {
+            navigate("/heightAndWeight");
         } else {
             alert("Please select a gender.");
         }
@@ -30,8 +30,8 @@ function UserInfo() {
                 <br />
                 <select onChange={(e) => setSkin(e.target.value)} value={skin}>
                     <option value="-">Select Skin</option>
-                    <option value="skin1">Male</option>
-                    <option value="female">Female</option>
+                    <option value="skin1">Skin 1</option>
+                    <option value="skin2">Skin 2</option>
                 </select>
                 <br />
                 <button type="submit" className="btn btn-dark">Submit</button>
