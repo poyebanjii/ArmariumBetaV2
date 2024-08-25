@@ -1,42 +1,77 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-//import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; // Import Firebase Auth
+import { useNavigate } from 'react-router-dom';
 import '../styles/App.css';
 
 function Brands() {
-  const [heightIn, setHeightIn] = useState('');
-  const [heightFt, setHeightFt] = useState('');
-  const [weight, setWeight] = useState('');
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [customBrand, setCustomBrand] = useState('');
   const navigate = useNavigate();
+
+  const brandsList = ['Gap', 'Nike', 'Lacoste', 'Raymond', 'Gucci', 'Ralph Lauren'];
+
+  const handleBrandClick = (brand) => {
+    setSelectedBrands((prevBrands) => 
+      prevBrands.includes(brand)
+        ? prevBrands.filter((b) => b !== brand)
+        : [...prevBrands, brand]
+    );
+  };
+
+  const handleCustomBrandChange = (e) => {
+    setCustomBrand(e.target.value);
+  };
+
+  const handleCustomBrandSubmit = (e) => {
+    e.preventDefault();
+    if (customBrand && !selectedBrands.includes(customBrand)) {
+      setSelectedBrands([...selectedBrands, customBrand]);
+      setCustomBrand('');
+    }
+  };
+
+  const handleNext = () => {
+    navigate('/styles');
+  };
 
   return (
     <div className="App">
-      <form>
-        <label>
-          Height:
+      <h3>What brands do you like?</h3>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+        {brandsList.map((brand) => (
+          <button
+            key={brand}
+            onClick={() => handleBrandClick(brand)}
+            style={{
+              backgroundColor: selectedBrands.includes(brand) ? 'gray' : 'lightgray',
+              padding: '10px 20px',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {brand}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={handleCustomBrandSubmit} style={{ marginTop: '20px' }}>
+        <label style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <span style={{ marginRight: '10px' }}>Insert your favorite brands:</span>
           <input
-            type="number"
-            value={heightIn}
-            onChange={(e) => setHeightIn(e.target.value)}
-            required
+            type="text"
+            value={customBrand}
+            onChange={handleCustomBrandChange}
+            placeholder="Enter brand name"
+            style={{ padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }}
           />
-          ft.
         </label>
-        <br />
-        <label>
-          Height:
-          <input
-            type="number"
-            value={heightFt}
-            onChange={(e) => setHeightFt(e.target.value)}
-            required
-          />
-          in.
-        </label>
-        <br />
-        <button type="submit">Next</button>
+        <button type="submit" style={{ display: 'block', margin: '10px auto' }}>
+          Add Brand
+        </button>
       </form>
-      <br />
+
+      <button onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
+        Next
+      </button>
     </div>
   );
 }
