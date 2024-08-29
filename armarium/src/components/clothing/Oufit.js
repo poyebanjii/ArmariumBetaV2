@@ -90,24 +90,24 @@ function Outfit() {
   const [tops, setTops] = useState([]);
   const [bottoms, setBottoms] = useState([]);
   const [isLocked, setIsLocked] = useState({ top: false, bottom: false, all: false });
+  const DELAY = 2500;
 
   useEffect(() => {
-    // Fetching tops from Firestore
-    const fetchTops = async () => {
-      const topsCollection = await getDocs(collection(db, 'ItemsCollection/top/items'));
-      const topsData = topsCollection.docs.map(doc => doc.data().url); 
-      setTops(topsData);
-    };
-  
-    // Fetching bottoms from Firestore
-    const fetchBottoms = async () => {
-      const bottomsCollection = await getDocs(collection(db, 'ItemsCollection/bottom/items'));
-      const bottomsData = bottomsCollection.docs.map(doc => doc.data().url); 
-      setBottoms(bottomsData);
-    };
-  
-    fetchTops();
-    fetchBottoms();
+    const fetchData = async () => {
+      await new Promise(resolve => setTimeout(resolve, DELAY));
+      if (tops.length === 0) {
+        const topsCollection = await getDocs(collection(db, 'ItemsCollection/top/items'));
+        const topsData = topsCollection.docs.map(doc => doc.data().url); 
+        setTops(topsData);
+      }
+
+      if (bottoms.length === 0) {
+        const bottomsCollection = await getDocs(collection(db, 'ItemsCollection/bottom/items'));
+        const bottomsData = bottomsCollection.docs.map(doc => doc.data().url); 
+        setBottoms(bottomsData);
+      }
+    }
+    fetchData();
   }, []);
 
   const handleSwipeTop = (direction) => {
