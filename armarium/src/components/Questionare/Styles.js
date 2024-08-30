@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 import '../styles/App.css';
 
 function Styles() {
@@ -24,8 +27,28 @@ function Styles() {
     }
   };
 
-  const handleNext = () => {
-    navigate('/occasions');
+  const handleNext = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert('Please log in to save your styles.');
+      return;
+    }
+
+    try {
+      // Save selected styles to Firestore
+      await addDoc(collection(db, `Users/${user.uid}/styles`), {
+        styles: selectedStyles,
+        timestamp: new Date(),
+      });
+
+      console.log('Styles saved successfully');
+      navigate('/occasions');
+    } catch (error) {
+      console.error('Error saving styles:', error);
+      alert('Error saving your styles. Please try again.');
+    }
   };
 
   return (

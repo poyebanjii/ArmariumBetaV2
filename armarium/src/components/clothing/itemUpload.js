@@ -103,6 +103,7 @@ const ItemUpload = () => {
   return (
     <div>
       <Navbar />
+      <div className="App">
       <h2>Upload an Item</h2>
       <progress value={progress} max="100" />
       <br />
@@ -112,6 +113,7 @@ const ItemUpload = () => {
         <option value="top">Top</option>
         <option value="bottom">Bottom</option>
       </select>
+      <br />
       <br />
       <input
         type="text"
@@ -130,6 +132,7 @@ const ItemUpload = () => {
       <button onClick={handleUpload}>Upload</button>
       <br />
       {url && <img src={bgRemove || url} alt="Uploaded" style={{ width: "300px" }} />}
+    </div>
     </div>
   );
 };

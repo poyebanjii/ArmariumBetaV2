@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 import '../styles/App.css';
 
 function UserInfo() {
@@ -7,14 +10,37 @@ function UserInfo() {
     const [skin, setSkin] = useState("-");
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (gender === "male" || gender === "female" && skin === "skin1" || skin === "skin2") {
-            navigate("/heightAndWeight");
+        
+        if ((gender === 'male' || gender === 'female') && (skin === 'skin1' || skin === 'skin2')) {
+          const auth = getAuth();
+          const user = auth.currentUser;
+          
+          if (!user) {
+            alert('Please log in to submit information.');
+            return;
+          }
+    
+          try {
+            // Add gender and skin information to Firestore
+            await addDoc(collection(db, `Users/${user.uid}/userInfo`), {
+              gender,
+              skin,
+              timestamp: new Date()
+            });
+    
+            console.log('User info submitted successfully');
+            alert('Information submitted successfully!');
+            navigate('/heightAndWeight');
+          } catch (error) {
+            console.error('Error submitting user info:', error);
+            alert('Error submitting information. Please try again.');
+          }
         } else {
-            alert("Please select a gender.");
+          alert('Please select a gender and skin type.');
         }
-    };
+      };
 
 
     return (

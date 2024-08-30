@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getAuth } from 'firebase/auth';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 import '../styles/App.css';
 
 function Brands() {
@@ -10,7 +13,7 @@ function Brands() {
   const brandsList = ['Gap', 'Nike', 'Lacoste', 'Raymond', 'Gucci', 'Ralph Lauren'];
 
   const handleBrandClick = (brand) => {
-    setSelectedBrands((prevBrands) => 
+    setSelectedBrands((prevBrands) =>
       prevBrands.includes(brand)
         ? prevBrands.filter((b) => b !== brand)
         : [...prevBrands, brand]
@@ -29,8 +32,28 @@ function Brands() {
     }
   };
 
-  const handleNext = () => {
-    navigate('/styles');
+  const handleNext = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert('Please log in to save your preferences.');
+      return;
+    }
+
+    try {
+      // Add selected brands to Firestore
+      await addDoc(collection(db, `Users/${user.uid}/preferences`), {
+        brands: selectedBrands,
+        timestamp: new Date(),
+      });
+
+      console.log('Brands preferences saved successfully');
+      navigate('/styles');
+    } catch (error) {
+      console.error('Error saving brands preferences:', error);
+      alert('Error saving your preferences. Please try again.');
+    }
   };
 
   return (

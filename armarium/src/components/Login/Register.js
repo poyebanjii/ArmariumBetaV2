@@ -1,44 +1,45 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
+import '../styles/App.css';
 
 /**
  * The Register page where users can create their accounts.
  * @returns The page of the register page.
  */
 function Register() {
-    /**
-    * The username.
-    */
-   const [username, setUsername] = useState('');
+  /**
+   * The username.
+   */
+  const [username, setUsername] = useState('');
 
-    /**
-    * The email.
-    */
-    const [email, setEmail] = useState('');
+  /**
+   * The email.
+   */
+  const [email, setEmail] = useState('');
 
-    /**
-     * The date of birth.
-     */
-    const [dateOfBirth, setDateOfBirth] = useState('');
+  /**
+   * The date of birth.
+   */
+  const [dateOfBirth, setDateOfBirth] = useState('');
 
-    /**
-     * Phone number
-     * NOTE: This field is optional when the user creates their account.
-     */
-    const [phoneNumber, setPhoneNumber] = useState('');
+  /**
+   * Phone number
+   * NOTE: This field is optional when the user creates their account.
+   */
+  const [phoneNumber, setPhoneNumber] = useState('');
 
-    /**
-    * The password.
-    */
-    const [password, setPassword] = useState('');
+  /**
+   * The password.
+   */
+  const [password, setPassword] = useState('');
 
-    /**
-     * This variable here is for confirming your password. 
-     */
-    const [confirmPassword, setConfirmPassword] = useState('');
+  /**
+   * This variable here is for confirming your password. 
+   */
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   /**
    * Used for navigating to other pages.
@@ -47,7 +48,7 @@ function Register() {
 
   /**
    * This is gives the functionally of the register button
-   * @param {*}} e 
+   * @param {*} e 
    */
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
@@ -66,12 +67,13 @@ function Register() {
         username,
         email,
         dateOfBirth,
-        phoneNumber
+        phoneNumber,
+        accountSetup: false // Initialize accountSetup as false
       });
 
       console.log('User registered successfully');
       alert('User registered successfully!');
-      navigate('/'); // Redirect to home page or another page after registration
+      navigate('/userInfo'); // Redirect to the user information page after registration
     } catch (error) {
       console.error('Error registering user:', error);
       alert('Error registering user. Please try again.');

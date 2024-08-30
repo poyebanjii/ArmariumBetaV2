@@ -1,42 +1,41 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'; // Import Firebase Auth
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { db } from '../backend/firebaseConfig'; 
 import '../styles/App.css';
 
-/**
- * This will be the login page as of now. 
- * @returns The page of the login page.
- */
 function Login() {
-  /**
-   * The email for logging in.
-   */
   const [email, setEmail] = useState('');
-  
-  /**
-   * The password for logging in.
-   */
   const [password, setPassword] = useState('');
-
-  /**
-   * Used for navigating to other pages.
-   */
   const navigate = useNavigate();
 
-  /**
-   * This is gives the functionally of the login basically
-   * the button. 
-   * @param {*} e 
-   */
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    
+
     const auth = getAuth();
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('User logged in successfully');
       alert('Login successful!');
-      navigate('/outfits'); // Redirect to the suggestions page upon successful login
+
+      // Check the accountSetup status
+      const user = auth.currentUser;
+      const userDocRef = doc(db, `Users/${user.uid}`);
+      const userDoc = await getDoc(userDocRef);
+
+      if (userDoc.exists()) {
+        const { accountSetup } = userDoc.data();
+        
+        if (accountSetup === false) {
+          navigate('/userInfo'); // Navigate to /userInfo if accountSetup is false
+        } else {
+          navigate('/outfits'); // Navigate to /outfits if accountSetup is true
+        }
+      } else {
+        console.log('No user document found');
+        alert('User data not found.');
+      }
     } catch (error) {
       console.error('Error logging in:', error);
       alert('Error logging in. Please check your email and password.');
@@ -72,7 +71,7 @@ function Login() {
       <br />
       <Link to="/forgot-password">Forgot Password</Link>
       <br />
-      <Link to="/userInfo">Register</Link>
+      <Link to="/register">Register</Link>
     </div>
   );
 }

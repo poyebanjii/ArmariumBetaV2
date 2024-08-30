@@ -1,29 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import './styles/Navbar.css'; 
-
+import { getAuth, signOut } from 'firebase/auth'; // Import Firebase Authentication
 function Navbar() {
-
-  /*const handleLogout = async (e) => {
+  const navigate = useNavigate();
+  const auth = getAuth();
+  const handleLogout = async (e) => {
     e.preventDefault();
-
-    Cookies.remove('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('email');
-    localStorage.removeItem('searchInput');
-
-    navigate('/login');
+    
+  
+    try {
+      await signOut(auth);
+      navigate('/login'); // Redirect to login page after successful sign-out
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
-  const handleMouseEnter = () => {
-    setDropdownVisible(true);
-    console.log("Hover");
-  };
-
-  const handleMouseLeave = () => {
-    setDropdownVisible(false);
-    console.log("unhover");
-  };*/
 
   return (
     <nav className="navbar">
@@ -50,12 +43,17 @@ function Navbar() {
                 Wardrobe
               </NavLink>
             </li>
+            <li className="nav-item">
+              <button className="nav-link btn btn-link" onClick={handleLogout}>
+                Sign Out
+              </button>
+            </li>
+
           </ul>
         </div>
       </div>
     </nav>
   );
-
 }
 
 export default Navbar;
