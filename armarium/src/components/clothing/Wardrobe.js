@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../backend/firebaseConfig';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
 
 const Wardrobe = () => {
@@ -11,8 +11,11 @@ const Wardrobe = () => {
     const [isBottom, setIsBottom] = useState(false);
     const [isDelete, setIsDelete] = useState(false);
     const [clothesToDelete, setClothesToDelete] = useState([]);
+    const navigate = useNavigate();
     const DELAY = 2000;
-
+    
+    //TODO: ADD IN REFRESH FOR LATER & SAVE THE TAB (TOP OR BOTTOM) INTO LOCAL STORAGE.
+    // ALSO ADD IN A LOADING ANIMATION AT SOMEPOINT
     useEffect(() => {
       const fetchData = async () => {
           // Simulate a delay
@@ -41,6 +44,11 @@ const Wardrobe = () => {
   }, []);
 
       const handleDelete = async (id, type) => {
+        if (!clothesToDelete.length) {
+            alert("No item has been selected.")
+            return;
+        }
+
         await new Promise(resolve => setTimeout(resolve, DELAY));
         for (let { id, type } of clothesToDelete) {
           const itemDoc = doc(db, `ItemsCollection/${type}/items`, id);
@@ -67,6 +75,16 @@ const Wardrobe = () => {
           }
       });
       }
+
+      const handleDeleteClick = (id, type) => {
+        console.log('Type: ',type)
+        if (isDelete) {
+            addToDeleteList({ id, type });
+        } else {
+            console.log(type);
+            navigate(`/editClothing/${id.id}/${id.type}`); // This weird naming but it works.
+        }
+    };
 
       const handleShowTops = () => {
         setIsTop(true);
@@ -114,7 +132,7 @@ const Wardrobe = () => {
                                 height: 'auto', 
                                 border: clothesToDelete.some(item => item.id === top.id) ? '2px solid red' : 'none'
                             }}
-                            onClick={() => isDelete && addToDeleteList({ id: top.id, type: 'top' })}
+                            onClick={() => handleDeleteClick({ id: top.id, type: 'top' })}
                         />
                         {isDelete && (
                             <button
@@ -146,7 +164,7 @@ const Wardrobe = () => {
                                 height: 'auto', 
                                 border: clothesToDelete.some(item => item.id === bottom.id) ? '2px solid red' : 'none'
                             }}
-                            onClick={() => isDelete && addToDeleteList({ id: bottom.id, type: 'bottom' })}
+                            onClick={() => handleDeleteClick({ id: bottom.id, type: 'bottom' })}
                         />
                         {isDelete && (
                             <button
