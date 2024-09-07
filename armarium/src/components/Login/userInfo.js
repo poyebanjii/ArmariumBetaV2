@@ -10,10 +10,16 @@ function UserInfo() {
     const [skin, setSkin] = useState("-");
     const navigate = useNavigate();
 
+    const skinTones = [
+      { name: 'Warm', shades: ['#5C2E1F', '#FBC6A4', '#FDE0D5', '#87442B'] },
+      { name: 'Neutral', shades: ['#F1D5BA', '#AE6345', '#D8A172', '#4E2C1A'] },
+      { name: 'Cool', shades: ['#F6DBC3', '#C6A089', '#D29B71', '#2A1C16'] }
+    ];
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if ((gender === 'male' || gender === 'female') && (skin === 'skin1' || skin === 'skin2')) {
+        if ((gender === 'male' || gender === 'female') && skin) {
           const auth = getAuth();
           const user = auth.currentUser;
           
@@ -43,27 +49,39 @@ function UserInfo() {
       };
 
 
-    return (
+      return (
         <div className="App">
-            <h2>Gender</h2>
-            <br />
-            <form onSubmit={handleSubmit}>
-                <select onChange={(e) => setGender(e.target.value)} value={gender}>
-                    <option value="-">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <br />
-                <select onChange={(e) => setSkin(e.target.value)} value={skin}>
-                    <option value="-">Select Skin</option>
-                    <option value="skin1">Skin 1</option>
-                    <option value="skin2">Skin 2</option>
-                </select>
-                <br />
-                <button type="submit" className="btn btn-dark">Submit</button>
-            </form>
+          <h2>Gender</h2>
+          <form onSubmit={handleSubmit}>
+            <select onChange={(e) => setGender(e.target.value)} value={gender}>
+              <option value="-">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            
+            <h3>Select Your Skin Tone</h3>
+            <div className="skin-tone-container">
+              {skinTones.map((group, groupIndex) => (
+                <div key={groupIndex} className="skin-tone-group">
+                  <h4>{group.name}</h4>
+                  <div className="skin-tone-options">
+                    {group.shades.map((color, index) => (
+                      <div
+                        key={index}
+                        className={`skin-tone ${skin === color ? 'selected' : ''}`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setSkin(color)}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+    
+            <button type="submit" className="btn btn-dark">Submit</button>
+          </form>
         </div>
-    );
+      );
 }
 
 
