@@ -9,6 +9,7 @@ const ItemUpload = () => {
   const [url, setUrl] = useState("");
   const [progress, setProgress] = useState(0);
   const [tags, setTags] = useState("");
+  const [title, setTitle] = useState("");
   const [color, setColor] = useState("");
   const [itemType, setItemType] = useState("top");
   const [bgRemove, setBgRemove] = useState(null);
@@ -47,6 +48,7 @@ const ItemUpload = () => {
               const itemId = `${itemType}-${new Date().getTime()}`;
               addDoc(collection(db, `ItemsCollection/${itemType}/items`), {
                 url: bgRemoveUrl || url,
+                title: title,
                 tags: tags.split(',').map(tag => tag.trim()),
                 color: color,
                 itemId: itemId,
@@ -114,6 +116,14 @@ const ItemUpload = () => {
         <option value="bottom">Bottom</option>
       </select>
       <br />
+      <br />
+      <br />
+      <input
+        type="text"
+        placeholder="Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
       <br />
       <input
         type="text"

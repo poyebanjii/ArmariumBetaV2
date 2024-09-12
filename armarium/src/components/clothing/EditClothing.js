@@ -10,6 +10,8 @@ const EditClothing = () => {
     const [image, setImage] = useState('');
     const [tags, setTags] = useState([]);
     const [newTags, setNewTags] = useState(''); 
+    const [title, setTitle] = useState('');
+    const [newTitle, setNewTitle] = useState(''); 
 
     useEffect(() => {
         const fetchData = async () => {
@@ -23,6 +25,8 @@ const EditClothing = () => {
                     setImage(data.url);
                     setTags(data.tags);
                     setNewTags(data.tags.join(', '));
+                    setTitle(data.title);
+                    setNewTitle(data.title);
                 }
                 else {
                     console.log("DNF");
@@ -38,6 +42,8 @@ const EditClothing = () => {
                     setImage(data.url);
                     setTags(data.tags);
                     setNewTags(data.tags.join(', '));
+                    setTitle(data.title);
+                    setNewTitle(data.title);
                 }
                 else {
                     console.log("DNF");
@@ -51,14 +57,40 @@ const EditClothing = () => {
         setNewTags(e.target.value); 
     };
 
+    // Perhaps they can be merged
     const handleUpdateTags = async () => {
+        let clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId); // as default so it won't yell at me.
+        if (type == 'top') {
+            clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId);
+        }
+        else if (type == 'bottom') {
+            clothingDoc = doc(db, 'ItemsCollection/bottom/items', clothingId);
+        }
         const tagsArray = newTags.split(',').map(tag => tag.trim());
         const uniqueTags = Array.from(new Set(tagsArray));
-        const clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId);
         await updateDoc(clothingDoc, { tags: uniqueTags });
 
         setTags(uniqueTags);
         setNewTags(uniqueTags.join(', '));
+    }
+
+    const handleTitleChange = (e) => {
+        setNewTitle(e.target.value); 
+    };
+
+    const handleUpdateTitle = async () => {
+        let clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId); // as default so it won't yell at me.
+        if (type == 'top') {
+            clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId);
+        }
+        else if (type == 'bottom') {
+            clothingDoc = doc(db, 'ItemsCollection/bottom/items', clothingId);
+        }
+
+        await updateDoc(clothingDoc, { title: newTitle });
+
+        setTitle(newTitle);
+        setNewTitle(newTitle);
     }
 
     return (
@@ -86,6 +118,16 @@ const EditClothing = () => {
                         onChange={handleTagChange}
                     />
                     <button onClick={handleUpdateTags}>Update Tags</button>
+                </div>
+                <div>
+                    <h3>Update Title</h3>
+                    <input 
+                        type="text" 
+                        placeholder="Enter a new title" 
+                        value={newTitle} 
+                        onChange={handleTitleChange}
+                    />
+                    <button onClick={handleUpdateTitle}>Update Title</button>
                 </div>
             </div>
         </div>

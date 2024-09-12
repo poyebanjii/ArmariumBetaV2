@@ -12,30 +12,33 @@ const Wardrobe = () => {
     const [isDelete, setIsDelete] = useState(false);
     const [clothesToDelete, setClothesToDelete] = useState([]);
     const navigate = useNavigate();
-    const DELAY = 2000;
+    const DELAY = 750;
     
     //TODO: ADD IN REFRESH FOR LATER & SAVE THE TAB (TOP OR BOTTOM) INTO LOCAL STORAGE.
     // ALSO ADD IN A LOADING ANIMATION AT SOMEPOINT
     useEffect(() => {
       const fetchData = async () => {
-          // Simulate a delay
           await new Promise(resolve => setTimeout(resolve, DELAY));
           
-          if (tops.length === 0) { // Check if data is already loaded
+          if (tops.length === 0) { 
               const topsCollection = await getDocs(collection(db, 'ItemsCollection/top/items'));
               const topsData = topsCollection.docs.map(doc => ({
                   id: doc.id,
+                  title: doc.data().title,
                   url: doc.data().url
               }));
+              console.log(topsData);
               setTops(topsData);
           }
   
-          if (bottoms.length === 0) { // Check if data is already loaded
+          if (bottoms.length === 0) { 
               const bottomsCollection = await getDocs(collection(db, 'ItemsCollection/bottom/items'));
               const bottomsData = bottomsCollection.docs.map(doc => ({
                   id: doc.id,
+                  title: doc.data().title,
                   url: doc.data().url
               }));
+              console.log(bottomsData);
               setBottoms(bottomsData);
           }
       };
