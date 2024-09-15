@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
 import './styles/Navbar.css'; 
+import Dropdown from './Dropdown';
 import { getAuth, signOut } from 'firebase/auth'; // Import Firebase Authentication
 function Navbar() {
   const navigate = useNavigate();
   const auth = getAuth();
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
   const handleLogout = async (e) => {
     e.preventDefault();
     
@@ -15,6 +17,16 @@ function Navbar() {
     } catch (error) {
       console.error('Error signing out:', error);
     }
+  };
+
+  const handleMouseEnter = () => {
+    setDropdownVisible(true);
+    console.log("Hover");
+  };
+
+  const handleMouseLeave = () => {
+    setDropdownVisible(false);
+    console.log("unhover");
   };
 
 
@@ -38,10 +50,13 @@ function Navbar() {
                 Upload
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/wardrobe" end>
+            <li
+              className="nav-item dropdown"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
                 Wardrobe
-              </NavLink>
+              {isDropdownVisible && <Dropdown />}
             </li>
             <li className="nav-item">
               <button className="nav-link btn btn-link" onClick={handleLogout}>
