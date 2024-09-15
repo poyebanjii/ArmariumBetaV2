@@ -114,6 +114,7 @@ const ItemUpload = () => {
       <select onChange={(e) => setItemType(e.target.value)} value={itemType}>
         <option value="top">Top</option>
         <option value="bottom">Bottom</option>
+        <option value="shoes">Shoes</option>
       </select>
       <br />
       <br />

@@ -14,7 +14,7 @@ import { db, storage } from '../backend/firebaseConfig';
  * @param {Boolean for locking} isLocked
  * @returns the swipeable image.
  */
-const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipeAll  }) => { 
+const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipeAll, itemLength  }) => { 
 
   /**
   * Sample styling.
@@ -49,7 +49,7 @@ const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipe
   
   return ( 
     <motion.div
-        drag={isLocked ? false : "x"}
+        drag={isLocked || itemLength <= 1 ? false : "x"}
         dragConstraints={{ left: -1000, right: 1000 }} 
         style={{
           ...style,
@@ -89,10 +89,12 @@ const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipe
 function Outfit() {
   const [topIndex, setTopIndex] = useState(0);
   const [bottomIndex, setBottomIndex] = useState(0);
+  const [shoesIndex, setShoesIndex] = useState(0);
   const [tops, setTops] = useState([]);
   const [bottoms, setBottoms] = useState([]);
-  const [isLocked, setIsLocked] = useState({ top: false, bottom: false, all: false });
-  const DELAY = 2500;
+  const [shoes, setShoes] = useState([]);
+  const [isLocked, setIsLocked] = useState({ top: false, bottom: false, shoes: false, all: false });
+  const DELAY = 650;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,12 +110,18 @@ function Outfit() {
         const bottomsData = bottomsCollection.docs.map(doc => doc.data().url); 
         setBottoms(bottomsData);
       }
+
+      if (shoes.length === 0) {
+        const shoesCollection = await getDocs(collection(db, 'ItemsCollection/shoes/items'));
+        const shoesData = shoesCollection.docs.map(doc => doc.data().url); 
+        setShoes(shoesData);
+      }
     }
     fetchData();
   }, []);
 
   const handleSwipeTop = (direction) => {
-    if (!isLocked.top && !isLocked.all) {
+    if (!isLocked.top && !isLocked.all && tops.length > 1) {
       if (direction === "left") {
         setTopIndex((prevIndex) => (prevIndex + 1) % tops.length);
       } else if (direction === "right") {
@@ -124,13 +132,25 @@ function Outfit() {
   };
 
   const handleSwipeBottom = (direction) => {
-    if (!isLocked.bottom && !isLocked.all) {
+    if (!isLocked.bottom && !isLocked.all && bottoms.length > 1) {
       if (direction === "left") {
         setBottomIndex((prevIndex) => (prevIndex + 1) % bottoms.length);
       } else if (direction === "right") {
         setBottomIndex((prevIndex) => (prevIndex - 1 + bottoms.length) % bottoms.length);
       }
       console.log('New Bottoms:', bottomIndex);
+    }
+  };
+
+  const handleSwipeShoes = (direction) => {
+    console.log("Shoes length", shoes.length);
+    if (!isLocked.shoes && !isLocked.all && shoes.length > 1) {
+      if (direction === "left") {
+        setShoesIndex((prevIndex) => (prevIndex + 1) % shoes.length);
+      } else if (direction === "right") {
+        setShoesIndex((prevIndex) => (prevIndex - 1 + shoes.length) % shoes.length);
+      }
+      console.log('New Shoes:', shoesIndex);
     }
   };
 
@@ -177,14 +197,17 @@ function Outfit() {
       alert('Error saving outfit. Please try again.');
     }
   };
+
   const handleSwipeAll = (direction) => {
     if (isLocked.all) {
       if (direction === "left") {
         setTopIndex((prevIndex) => (prevIndex + 1) % tops.length);
         setBottomIndex((prevIndex) => (prevIndex + 1) % bottoms.length);
+        setShoesIndex((prevIndex) => (prevIndex + 1) % shoes.length);
       } else if (direction === "right") {
         setTopIndex((prevIndex) => (prevIndex - 1 + tops.length) % tops.length);
         setBottomIndex((prevIndex) => (prevIndex - 1 + bottoms.length) % bottoms.length);
+        setShoesIndex((prevIndex) => (prevIndex + 1) % shoes.length);
       }
       console.log('New Bottoms:', bottomIndex);
       console.log('New1');
@@ -199,6 +222,10 @@ function Outfit() {
     setIsLocked(prevState => ({ ...prevState, bottom: !prevState.bottom }));
   };
 
+  const toggleLockShoes = () => {
+    setIsLocked(prevState => ({ ...prevState, shoes: !prevState.shoes }));
+  };
+
   const toggleOneLock = () => {
     setIsLocked(prevState => {
       const newState = { ...prevState, all: !prevState.all };
@@ -207,6 +234,7 @@ function Outfit() {
       if (newState.all) {
         newState.top = false;
         newState.bottom = false;
+        newState.shoes = false;
       }
       
       return newState;
@@ -234,6 +262,7 @@ function Outfit() {
             isLocked={isLocked.top}
             isAllLocked={isLocked.all}
             handleSwipeAll={handleSwipeAll}
+            itemLength={tops.length} 
           />
           </div>
         <div className="swipeable-container bottom">
@@ -244,14 +273,29 @@ function Outfit() {
             isLocked={isLocked.bottom}
             isAllLocked={isLocked.all}
             handleSwipeAll={handleSwipeAll}
+            itemLength={bottoms.length} 
           />
         </div>
+        <div className="swipeable-container bottom">
+      <SwipeableImage 
+        key={shoesIndex}
+        image={shoes[shoesIndex]} 
+        handleSwipe={handleSwipeShoes} 
+        isLocked={isLocked.shoes}
+        isAllLocked={isLocked.all}
+        handleSwipeAll={handleSwipeAll}
+        itemLength={shoes.length} 
+      />
+      </div>
       </div>
       <br></br>
       <button onClick={toggleLockBottom} disabled={isLocked.all}>
         {isLocked.bottom ? 'Unlock Bottom' : 'Lock Bottom'}
       </button>
       <br></br>
+      <button onClick={toggleLockShoes} disabled={isLocked.all}>
+        {isLocked.shoes ? 'Unlock Shoes' : 'Lock Shoes'}
+      </button>
       <div>
         <button onClick={saveOutfit}>Save Outfit</button>
       </div>

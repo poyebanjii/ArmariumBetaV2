@@ -7,8 +7,10 @@ import Navbar from '../Navbar';
 const Wardrobe = () => {
     const [tops, setTops] = useState([]);
     const [bottoms, setBottoms] = useState([]);
+    const [shoes, setShoes] = useState([]);
     const [isTop, setIsTop] = useState(true);
     const [isBottom, setIsBottom] = useState(false);
+    const [isShoes, setIsShoes] = useState(false);
     const [isDelete, setIsDelete] = useState(false);
     const [clothesToDelete, setClothesToDelete] = useState([]);
     const navigate = useNavigate();
@@ -41,6 +43,17 @@ const Wardrobe = () => {
               console.log(bottomsData);
               setBottoms(bottomsData);
           }
+
+          if (shoes.length === 0) { 
+            const shoesCollection = await getDocs(collection(db, 'ItemsCollection/shoes/items'));
+            const shoesData = shoesCollection.docs.map(doc => ({
+                id: doc.id,
+                title: doc.data().title,
+                url: doc.data().url
+            }));
+            console.log(shoesData);
+            setShoes(shoesData);
+        }
       };
       
       fetchData();
@@ -60,8 +73,11 @@ const Wardrobe = () => {
           if (type === 'top') {
             setTops(tops.filter((item) => item.id !== id));
           }
-          else {
+          else if (type === 'bottom') {
             setBottoms(bottoms.filter((item) => item.id !== id));
+          }
+          else if (type === 'shoes') {
+            setShoes(shoes.filter((item) => item.id !== id));
           }
         }
 
@@ -92,12 +108,21 @@ const Wardrobe = () => {
       const handleShowTops = () => {
         setIsTop(true);
         setIsBottom(false);
+        setIsShoes(false);
       };
     
       const handleShowBottoms = () => {
         setIsTop(false);
         setIsBottom(true);
+        setIsShoes(false);
       };
+
+      const handleShowShoes = () => {
+        setIsTop(false);
+        setIsBottom(false);
+        setIsShoes(true);
+      };
+
 
       const toggleDelete = () => {
         if (isDelete) {
@@ -115,6 +140,9 @@ const Wardrobe = () => {
             </NavLink>
             <NavLink onClick={handleShowBottoms} style={{ cursor: 'pointer' }}>
                 Bottoms
+            </NavLink>
+            <NavLink onClick={handleShowShoes} style={{ marginRight: '10px', cursor: 'pointer' }}>
+                Shoes
             </NavLink>
             <button onClick={toggleDelete}>
                 {isDelete ? 'Cancel' : 'Delete'}
@@ -188,7 +216,39 @@ const Wardrobe = () => {
                     </div>
                 ))}
             </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+      {isShoes && shoes.map((shoe, index) => (
+        <div key={shoe.id} style={{ position: 'relative' }}>
+          <img 
+            src={shoe.url} 
+            alt={`Shoe ${index + 1}`} 
+            style={{ 
+              width: '150px', 
+              height: 'auto', 
+              border: clothesToDelete.some(item => item.id === shoe.id) ? '2px solid red' : 'none'
+            }}
+            onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
+          />
+          {isDelete && (
+            <button
+              onClick={() => addToDeleteList({ id: shoe.id, type: 'shoes' })}
+              style={{
+                position: 'absolute',
+                top: '5px',
+                right: '5px',
+                backgroundColor: 'red',
+                color: 'white',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              {clothesToDelete.some(item => item.id === shoe.id) ? 'Remove' : 'Select'}
+            </button>
+          )}
         </div>
+      ))}
+    </div>
+  </div>
     );
 };
 

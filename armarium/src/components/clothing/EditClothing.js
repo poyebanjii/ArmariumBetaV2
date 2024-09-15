@@ -49,6 +49,23 @@ const EditClothing = () => {
                     console.log("DNF");
                 }
             }
+            else if (type == 'shoes') {
+                const clothingDoc = doc(db, 'ItemsCollection/shoes/items', clothingId);
+                const clothingData = await getDoc(clothingDoc);
+    
+                if (clothingData.exists()) {
+                    const data = clothingData.data();
+                    console.log(clothingData.data());
+                    setImage(data.url);
+                    setTags(data.tags);
+                    setNewTags(data.tags.join(', '));
+                    setTitle(data.title);
+                    setNewTitle(data.title);
+                }
+                else {
+                    console.log("DNF");
+                }
+            }
         };
         fetchData();
     }, [clothingId])
@@ -65,6 +82,9 @@ const EditClothing = () => {
         }
         else if (type == 'bottom') {
             clothingDoc = doc(db, 'ItemsCollection/bottom/items', clothingId);
+        }
+        else if (type == 'shoes') {
+            clothingDoc = doc(db, 'ItemsCollection/shoes/items', clothingId);
         }
         const tagsArray = newTags.split(',').map(tag => tag.trim());
         const uniqueTags = Array.from(new Set(tagsArray));
@@ -85,6 +105,9 @@ const EditClothing = () => {
         }
         else if (type == 'bottom') {
             clothingDoc = doc(db, 'ItemsCollection/bottom/items', clothingId);
+        }
+        else if (type == 'shoes') {
+            clothingDoc = doc(db, 'ItemsCollection/shoes/items', clothingId);
         }
 
         await updateDoc(clothingDoc, { title: newTitle });
