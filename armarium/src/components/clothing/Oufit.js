@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation } from "framer-motion"; 
 import '../styles/Outfits.css';
 import Navbar from '../Navbar';
-import { db } from '../backend/firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs,addDoc,getFirestore } from 'firebase/firestore';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
+import { db, storage } from '../backend/firebaseConfig';
 
 /**
  * The swipeable component for tops and bottoms
@@ -152,6 +154,50 @@ function Outfit() {
     }
   };
 
+  const saveOutfit = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert('Please log in to save your outfit.');
+      return;
+    }
+
+    try {
+      //Rewrite to save itemid instead of url to user's outfits collection
+      // Upload top image
+      const topImage = tops[topIndex];
+      const topImageRef = ref(storage, `Users/${user.uid}/tops/${Date.now()}_${topIndex}.jpg`);
+      await uploadBytes(topImageRef, await fetch(topImage).then(r => r.blob()));
+      const topImageUrl = await getDownloadURL(topImageRef);
+      
+      
+      
+      // Upload bottom image
+      const bottomImage = bottoms[bottomIndex];
+      const bottomImageRef = ref(storage, `Users/${user.uid}/bottoms/${Date.now()}_${bottomIndex}.jpg`);
+      await uploadBytes(bottomImageRef, await fetch(bottomImage).then(r => r.blob()));
+      const bottomImageUrl = await getDownloadURL(bottomImageRef);
+
+      await addDoc(collection(db, `Users/${user.uid}/Outfits`), {
+        topImageUrl,
+        bottomImageUrl,
+        timestamp: new Date()
+      });
+
+      console.log('Top Image URL:', topImageUrl);
+      console.log('Bottom Image URL:', bottomImageUrl);
+    
+      // Store URLs in Firestore
+    
+      console.log('Outfit saved successfully');
+      alert('Outfit saved successfully!');
+    } catch (error) {
+      console.error('Error saving outfit:', error);
+      alert('Error saving outfit. Please try again.');
+    }
+  };
+
   const handleSwipeAll = (direction) => {
     if (isLocked.all) {
       if (direction === "left") {
@@ -251,7 +297,7 @@ function Outfit() {
         {isLocked.shoes ? 'Unlock Shoes' : 'Lock Shoes'}
       </button>
       <div>
-        <button>Save Outfit</button>
+        <button onClick={saveOutfit}>Save Outfit</button>
       </div>
     </div> 
     </div>
