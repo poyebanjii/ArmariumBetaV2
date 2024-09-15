@@ -28,6 +28,11 @@
   
   .swipeable-container.bottom {
     height: 50%; /* Adjust height for better visibility */
+    border-bottom: 1px solid #ddd; /* Add a divider between top and bottom */
+  }
+
+  .swipeable-container.shoes {
+    height: 50%; /* Adjust height for better visibility */
   }
   
   .swipeable-container img {
