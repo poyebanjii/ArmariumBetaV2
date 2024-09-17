@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
@@ -10,7 +10,63 @@ function Suggestions() {
   const [event, setEvent] = useState('');
   const [theme, setTheme] = useState('');
   const [color, setColor] = useState('');
+  const [temperature, setTemperature] = useState('');
+  const [weatherDesc, setWeatherDesc] = useState('');
+  
   const navigate = useNavigate();
+  
+  const fetchWeatherData = async () => {
+    const apiKey = '03ed7d11f60f0f23724d9e14dae193ea';
+    const successCallback = async (position) => {
+      const { latitude, longitude } = position.coords;
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=imperial`;
+
+      try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const data = await response.json();
+        console.log('Weather Data:', data);
+
+        const weather = {
+          temperature: data.main.temp,
+          description: data.weather[0].description,
+          city: data.name,
+          country: data.sys.country
+        };
+
+        // For debugging.
+        console.log(`Current weather in ${weather.city}, ${weather.country}:`);
+        console.log(`Temperature: ${weather.temperature}°C`);
+        console.log(`Description: ${weather.description}`);
+
+        setTemperature(weather.temperature)
+        setWeatherDesc(weather.description)
+  
+
+      }
+      catch (error) {
+        console.error('Error fetching data:', error);
+      }
+      
+    }
+    const errorCallback = (error) => {
+      console.error('Error getting location:', error);
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
+  }
+
+  useEffect(() => {
+    fetchWeatherData();
+}, []);
 
   const handleConfirmSubmit = async (e) => {
     e.preventDefault();
@@ -28,6 +84,8 @@ function Suggestions() {
         event,
         theme,
         color,
+        weather: weatherDesc,
+        temperature: temperature,
         timestamp: new Date()
       });
       console.log('Suggestion submitted successfully');
