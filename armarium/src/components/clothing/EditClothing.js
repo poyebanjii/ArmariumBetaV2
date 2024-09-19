@@ -99,6 +99,11 @@ const EditClothing = () => {
     };
 
     const handleUpdateTitle = async () => {
+        if (newTitle.trim() === '') {
+            alert("Title cannot be empty")
+            return; 
+        }
+
         let clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId); // as default so it won't yell at me.
         if (type == 'top') {
             clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId);

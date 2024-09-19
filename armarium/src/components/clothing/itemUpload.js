@@ -124,6 +124,7 @@ const ItemUpload = () => {
         placeholder="Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        required
       />
       <br />
       <input
@@ -131,6 +132,7 @@ const ItemUpload = () => {
         placeholder="Tags (comma separated)"
         value={tags}
         onChange={(e) => setTags(e.target.value)}
+        required
       />
       <br />
       <input
@@ -138,6 +140,7 @@ const ItemUpload = () => {
         placeholder="Color"
         value={color}
         onChange={(e) => setColor(e.target.value)}
+        required
       />
       <br />
       <button onClick={handleUpload}>Upload</button>

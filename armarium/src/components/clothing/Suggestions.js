@@ -16,7 +16,7 @@ function Suggestions() {
   const navigate = useNavigate();
   
   const fetchWeatherData = async () => {
-    const apiKey = '03ed7d11f60f0f23724d9e14dae193ea';
+    const apiKey = '03ed7d11f60f0f23724d9e14dae193ea'; // Gotta put this in an env file (hidden place)
     const successCallback = async (position) => {
       const { latitude, longitude } = position.coords;
       const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=imperial`;
