@@ -18,6 +18,7 @@ import Brands from './Questionare/Brands';
 import Styles from './Questionare/Styles';
 import Ocassions from './Questionare/Ocassions';
 import EditClothing from './clothing/EditClothing';
+import Outfits from './clothing/Outfits';
 
 /**
  * The routers for linking to different pages.
@@ -45,6 +46,7 @@ function App() {
         <Route path="/occasions" element={<Ocassions />}/>
         <Route path="/login" element={<Login />}/>
         <Route path="/editClothing/:clothingId/:type" element={<EditClothing />}/>
+        <Route path="/wardrobeOutfits/:userId" element={<Outfits />}/>
       </Routes>
     </Router>
   );
