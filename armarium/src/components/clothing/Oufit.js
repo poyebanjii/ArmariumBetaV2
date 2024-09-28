@@ -5,7 +5,7 @@ import Navbar from '../Navbar';
 import { collection, getDocs,addDoc,getFirestore } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAuth } from 'firebase/auth';
-import { db, storage } from '../backend/firebaseConfig';
+import { auth, db, storage } from '../backend/firebaseConfig';
 
 /**
  * The swipeable component for tops and bottoms
@@ -118,7 +118,7 @@ function Outfit() {
       }
     }
     fetchData();
-  }, []);
+  }, [auth]);
 
   const handleSwipeTop = (direction) => {
     if (!isLocked.top && !isLocked.all && tops.length > 1) {
@@ -179,14 +179,18 @@ function Outfit() {
       await uploadBytes(bottomImageRef, await fetch(bottomImage).then(r => r.blob()));
       const bottomImageUrl = await getDownloadURL(bottomImageRef);
 
+      const shoesImage = shoes[shoesIndex];
+      const shoesImageRef = ref(storage, `Users/${user.uid}/shoes/${Date.now()}_${shoesIndex}.jpg`);
+      await uploadBytes(shoesImageRef, await fetch(shoesImage).then(r => r.blob()));
+      const shoesImageUrl = await getDownloadURL(shoesImageRef);
+
       await addDoc(collection(db, `Users/${user.uid}/Outfits`), {
         topImageUrl,
         bottomImageUrl,
+        shoesImageUrl,
         timestamp: new Date()
       });
 
-      console.log('Top Image URL:', topImageUrl);
-      console.log('Bottom Image URL:', bottomImageUrl);
     
       // Store URLs in Firestore
     
