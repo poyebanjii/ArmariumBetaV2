@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../backend/firebaseConfig';
+import { db, auth } from '../backend/firebaseConfig';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
@@ -31,11 +31,12 @@ const Wardrobe = () => {
     //TODO: ADD IN REFRESH FOR LATER & SAVE THE TAB (TOP OR BOTTOM) INTO LOCAL STORAGE.
     // ALSO ADD IN A LOADING ANIMATION AT SOMEPOINT
     useEffect(() => {
+        const user = auth.currentUser;
         const fetchData = async () => {
             await new Promise(resolve => setTimeout(resolve, DELAY));
 
             if (tops.length === 0) { 
-                const topsCollection = await getDocs(collection(db, 'ItemsCollection/top/items'));
+                const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`)); //`Users/${user.uid}/ItemsCollection/top/items`
                 const topsData = topsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -81,8 +82,8 @@ const Wardrobe = () => {
         for (let { id, type } of clothesToDelete) {
             const itemDoc = doc(db, `ItemsCollection/${type}/items`, id);
             await deleteDoc(itemDoc);
-
-            if (type === 'top') {
+            
+            if (type === 'top') {                                                                                                                                                                               
                 setTops(tops.filter((item) => item.id !== id));
             }
             else if (type === 'bottom') {
