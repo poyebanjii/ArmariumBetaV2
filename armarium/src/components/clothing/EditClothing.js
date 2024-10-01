@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../backend/firebaseConfig';
+import { db, auth } from '../backend/firebaseConfig';
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import Navbar from '../Navbar';
@@ -14,9 +14,10 @@ const EditClothing = () => {
     const [newTitle, setNewTitle] = useState(''); 
 
     useEffect(() => {
+        const user = auth.currentUser;
         const fetchData = async () => {
             if (type == 'top') {
-                const clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId);
+                const clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/top/items`, clothingId);
                 const clothingData = await getDoc(clothingDoc);
     
                 if (clothingData.exists()) {

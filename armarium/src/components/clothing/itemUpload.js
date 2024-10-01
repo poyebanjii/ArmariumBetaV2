@@ -25,6 +25,7 @@ const ItemUpload = () => {
       console.error('User is not authenticated');
       return;
     }
+    const user = auth.currentUser;
 
     if (image) {
       const storageRef = ref(storage, `images/${image.name}`);
@@ -46,7 +47,7 @@ const ItemUpload = () => {
             setUrl(url);
             removeBackground(url).then((bgRemoveUrl) => {
               const itemId = `${itemType}-${new Date().getTime()}`;
-              addDoc(collection(db, `ItemsCollection/${itemType}/items`), {
+              addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${itemType}/items`), {
                 url: bgRemoveUrl || url,
                 title: title,
                 tags: tags.split(',').map(tag => tag.trim()),

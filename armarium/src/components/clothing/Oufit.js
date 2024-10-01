@@ -95,12 +95,13 @@ function Outfit() {
   const [shoes, setShoes] = useState([]);
   const [isLocked, setIsLocked] = useState({ top: false, bottom: false, shoes: false, all: false });
   const DELAY = 650;
+  const user = auth.currentUser;
 
   useEffect(() => {
     const fetchData = async () => {
       await new Promise(resolve => setTimeout(resolve, DELAY));
       if (tops.length === 0) {
-        const topsCollection = await getDocs(collection(db, 'ItemsCollection/top/items'));
+        const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
         const topsData = topsCollection.docs.map(doc => doc.data().url); 
         setTops(topsData);
       }
