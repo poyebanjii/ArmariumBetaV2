@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../backend/firebaseConfig';
+import { onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
@@ -15,8 +16,9 @@ const Wardrobe = () => {
     const [clothesToDelete, setClothesToDelete] = useState([]);
     const [searchInput, setSearchInput] = useState("");
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
     const DELAY = 750;
-
+    
     const filteredClothes = (clothes) => {
         return clothes.filter(clothing => 
           clothing.title && clothing.title.toLowerCase().includes(searchInput.toLowerCase())
@@ -30,13 +32,12 @@ const Wardrobe = () => {
 
     //TODO: ADD IN REFRESH FOR LATER & SAVE THE TAB (TOP OR BOTTOM) INTO LOCAL STORAGE.
     // ALSO ADD IN A LOADING ANIMATION AT SOMEPOINT
-    useEffect(() => {
-        const user = auth.currentUser;
-        const fetchData = async () => {
+    const fetchData = async (user) => {
+        try {
             await new Promise(resolve => setTimeout(resolve, DELAY));
 
             if (tops.length === 0) { 
-                const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`)); //`Users/${user.uid}/ItemsCollection/top/items`
+                const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
                 const topsData = topsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -47,7 +48,7 @@ const Wardrobe = () => {
             }
 
             if (bottoms.length === 0) { 
-                const bottomsCollection = await getDocs(collection(db, 'ItemsCollection/bottom/items'));
+                const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
                 const bottomsData = bottomsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -58,7 +59,7 @@ const Wardrobe = () => {
             }
 
             if (shoes.length === 0) { 
-                const shoesCollection = await getDocs(collection(db, 'ItemsCollection/shoes/items'));
+                const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
                 const shoesData = shoesCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -67,12 +68,26 @@ const Wardrobe = () => {
                 console.log(shoesData);
                 setShoes(shoesData);
             }
-        };
-        
-        fetchData();
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchData(user).then(() => setLoading(false));
+            } else {
+                navigate('/login'); 
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
+
     const handleDelete = async (id, type) => {
+        const user = auth.currentUser;
         if (!clothesToDelete.length) {
             alert("No item has been selected.");
             return;
@@ -80,7 +95,7 @@ const Wardrobe = () => {
 
         await new Promise(resolve => setTimeout(resolve, DELAY));
         for (let { id, type } of clothesToDelete) {
-            const itemDoc = doc(db, `ItemsCollection/${type}/items`, id);
+            const itemDoc = doc(db, `Users/${user.uid}/ItemsCollection/${type}/items`, id);
             await deleteDoc(itemDoc);
             
             if (type === 'top') {                                                                                                                                                                               
