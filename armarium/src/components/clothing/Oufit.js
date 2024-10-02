@@ -4,8 +4,9 @@ import '../styles/Outfits.css';
 import Navbar from '../Navbar';
 import { collection, getDocs,addDoc,getFirestore } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { auth, db, storage } from '../backend/firebaseConfig';
+import { useNavigate } from 'react-router-dom';
 
 /**
  * The swipeable component for tops and bottoms
@@ -96,8 +97,10 @@ function Outfit() {
   const [isLocked, setIsLocked] = useState({ top: false, bottom: false, shoes: false, all: false });
   const DELAY = 650;
   const user = auth.currentUser;
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchData = async () => {
       await new Promise(resolve => setTimeout(resolve, DELAY));
       if (tops.length === 0) {
@@ -107,19 +110,52 @@ function Outfit() {
       }
 
       if (bottoms.length === 0) {
-        const bottomsCollection = await getDocs(collection(db, 'ItemsCollection/bottom/items'));
+        const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
         const bottomsData = bottomsCollection.docs.map(doc => doc.data().url); 
         setBottoms(bottomsData);
       }
 
       if (shoes.length === 0) {
-        const shoesCollection = await getDocs(collection(db, 'ItemsCollection/shoes/items'));
+        const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
         const shoesData = shoesCollection.docs.map(doc => doc.data().url); 
         setShoes(shoesData);
       }
     }
     fetchData();
-  }, [auth]);
+  }, [auth]);*/
+
+  const fetchData = async (user) => {
+    await new Promise(resolve => setTimeout(resolve, DELAY));
+    if (tops.length === 0) {
+      const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
+      const topsData = topsCollection.docs.map(doc => doc.data().url); 
+      setTops(topsData);
+    }
+
+    if (bottoms.length === 0) {
+      const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
+      const bottomsData = bottomsCollection.docs.map(doc => doc.data().url); 
+      setBottoms(bottomsData);
+    }
+
+    if (shoes.length === 0) {
+      const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
+      const shoesData = shoesCollection.docs.map(doc => doc.data().url); 
+      setShoes(shoesData);
+    }
+  }
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+            fetchData(user).then(() => setLoading(false));
+        } else {
+            navigate('/login'); // Ensure you have a login route
+        }
+    });
+
+    return () => unsubscribe();
+}, []);
 
   const handleSwipeTop = (direction) => {
     if (!isLocked.top && !isLocked.all && tops.length > 1) {

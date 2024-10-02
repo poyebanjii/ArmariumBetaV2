@@ -34,7 +34,7 @@ const EditClothing = () => {
                 }
             }
             else if (type == 'bottom') {
-                const clothingDoc = doc(db, 'ItemsCollection/bottom/items', clothingId);
+                const clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottom/items`, clothingId);
                 const clothingData = await getDoc(clothingDoc);
     
                 if (clothingData.exists()) {
@@ -51,7 +51,7 @@ const EditClothing = () => {
                 }
             }
             else if (type == 'shoes') {
-                const clothingDoc = doc(db, 'ItemsCollection/shoes/items', clothingId);
+                const clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/shoes/items`, clothingId);
                 const clothingData = await getDoc(clothingDoc);
     
                 if (clothingData.exists()) {
