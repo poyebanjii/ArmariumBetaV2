@@ -22,18 +22,18 @@ const Wardrobe = () => {
     const DELAY = 750;
     
     const filteredClothes = (clothes) => {
-        return clothes.filter(clothing => 
-          clothing.title && clothing.title.toLowerCase().includes(searchInput.toLowerCase())
-        );
+        return clothes.filter(clothing => {
+            const matchesTitle = clothing.title && clothing.title.toLowerCase().includes(searchInput.toLowerCase());
+            const matchesTags = clothing.tags && clothing.tags.some(tag => tag.toLowerCase().includes(searchInput.toLowerCase()));
+            return matchesTitle || matchesTags;
+        });
     };
 
     const displayedClothes = isTop ? filteredClothes(tops) :
                          isBottom ? filteredClothes(bottoms) :
                          isShoes ? filteredClothes(shoes) :
                          [];
-
-    //TODO: ADD IN REFRESH FOR LATER & SAVE THE TAB (TOP OR BOTTOM) INTO LOCAL STORAGE.
-    // ALSO ADD IN A LOADING ANIMATION AT SOMEPOINT
+                         
     const fetchData = async (user) => {
         try {
             await new Promise(resolve => setTimeout(resolve, DELAY));
@@ -43,6 +43,7 @@ const Wardrobe = () => {
                 const topsData = topsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
+                    tags: doc.data().tags,
                     url: doc.data().url
                 }));
                 console.log(topsData);
@@ -54,6 +55,7 @@ const Wardrobe = () => {
                 const bottomsData = bottomsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
+                    tags: doc.data().tags,
                     url: doc.data().url
                 }));
                 console.log(bottomsData);
@@ -65,6 +67,7 @@ const Wardrobe = () => {
                 const shoesData = shoesCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
+                    tags: doc.data().tags,
                     url: doc.data().url
                 }));
                 console.log(shoesData);
