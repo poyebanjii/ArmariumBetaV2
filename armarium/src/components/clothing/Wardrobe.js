@@ -4,6 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
+import '../styles/Loading.css';
 
 const Wardrobe = () => {
     const [tops, setTops] = useState([]);
@@ -17,6 +18,7 @@ const Wardrobe = () => {
     const [searchInput, setSearchInput] = useState("");
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const DELAY = 750;
     
     const filteredClothes = (clothes) => {
@@ -69,6 +71,8 @@ const Wardrobe = () => {
                 setShoes(shoesData);
             }
         } catch (error) {
+            setError(error);
+            setLoading(false);
             console.error("Error fetching data:", error);
         }
     };
@@ -161,6 +165,14 @@ const Wardrobe = () => {
     const handleSearchChange = (e) => {
         const inputValue = e.target.value.toLowerCase();
         setSearchInput(inputValue);
+    }
+
+    if (loading) {
+        return <div><Navbar /> <div className="loader"></div></div>;
+    }
+
+    if (error) {
+        return <div><Navbar /> Error: {error.message}</div>;
     }
 
     return (

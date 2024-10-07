@@ -99,6 +99,7 @@ function Outfit() {
   const user = auth.currentUser;
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
   /*useEffect(() => {
     const fetchData = async () => {
@@ -190,6 +191,9 @@ function Outfit() {
       console.log('New Shoes:', shoesIndex);
     }
   };
+
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
   const saveOutfit = async () => {
     const auth = getAuth();
