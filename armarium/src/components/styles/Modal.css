@@ -1,0 +1,66 @@
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1050; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    background-color: rgba(0, 0, 0, 0.5); /* Dim the background */
+  }
+
+  .d-block {
+    display: block;
+  }
+  
+  .d-none {
+    display: none;
+  }
+  
+  .modal-dialog {
+    position: relative;
+    margin: auto;
+    top: 20%;
+    max-width: 500px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .modal-body {
+    margin-top: 10px;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+  }
+  
+  .btn-close {
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+  }
+  
+  .btn-close:hover {
+    color: red;
+    cursor: pointer;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }

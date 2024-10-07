@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation } from "framer-motion"; 
 import '../styles/Outfits.css';
+import '../styles/Modal.css';
 import Navbar from '../Navbar';
 import { collection, getDocs,addDoc,getFirestore } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -100,30 +101,7 @@ function Outfit() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-
-  /*useEffect(() => {
-    const fetchData = async () => {
-      await new Promise(resolve => setTimeout(resolve, DELAY));
-      if (tops.length === 0) {
-        const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
-        const topsData = topsCollection.docs.map(doc => doc.data().url); 
-        setTops(topsData);
-      }
-
-      if (bottoms.length === 0) {
-        const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
-        const bottomsData = bottomsCollection.docs.map(doc => doc.data().url); 
-        setBottoms(bottomsData);
-      }
-
-      if (shoes.length === 0) {
-        const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
-        const shoesData = shoesCollection.docs.map(doc => doc.data().url); 
-        setShoes(shoesData);
-      }
-    }
-    fetchData();
-  }, [auth]);*/
+  const [outfitName, setOutfitName] = useState('');
 
   const fetchData = async (user) => {
     await new Promise(resolve => setTimeout(resolve, DELAY));
@@ -192,9 +170,6 @@ function Outfit() {
     }
   };
 
-  const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
-
   const saveOutfit = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -229,6 +204,7 @@ function Outfit() {
         topImageUrl,
         bottomImageUrl,
         shoesImageUrl,
+        outfitName,
         timestamp: new Date()
       });
 
@@ -237,6 +213,8 @@ function Outfit() {
     
       console.log('Outfit saved successfully');
       alert('Outfit saved successfully!');
+      setShowModal(false);
+      setOutfitName('');
     } catch (error) {
       console.error('Error saving outfit:', error);
       alert('Error saving outfit. Please try again.');
@@ -254,8 +232,6 @@ function Outfit() {
         setBottomIndex((prevIndex) => (prevIndex - 1 + bottoms.length) % bottoms.length);
         setShoesIndex((prevIndex) => (prevIndex + 1) % shoes.length);
       }
-      console.log('New Bottoms:', bottomIndex);
-      console.log('New1');
     }
   }
 
@@ -286,67 +262,89 @@ function Outfit() {
     });
   };
 
-  return ( 
-    <div>
-      <Navbar />
-      <div className='App'> 
-      <h1>Outfits</h1>
-      <button onClick={toggleOneLock}>
-        {isLocked.all ? 'Unlock All' : 'Lock All'}
-      </button>
-      <br></br>
-      <button onClick={toggleLockTop} disabled={isLocked.all}>
-        {isLocked.top ? 'Unlock Top' : 'Lock Top'}
-      </button>
-      <div className="outfit-card">
-        <div className="swipeable-container top">
-          <SwipeableImage 
-            key={topIndex}
-            image={tops[topIndex]} 
-            handleSwipe={handleSwipeTop} 
-            isLocked={isLocked.top}
-            isAllLocked={isLocked.all}
-            handleSwipeAll={handleSwipeAll}
-            itemLength={tops.length} 
-          />
-          </div>
-        <div className="swipeable-container bottom">
-          <SwipeableImage 
-            key={bottomIndex}
-            image={bottoms[bottomIndex]} 
-            handleSwipe={handleSwipeBottom} 
-            isLocked={isLocked.bottom}
-            isAllLocked={isLocked.all}
-            handleSwipeAll={handleSwipeAll}
-            itemLength={bottoms.length} 
-          />
-        </div>
-        <div className="swipeable-container bottom">
-      <SwipeableImage 
-        key={shoesIndex}
-        image={shoes[shoesIndex]} 
-        handleSwipe={handleSwipeShoes} 
-        isLocked={isLocked.shoes}
-        isAllLocked={isLocked.all}
-        handleSwipeAll={handleSwipeAll}
-        itemLength={shoes.length} 
-      />
-      </div>
-      </div>
-      <br></br>
-      <button onClick={toggleLockBottom} disabled={isLocked.all}>
-        {isLocked.bottom ? 'Unlock Bottom' : 'Lock Bottom'}
-      </button>
-      <br></br>
-      <button onClick={toggleLockShoes} disabled={isLocked.all}>
-        {isLocked.shoes ? 'Unlock Shoes' : 'Lock Shoes'}
-      </button>
+  return (
+    <>
       <div>
-        <button onClick={saveOutfit}>Save Outfit</button>
+        <Navbar />
+        <div className="App">
+          <h1>Outfits</h1>
+          <button onClick={toggleOneLock}>
+            {isLocked.all ? 'Unlock All' : 'Lock All'}
+          </button>
+          <br />
+          <button onClick={toggleLockTop} disabled={isLocked.all}>
+            {isLocked.top ? 'Unlock Top' : 'Lock Top'}
+          </button>
+          <div className="outfit-card">
+            <div className="swipeable-container top">
+              <SwipeableImage
+                key={topIndex}
+                image={tops[topIndex]}
+                handleSwipe={handleSwipeTop}
+                isLocked={isLocked.top}
+                isAllLocked={isLocked.all}
+                handleSwipeAll={handleSwipeAll}
+                itemLength={tops.length}
+              />
+            </div>
+            <div className="swipeable-container bottom">
+              <SwipeableImage
+                key={bottomIndex}
+                image={bottoms[bottomIndex]}
+                handleSwipe={handleSwipeBottom}
+                isLocked={isLocked.bottom}
+                isAllLocked={isLocked.all}
+                handleSwipeAll={handleSwipeAll}
+                itemLength={bottoms.length}
+              />
+            </div>
+            <div className="swipeable-container bottom">
+              <SwipeableImage
+                key={shoesIndex}
+                image={shoes[shoesIndex]}
+                handleSwipe={handleSwipeShoes}
+                isLocked={isLocked.shoes}
+                isAllLocked={isLocked.all}
+                handleSwipeAll={handleSwipeAll}
+                itemLength={shoes.length}
+              />
+            </div>
+          </div>
+          <br />
+          <button onClick={toggleLockBottom} disabled={isLocked.all}>
+            {isLocked.bottom ? 'Unlock Bottom' : 'Lock Bottom'}
+          </button>
+          <br />
+          <button onClick={toggleLockShoes} disabled={isLocked.all}>
+            {isLocked.shoes ? 'Unlock Shoes' : 'Lock Shoes'}
+          </button>
+          <div>
+            <button onClick={() => setShowModal(true)}>Save Outfit</button>
+          </div>
+        </div>
       </div>
-    </div> 
+
+      <div className={`modal ${showModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">
+  <div className="modal-dialog">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h5 className="modal-title">Save Outfit</h5>
+        <button type="button" className="btn-close" onClick={() => setShowModal(false)}>×</button>
+      </div>
+      <div className="modal-body">
+        <p>Are you sure you want to save this outfit?</p>
+        <input type="text" className="form-control" placeholder="Outfit name" value={outfitName}  onChange={(e) => setOutfitName(e.target.value)}/>
+      </div>
+      <div className="modal-footer">
+        <button type="button" className="btn btn-danger" onClick={saveOutfit}>Yes</button>
+        <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>No</button>
+      </div>
     </div>
-  ); 
+  </div>
+</div>
+
+    </>
+  );
 }
 
 export default Outfit;
