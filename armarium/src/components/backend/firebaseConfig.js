@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { getAuth , signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth , signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from 'firebase/auth';
 
 const firebaseConfig = {
     apiKey: "AIzaSyC7BCbxCDv-Bj7rIo-UbRcGB2CWq1DDCYU",
@@ -19,4 +19,12 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
-export { db,storage, auth, signInWithEmailAndPassword};
+
+setPersistence(auth, browserLocalPersistence) 
+  .then(() => {
+    console.log('Firebase Auth persistence set to local');
+  })
+  .catch((error) => {
+    console.error('Error setting persistence:', error);
+  });
+export { db, storage, auth, signInWithEmailAndPassword};

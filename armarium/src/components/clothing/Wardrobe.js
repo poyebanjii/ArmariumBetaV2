@@ -183,7 +183,7 @@ const Wardrobe = () => {
             <Navbar />
             <input 
                 type="text" 
-                placeholder="Search..." 
+                placeholder="Search by title or tags..." 
                 value={searchInput} 
                 onChange={handleSearchChange} 
             />
