@@ -40,11 +40,13 @@ function Navbar() {
                 Home
               </NavLink>
             </li>
+            {/*
             <li className="nav-item">
               <NavLink className="nav-link" to="/suggestions" end>
                 Outfit
               </NavLink>
             </li>
+            */}
             <li className="nav-item">
               <NavLink className="nav-link" to="/itemUpload" end>
                 Upload
@@ -63,7 +65,6 @@ function Navbar() {
                 Sign Out
               </button>
             </li>
-
           </ul>
         </div>
       </div>
