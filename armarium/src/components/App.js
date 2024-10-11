@@ -19,6 +19,7 @@ import Styles from './Questionare/Styles';
 import Ocassions from './Questionare/Ocassions';
 import EditClothing from './clothing/EditClothing';
 import Outfits from './clothing/Outfits';
+import ProtectedRoute from './ProtectedRoute';
 
 /**
  * The routers for linking to different pages.
@@ -28,25 +29,28 @@ function App() {
   return (
     <Router>
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />}/>
-        <Route path="/new-password" element={<NewPassword />}/>
-        <Route path="/clothes-swipe" element={<Tinder />}/>
-        <Route path="/outfits" element={<Outfit />}/>
-        <Route path="/suggestions" element={<Suggestions />}/>
-        <Route path="/profileSettings" element={<ProfileSettings />}/>
-        <Route path="/imageUpload" element={<ImageUpload />}/>
-        <Route path="/itemUpload" element={<ItemUpload />}/>
-        <Route path="/userInfo" element={<UserInfo />}/>
-        <Route path="/wardrobe" element={<Wardrobe />}/>
-        <Route path="/heightAndWeight" element={<HeightAndWeight />}/>
-        <Route path="/brands" element={<Brands />}/>
-        <Route path="/styles" element={<Styles />}/>
-        <Route path="/occasions" element={<Ocassions />}/>
-        <Route path="/login" element={<Login />}/>
-        <Route path="/editClothing/:clothingId/:type" element={<EditClothing />}/>
-        <Route path="/wardrobeOutfits/:userId" element={<Outfits />}/>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/new-password" element={<NewPassword />} />
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected Routes */}
+        <Route path="/clothes-swipe" element={<ProtectedRoute element={<Tinder />} />} />
+        <Route path="/outfits" element={<ProtectedRoute element={<Outfit />} />} />
+        <Route path="/suggestions" element={<ProtectedRoute element={<Suggestions />} />} />
+        <Route path="/profileSettings" element={<ProtectedRoute element={<ProfileSettings />} />} />
+        <Route path="/imageUpload" element={<ProtectedRoute element={<ImageUpload />} />} />
+        <Route path="/itemUpload" element={<ProtectedRoute element={<ItemUpload />} />} />
+        <Route path="/userInfo" element={<ProtectedRoute element={<UserInfo />} />} />
+        <Route path="/wardrobe" element={<ProtectedRoute element={<Wardrobe />} />} />
+        <Route path="/heightAndWeight" element={<ProtectedRoute element={<HeightAndWeight />} />} />
+        <Route path="/brands" element={<ProtectedRoute element={<Brands />} />} />
+        <Route path="/styles" element={<ProtectedRoute element={<Styles />} />} />
+        <Route path="/occasions" element={<ProtectedRoute element={<Ocassions />} />} />
+        <Route path="/editClothing/:clothingId/:type" element={<ProtectedRoute element={<EditClothing />} />} />
+        <Route path="/wardrobeOutfits/:userId" element={<ProtectedRoute element={<Outfits />} />} />
       </Routes>
     </Router>
   );
