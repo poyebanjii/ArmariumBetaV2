@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import '../styles/App.css';
 
 // NOTE: This is currently just the setup for this page until
@@ -25,13 +26,24 @@ function ForgotPassword() {
   */
   const navigate = useNavigate();
 
+  const [message, setMessage] = useState('');
+
   /**
    * Handles how the confirm button functions.
    * @param {*} e 
    */
-  const handleConfirmSubmit = (e) => {
+  const handleConfirmSubmit = async (e) => {
     e.preventDefault();
-    navigate('/new-password');
+    const auth = getAuth();
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert("Recovery email sent!. Check your inbox");
+      navigate('/login');
+    }
+    catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -47,19 +59,8 @@ function ForgotPassword() {
           />
         </label>
         <br />
-        <label>
-          Recovery Code:
-          <input
-            type="password"
-            value={recoverCode}
-            onChange={(e) => setRecoverCode(e.target.value)}
-            required
-          />
-        </label>
         <br />
         <button className="confirmButton" onClick={handleConfirmSubmit}>Confirm</button>
-        <br />
-        <p>Send Code</p>
       </div>
   );
 }
