@@ -12,6 +12,155 @@ const ItemUpload = () => {
   const [title, setTitle] = useState("");
   const [color, setColor] = useState("");
   const [itemType, setItemType] = useState("top");
+
+  const handleChange = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = () => {
+    if (!auth.currentUser) {
+      console.error('User is not authenticated');
+      return;
+    }
+    const user = auth.currentUser;
+
+    if (image) {
+      const storageRef = ref(storage, `images/${image.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, image);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setProgress(progress);
+        },
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            setUrl(url);
+            const itemId = `${itemType}-${new Date().getTime()}`;
+            addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${itemType}/items`), {
+              url: url,
+              title: title,
+              tags: tags.split(',').map(tag => tag.trim()),
+              brand: brand,
+              size: size,
+              type: type,
+              occasion: occasion,
+              color: color,
+              itemId: itemId,
+              createdAt: serverTimestamp(),
+            });
+          });
+        }
+      );
+    }
+  };
+
+  return (
+    <div>
+      <Navbar />
+      <div className="App">
+        <h2>Upload an Item</h2>
+        <progress value={progress} max="100" />
+        <br />
+        <input type="file" onChange={handleChange} />
+        <br />
+        <select onChange={(e) => setItemType(e.target.value)} value={itemType}>
+          <option value="top">Top</option>
+          <option value="bottom">Bottom</option>
+          <option value="shoes">Shoes</option>
+        </select>
+        <br />
+        <br />
+        <br />
+        <input
+          type="text"
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="Tags (comma separated)"
+          value={tags}
+          onChange={(e) => setTags(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="Brand"
+          value={brand}
+          onChange={(e) => setBrand(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="Size"
+          value={size}
+          onChange={(e) => setSize(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="Type (e.g., Shirt, Pants)"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="Occasion (e.g., Casual, Formal)"
+          value={occasion}
+          onChange={(e) => setOccasion(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="text"
+          placeholder="Color"
+          value={color}
+          onChange={(e) => setColor(e.target.value)}
+          required
+        />
+        <br />
+        <button onClick={handleUpload}>Upload</button>
+        <br />
+        {url && <img src={url} alt="Uploaded" style={{ width: "300px" }} />}
+      </div>
+    </div>
+  );
+};
+
+export default ItemUpload;
+
+// Old code that will be used once funding happens.
+/*import React, { useState } from 'react';
+import { storage, db, auth } from '../backend/firebaseConfig';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import Navbar from '../Navbar';
+
+const ItemUpload = () => {
+  const [image, setImage] = useState(null);
+  const [url, setUrl] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [tags, setTags] = useState("");
+  const [title, setTitle] = useState("");
+  const [color, setColor] = useState("");
+  const [itemType, setItemType] = useState("top");
   const [bgRemove, setBgRemove] = useState(null);
 
   const handleChange = (e) => {
@@ -152,4 +301,4 @@ const ItemUpload = () => {
   );
 };
 
-export default ItemUpload;
+export default ItemUpload;*/
