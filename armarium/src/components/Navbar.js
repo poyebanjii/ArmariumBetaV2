@@ -36,7 +36,7 @@ function Navbar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <NavLink className="nav-link" to="/outfits" end>
+              <NavLink className="nav-link" id="home-link" to="/outfits" end>
                 Home
               </NavLink>
             </li>
@@ -48,12 +48,13 @@ function Navbar() {
             </li>
             */}
             <li className="nav-item">
-              <NavLink className="nav-link" to="/itemUpload" end>
+              <NavLink className="nav-link" id="upload-link" to="/itemUpload" end>
                 Upload
               </NavLink>
             </li>
             <li
               className="nav-item dropdown"
+              id="wardrobe-link"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
@@ -61,7 +62,7 @@ function Navbar() {
               {isDropdownVisible && <Dropdown />}
             </li>
             <li className="nav-item">
-              <button className="nav-link btn btn-link" onClick={handleLogout}>
+              <button className="nav-link btn btn-link" id="signout-button" onClick={handleLogout}>
                 Sign Out
               </button>
             </li>

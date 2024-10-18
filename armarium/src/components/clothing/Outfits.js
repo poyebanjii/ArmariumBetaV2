@@ -40,6 +40,7 @@ function Outfits() {
     });
 };
 
+
 const handleSearchChange = (e) => {
   const inputValue = e.target.value.toLowerCase();
   setSearchInput(inputValue);

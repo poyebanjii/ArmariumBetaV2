@@ -3,11 +3,12 @@ import { motion, useMotionValue, useTransform, useAnimation } from "framer-motio
 import '../styles/Outfits.css';
 import '../styles/Modal.css';
 import Navbar from '../Navbar';
-import { collection, getDocs,addDoc,getFirestore } from 'firebase/firestore';
+import { collection, getDoc, getDocs,addDoc,getFirestore, doc, updateDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { auth, db, storage } from '../backend/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
+import Joyride from 'react-joyride';
 
 /**
  * The swipeable component for tops and bottoms
@@ -102,6 +103,41 @@ function Outfit() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [outfitName, setOutfitName] = useState('');
+  const [runTour, setRunTour] = useState(false);
+  const [steps, setSteps] = useState([
+    {
+      target: '.navbar', 
+      content: 'This is the navigation bar where you can access the pages.',
+    },
+    {
+      target: '#home-link', 
+      content: 'This is the Home page where you can swipe through clothing items and save outfits.',
+    },
+    {
+      target: '#homepage', 
+      content: 'This is the main area where you can browse and create outfits by swiping left or right on the clothing items.',
+    },
+    {
+      target: '#.swipeable-container.top', 
+      content: 'Swipe left or right to browse through the clothing item. Each clothing item has one.'
+    },
+    {
+      target: '#lockbutton',
+      content: 'Each clothing item has a lock button, locking it means it will not change/swipe.',
+    },
+    {
+      target: '#lockall',
+      content: 'This button enables all clothing items to change when swipping.',
+    },
+    {
+      target: '#save',
+      content: 'Once you’ve chosen your outfit, click here to save it.',
+    },
+    {
+      target: '#signout-button',
+      content: 'Click here to sign out of your account.',
+    },
+  ]);
 
   const fetchData = async (user) => {
     await new Promise(resolve => setTimeout(resolve, DELAY));
@@ -123,18 +159,6 @@ function Outfit() {
       setShoes(shoesData);
     }
   }
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-            fetchData(user).then(() => setLoading(false));
-        } else {
-            navigate('/login'); // Ensure you have a login route
-        }
-    });
-
-    return () => unsubscribe();
-}, []);
 
   const handleSwipeTop = (direction) => {
     if (!isLocked.top && !isLocked.all && tops.length > 1) {
@@ -169,6 +193,29 @@ function Outfit() {
       console.log('New Shoes:', shoesIndex);
     }
   };
+
+  const checkNewUser = async (user) => {
+    const userDocRef = doc(db, 'Users', user.uid);
+    const userSnapshot = await getDoc(userDocRef);
+    
+    if (userSnapshot.exists() && userSnapshot.data().isNewUser) {
+      setRunTour(true); // Run the tutorial
+      await updateDoc(userDocRef, { isNewUser: false }); // Mark tutorial as complete
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+            fetchData(user).then(() => setLoading(false));
+            fetchData(user).then(() => checkNewUser(user));
+        } else {
+            navigate('/login'); // Ensure you have a login route
+        }
+    });
+
+    return () => unsubscribe();
+}, []);
 
   const saveOutfit = async () => {
     const auth = getAuth();
@@ -266,15 +313,18 @@ function Outfit() {
     <>
       <div>
         <Navbar />
-        <div className="App">
+        <div className="App" id="homepage">
           <h1>Outfits</h1>
-          <button onClick={toggleOneLock}>
+          <button onClick={toggleOneLock} id="lockall">
             {isLocked.all ? 'Unlock All' : 'Lock All'}
           </button>
+  
           <br />
-          <button onClick={toggleLockTop} disabled={isLocked.all}>
+  
+          <button onClick={toggleLockTop} id='lockbutton' disabled={isLocked.all}>
             {isLocked.top ? 'Unlock Top' : 'Lock Top'}
           </button>
+  
           <div className="outfit-card">
             <div className="swipeable-container top">
               <SwipeableImage
@@ -287,6 +337,7 @@ function Outfit() {
                 itemLength={tops.length}
               />
             </div>
+  
             <div className="swipeable-container bottom">
               <SwipeableImage
                 key={bottomIndex}
@@ -298,6 +349,7 @@ function Outfit() {
                 itemLength={bottoms.length}
               />
             </div>
+  
             <div className="swipeable-container bottom">
               <SwipeableImage
                 key={shoesIndex}
@@ -310,39 +362,66 @@ function Outfit() {
               />
             </div>
           </div>
+  
           <br />
+  
           <button onClick={toggleLockBottom} disabled={isLocked.all}>
             {isLocked.bottom ? 'Unlock Bottom' : 'Lock Bottom'}
           </button>
+  
           <br />
+  
           <button onClick={toggleLockShoes} disabled={isLocked.all}>
             {isLocked.shoes ? 'Unlock Shoes' : 'Lock Shoes'}
           </button>
+  
           <div>
-            <button onClick={() => setShowModal(true)}>Save Outfit</button>
+            <button onClick={() => setShowModal(true)} id="save">Save Outfit</button>
           </div>
         </div>
       </div>
-
+  
+      {/* Modal for saving outfit */}
       <div className={`modal ${showModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">
-  <div className="modal-dialog">
-    <div className="modal-content">
-      <div className="modal-header">
-        <h5 className="modal-title">Save Outfit</h5>
-        <button type="button" className="btn-close" onClick={() => setShowModal(false)}>×</button>
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Save Outfit</h5>
+              <button type="button" className="btn-close" onClick={() => setShowModal(false)}>×</button>
+            </div>
+  
+            <div className="modal-body">
+              <p>Are you sure you want to save this outfit?</p>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Outfit name"
+                value={outfitName}
+                onChange={(e) => setOutfitName(e.target.value)}
+              />
+            </div>
+  
+            <div className="modal-footer">
+              <button type="button" className="btn btn-danger" onClick={saveOutfit}>Yes</button>
+              <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>No</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div className="modal-body">
-        <p>Are you sure you want to save this outfit?</p>
-        <input type="text" className="form-control" placeholder="Outfit name" value={outfitName}  onChange={(e) => setOutfitName(e.target.value)}/>
-      </div>
-      <div className="modal-footer">
-        <button type="button" className="btn btn-danger" onClick={saveOutfit}>Yes</button>
-        <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>No</button>
-      </div>
-    </div>
-  </div>
-</div>
-
+  
+      {/* Joyride tutorial */}
+      <Joyride
+        steps={steps}
+        run={runTour}
+        continuous={true}
+        showProgress={true}
+        showSkipButton={true}
+        callback={(data) => {
+          if (data.status === 'finished' || data.status === 'skipped') {
+            setRunTour(false); // Stop the tour when finished or skipped
+          }
+        }}
+      />
     </>
   );
 }

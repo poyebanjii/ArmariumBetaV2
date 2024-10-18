@@ -68,7 +68,8 @@ function Register() {
         email,
         dateOfBirth,
         phoneNumber,
-        accountSetup: false // Initialize accountSetup as false
+        accountSetup: false, // Initialize accountSetup as false
+        isNewUser: true
       });
 
       console.log('User registered successfully');
