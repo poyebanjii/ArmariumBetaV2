@@ -134,8 +134,8 @@ function Outfit() {
       content: 'Once you’ve chosen your outfit, click here to save it.',
     },
     {
-      target: '#signout-button',
-      content: 'Click here to sign out of your account.',
+      target: '#upload-link',
+      content: 'Lets go to the upload page to learn how to upload an clothing item.',
     },
   ]);
 
@@ -200,8 +200,17 @@ function Outfit() {
     
     if (userSnapshot.exists() && userSnapshot.data().isNewUser) {
       setRunTour(true); // Run the tutorial
+      //await updateDoc(userDocRef, { isNewUser: false }); // Mark tutorial as complete
+    }
+  };
+
+  const finishTour = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDocRef = doc(db, 'Users', user.uid);
       await updateDoc(userDocRef, { isNewUser: false }); // Mark tutorial as complete
     }
+    setRunTour(false); // Stop the tutorial
   };
 
   useEffect(() => {
@@ -417,8 +426,11 @@ function Outfit() {
         showProgress={true}
         showSkipButton={true}
         callback={(data) => {
-          if (data.status === 'finished' || data.status === 'skipped') {
-            setRunTour(false); // Stop the tour when finished or skipped
+          if (data.status === 'finished' || data.status === 'skipped') { 
+            navigate('/itemUpload')
+          }
+          else if (data.status == 'skipped') {
+            finishTour();
           }
         }}
       />
