@@ -4,6 +4,7 @@ import { db } from '../backend/firebaseConfig';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
+import '../styles/Outfits2.css'; 
 
 function Outfits() {
   const [outfits, setOutfits] = useState([]);
@@ -12,6 +13,7 @@ function Outfits() {
   const [searchInput, setSearchInput] = useState("");
   const [isDelete, setIsDelete] = useState(false);
   const [outfitToDelete, setOutfitToDelete] = useState([]);
+  const [title, setTitle] = useState('');
   const navigate = useNavigate();
   const DELAY = 750;
 
@@ -26,6 +28,7 @@ function Outfits() {
         ...doc.data(),
       }));
       setOutfits(outfitsList);
+      setTitle(querySnapshot.outfitName);
       console.log(outfitsList)
     } else {
       console.log("No user logged in");
@@ -127,6 +130,7 @@ return (
         filteredOutfits().map((outfit) => (
           <li key={outfit.id} className="outfit-item">
             <div className="image-container">
+              <h1>{outfit.outfitName}</h1>
               <img 
                 src={outfit.topImageUrl} 
                 alt="Top"
