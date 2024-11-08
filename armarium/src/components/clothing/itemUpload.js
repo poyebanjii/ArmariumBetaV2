@@ -109,7 +109,7 @@ const ItemUpload = () => {
   }, []);
 
   const removeBackground = async (imageUrl) => {
-    const apiKey = "izMQbubK4NUk3p24uQn9kBvP"; // At some point this should be in a hidden place. 
+    const apiKey = "Q2oKPAsWNRasDXwLHrZGcEe2"; // At some point this should be in a hidden place. 
     const apiUrl = "https://api.remove.bg/v1.0/removebg";
 
     const formData = new FormData();
