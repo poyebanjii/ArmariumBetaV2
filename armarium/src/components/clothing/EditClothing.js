@@ -77,15 +77,23 @@ const EditClothing = () => {
 
     // Perhaps they can be merged
     const handleUpdateTags = async () => {
-        let clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId); // as default so it won't yell at me.
-        if (type == 'top') {
-            clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId);
+        const user = auth.currentUser; // Ensure `user` is defined
+        if (!user) {
+            console.error("User is not authenticated");
+            return;
         }
-        else if (type == 'bottom') {
-            clothingDoc = doc(db, 'ItemsCollection/bottom/items', clothingId);
-        }
-        else if (type == 'shoes') {
-            clothingDoc = doc(db, 'ItemsCollection/shoes/items', clothingId);
+
+        
+        let clothingDoc;
+        if (type === 'top') {
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/top/items`, clothingId);
+        } else if (type === 'bottom') {
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottom/items`, clothingId);
+        } else if (type === 'shoes') {
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/shoes/items`, clothingId);
+        } else {
+            console.error("Invalid type provided");
+            return;
         }
         const tagsArray = newTags.split(',').map(tag => tag.trim());
         const uniqueTags = Array.from(new Set(tagsArray));
@@ -100,20 +108,28 @@ const EditClothing = () => {
     };
 
     const handleUpdateTitle = async () => {
+        const user = auth.currentUser; // Ensure `user` is defined
+        if (!user) {
+            console.error("User is not authenticated");
+            return;
+        }
+
+        
         if (newTitle.trim() === '') {
             alert("Title cannot be empty")
             return; 
         }
 
-        let clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId); // as default so it won't yell at me.
-        if (type == 'top') {
-            clothingDoc = doc(db, 'ItemsCollection/top/items', clothingId);
-        }
-        else if (type == 'bottom') {
-            clothingDoc = doc(db, 'ItemsCollection/bottom/items', clothingId);
-        }
-        else if (type == 'shoes') {
-            clothingDoc = doc(db, 'ItemsCollection/shoes/items', clothingId);
+        let clothingDoc;
+        if (type === 'top') {
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/top/items`, clothingId);
+        } else if (type === 'bottom') {
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottom/items`, clothingId);
+        } else if (type === 'shoes') {
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/shoes/items`, clothingId);
+        } else {
+            console.error("Invalid type provided");
+            return;
         }
 
         await updateDoc(clothingDoc, { title: newTitle });
