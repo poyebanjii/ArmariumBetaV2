@@ -1,6 +1,7 @@
 // Old code that will be used once funding happens.
 import React, { useState, useEffect } from 'react';
-import { storage, db, auth } from '../backend/firebaseConfig';
+import { storage, db, auth, analytics } from '../backend/firebaseConfig';
+import { logEvent } from 'firebase/analytics';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { collection, addDoc, getDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import Navbar from '../Navbar';
@@ -47,11 +48,11 @@ const ItemUpload = () => {
       return;
     }
     const user = auth.currentUser;
-
+  
     if (image) {
       const storageRef = ref(storage, `images/${image.name}`);
       const uploadTask = uploadBytesResumable(storageRef, image);
-
+  
       uploadTask.on(
         "state_changed",
         (snapshot) => {
@@ -75,8 +76,18 @@ const ItemUpload = () => {
                 color: color,
                 itemId: itemId,
                 createdAt: serverTimestamp(),
+              }).then(() => {
+                logEvent(analytics, 'item_uploaded', {
+                  item_type: itemType,
+                  title: title,
+                  color: color,
+                  tags: tags.split(',').map(tag => tag.trim()),
+                });
+                console.log('Item uploaded and event logged');
+              }).catch((error) => {
+                console.error('Error logging event:', error);
               });
-            })
+            });
           });
         }
       );
@@ -162,6 +173,7 @@ const ItemUpload = () => {
           <option value="top">Top</option>
           <option value="bottom">Bottom</option>
           <option value="shoes">Shoes</option>
+          <option value="toplayer">Top Layer</option>
         </select>
         <br />
         <br />
