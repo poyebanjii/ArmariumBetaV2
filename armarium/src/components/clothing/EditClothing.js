@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { db, auth } from '../backend/firebaseConfig';
+import { db, auth, analytics } from '../backend/firebaseConfig';
+import { logEvent } from 'firebase/analytics';
 import { getDoc, doc, updateDoc } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import Navbar from '../Navbar';
@@ -101,6 +102,13 @@ const EditClothing = () => {
 
         setTags(uniqueTags);
         setNewTags(uniqueTags.join(', '));
+
+        console.log('Logging event: tags_updated', { clothing_id: clothingId, type, new_tags: uniqueTags });
+        logEvent(analytics, 'tags_updated', {
+            clothing_id: clothingId,
+            type: type,
+            new_tags: uniqueTags,
+        });
     }
 
     const handleTitleChange = (e) => {
@@ -136,6 +144,12 @@ const EditClothing = () => {
 
         setTitle(newTitle);
         setNewTitle(newTitle);
+
+        logEvent(analytics, 'title_updated', {
+            clothing_id: clothingId,
+            type: type,
+            new_title: newTitle,
+        });
     }
 
     return (

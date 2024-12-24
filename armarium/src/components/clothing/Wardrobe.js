@@ -10,9 +10,11 @@ const Wardrobe = () => {
     const [tops, setTops] = useState([]);
     const [bottoms, setBottoms] = useState([]);
     const [shoes, setShoes] = useState([]);
+    const [topLayers, setTopLayers] = useState([]);
     const [isTop, setIsTop] = useState(true);
     const [isBottom, setIsBottom] = useState(false);
     const [isShoes, setIsShoes] = useState(false);
+    const [isTopLayer, setIsTopLayer] = useState(false);
     const [isDelete, setIsDelete] = useState(false);
     const [clothesToDelete, setClothesToDelete] = useState([]);
     const [searchInput, setSearchInput] = useState("");
@@ -32,6 +34,7 @@ const Wardrobe = () => {
     const displayedClothes = isTop ? filteredClothes(tops) :
                          isBottom ? filteredClothes(bottoms) :
                          isShoes ? filteredClothes(shoes) :
+                         isTopLayer ? filteredClothes(topLayers) :
                          [];
                          
     const fetchData = async (user) => {
@@ -73,6 +76,19 @@ const Wardrobe = () => {
                 console.log(shoesData);
                 setShoes(shoesData);
             }
+
+            if (topLayers.length === 0) { 
+                const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/toplayer/items`));
+                const topLayerData = topLayersCollection.docs.map(doc => ({
+                    id: doc.id,
+                    title: doc.data().title,
+                    tags: doc.data().tags,
+                    url: doc.data().url
+                }));
+                console.log("TOP", topLayerData);
+                setTopLayers(topLayerData);
+            }
+
         } catch (error) {
             setError(error);
             setLoading(false);
@@ -114,6 +130,9 @@ const Wardrobe = () => {
             else if (type === 'shoes') {
                 setShoes(shoes.filter((item) => item.id !== id));
             }
+            else if (type === 'toplayer') {
+                setTopLayers(topLayers.filter((item) => item.id !== id));
+            }
         }
 
         setClothesToDelete([]);
@@ -144,18 +163,28 @@ const Wardrobe = () => {
         setIsTop(true);
         setIsBottom(false);
         setIsShoes(false);
+        setIsTopLayer(false);
     };
 
     const handleShowBottoms = () => {
         setIsTop(false);
         setIsBottom(true);
         setIsShoes(false);
+        setIsTopLayer(false);
     };
 
     const handleShowShoes = () => {
         setIsTop(false);
         setIsBottom(false);
         setIsShoes(true);
+        setIsTopLayer(false);
+    };
+
+    const handleShowTopLayers = () => {
+        setIsTop(false);
+        setIsBottom(false);
+        setIsShoes(false);
+        setIsTopLayer(true);
     };
 
     const toggleDelete = () => {
@@ -195,6 +224,9 @@ const Wardrobe = () => {
             </NavLink>
             <NavLink onClick={handleShowShoes} style={{ marginRight: '10px', cursor: 'pointer' }}>
                 Shoes
+            </NavLink>
+            <NavLink onClick={handleShowTopLayers} style={{ marginRight: '10px', cursor: 'pointer' }}>
+                Top Layer
             </NavLink>
             <button onClick={toggleDelete}>
                 {isDelete ? 'Cancel' : 'Delete'}
@@ -295,6 +327,38 @@ const Wardrobe = () => {
                                 }}
                             >
                                 {clothesToDelete.some(item => item.id === shoe.id) ? 'Remove' : 'Select'}
+                            </button>
+                        )}
+                    </div>
+                ))}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {isTopLayer && displayedClothes.map((toplayer, index) => (
+                    <div key={toplayer.id} style={{ position: 'relative' }}>
+                        <img 
+                            src={toplayer.url} 
+                            alt={`TopLayer ${index + 1}`} 
+                            style={{ 
+                                width: '150px', 
+                                height: 'auto', 
+                                border: clothesToDelete.some(item => item.id === toplayer.id) ? '2px solid red' : 'none'
+                            }}
+                            onClick={() => handleDeleteClick({ id: toplayer.id, type: 'toplayer' })}
+                        />
+                        {isDelete && (
+                            <button
+                                onClick={() => addToDeleteList({ id: toplayer.id, type: 'toplayer' })}
+                                style={{
+                                    position: 'absolute',
+                                    top: '5px',
+                                    right: '5px',
+                                    backgroundColor: 'red',
+                                    color: 'white',
+                                    border: 'none',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                {clothesToDelete.some(item => item.id === toplayer.id) ? 'Remove' : 'Select'}
                             </button>
                         )}
                     </div>
