@@ -116,11 +116,12 @@ function Register() {
         </label>
         <br />
         <label>
-          Phone Number (optional):
+          Phone Number:
           <input
             type="tel"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            required
           />
         </label>
         <br />

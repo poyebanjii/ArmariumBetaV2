@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth, analytics } from '../backend/firebaseConfig';
 import { logEvent } from 'firebase/analytics';
-import { getDoc, doc, updateDoc } from 'firebase/firestore';
+import { getDoc, doc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import Navbar from '../Navbar';
 
@@ -13,6 +13,7 @@ const EditClothing = () => {
     const [newTags, setNewTags] = useState(''); 
     const [title, setTitle] = useState('');
     const [newTitle, setNewTitle] = useState(''); 
+    const [newType, setNewType] = useState(type);
 
     useEffect(() => {
         const user = auth.currentUser;
@@ -68,6 +69,23 @@ const EditClothing = () => {
                     console.log("DNF");
                 }
             }
+            else if (type == 'toplayer') {
+                const clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/toplayer/items`, clothingId);
+                const clothingData = await getDoc(clothingDoc);
+    
+                if (clothingData.exists()) {
+                    const data = clothingData.data();
+                    console.log(clothingData.data());
+                    setImage(data.url);
+                    setTags(data.tags);
+                    setNewTags(data.tags.join(', '));
+                    setTitle(data.title);
+                    setNewTitle(data.title);
+                }
+                else {
+                    console.log("DNF");
+                }
+            }
         };
         fetchData();
     }, [clothingId])
@@ -96,6 +114,7 @@ const EditClothing = () => {
             console.error("Invalid type provided");
             return;
         }
+        console.log("clothiing doc:", clothingDoc)
         const tagsArray = newTags.split(',').map(tag => tag.trim());
         const uniqueTags = Array.from(new Set(tagsArray));
         await updateDoc(clothingDoc, { tags: uniqueTags });
@@ -152,6 +171,40 @@ const EditClothing = () => {
         });
     }
 
+    const handleTypeChange = async (e) => {
+        setNewType(e.target.value);
+    };
+
+    const handleUpdateType = async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            console.error('User is not authenticated');
+            return;
+        }
+
+        if (newType === type) {
+            alert('Selected type is the same as the current type');
+            return;
+        }
+
+        const currentDoc = doc(db, `Users/${user.uid}/ItemsCollection/${type}/items`, clothingId);
+        const newDoc = doc(db, `Users/${user.uid}/ItemsCollection/${newType}/items`, clothingId);
+
+        const clothingData = await getDoc(currentDoc);
+        if (!clothingData.exists()) {
+            console.error('Clothing item not found in the current collection');
+            return;
+        }
+
+        // Move document to the new collection
+        await setDoc(newDoc, clothingData.data());
+        await deleteDoc(currentDoc);
+
+        setNewType(newType);
+        logEvent(analytics, 'type_updated', { clothing_id: clothingId, old_type: type, new_type: newType });
+        alert('Clothing type updated successfully');
+    };
+
     return (
         <div>
             <Navbar />
@@ -187,6 +240,16 @@ const EditClothing = () => {
                         onChange={handleTitleChange}
                     />
                     <button onClick={handleUpdateTitle}>Update Title</button>
+                </div>
+                <div>
+                    <h3>Change Clothing Type</h3>
+                    <select value={newType} onChange={handleTypeChange}>
+                        <option value="top">Top</option>
+                        <option value="bottom">Bottom</option>
+                        <option value="shoes">Shoes</option>
+                        <option value="toplayer">Top Layer</option>
+                    </select>
+                    <button onClick={handleUpdateType}>Update Type</button>
                 </div>
             </div>
         </div>

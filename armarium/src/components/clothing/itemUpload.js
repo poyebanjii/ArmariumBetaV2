@@ -143,6 +143,14 @@ const ItemUpload = () => {
       const storageRef = ref(storage, `images/bg-removed-${image.name}`);
       const uploadTask = uploadBytesResumable(storageRef, data);
 
+      // Alert
+      if (res.status === 402) {
+        alert("You've run out of Remove.bg credits. Please add more credits or switch to an alternative API.");
+        return null;
+      } else if (!res.ok) {
+        throw new Error(`API error: ${res.statusText}`);
+      }
+
       return new Promise((resolve, reject) => {
         uploadTask.on(
           "state_changed",
