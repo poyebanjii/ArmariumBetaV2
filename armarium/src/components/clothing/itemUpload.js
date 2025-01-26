@@ -120,37 +120,66 @@ const ItemUpload = () => {
   }, []);
 
   const removeBackground = async (imageUrl) => {
-    const apiKey = "izMQbubK4NUk3p24uQn9kBvP"; // At some point this should be in a hidden place. 
+    const apiKey = "izMQbubK4NUk3p24uQn9kBvP"; // Consider moving this to a secure location (e.g., environment variables)
     const apiUrl = "https://api.remove.bg/v1.0/removebg";
-
-    const formData = new FormData();
-    formData.append("image_url", imageUrl);
-    formData.append("size", "auto");
-
+    const accountUrl = "https://api.remove.bg/v1.0/account";
+  
+    // Check account credits
     try {
-      const res = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-              'X-Api-Key': apiKey
-          },
-          body: formData
+      const accountRes = await fetch(accountUrl, {
+        method: "GET",
+        headers: {
+          "X-Api-Key": apiKey,
+        },
       });
-
+  
+      if (!accountRes.ok) {
+        throw new Error("Failed to fetch account info.");
+      }
+  
+      const accountData = await accountRes.json();
+      const { total_credits, total_credits_used } = accountData.data.attributes;
+      const remainingCredits = total_credits - total_credits_used;
+  
+      // Alert if half of the credits are used
+      if (remainingCredits <= total_credits / 2) {
+        alert("Warning: You've used more than half of your Remove.bg credits.");
+      }
+  
+      if (remainingCredits <= 0) {
+        alert("You've run out of Remove.bg credits. Please add more credits.");
+        return null;
+      }
+  
+      // Proceed with background removal
+      const formData = new FormData();
+      formData.append("image_url", imageUrl);
+      formData.append("size", "auto");
+  
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "X-Api-Key": apiKey,
+        },
+        body: formData,
+      });
+  
+      if (res.status === 402) {
+        alert("You've run out of Remove.bg credits. Please add more credits.");
+        return null;
+      }
+  
+      if (!res.ok) {
+        throw new Error(`API error: ${res.statusText}`);
+      }
+  
       const data = await res.blob();
       const bgRemovedImageUrl = URL.createObjectURL(data);
       setBgRemove(bgRemovedImageUrl);
-
+  
       const storageRef = ref(storage, `images/bg-removed-${image.name}`);
       const uploadTask = uploadBytesResumable(storageRef, data);
-
-      // Alert
-      if (res.status === 402) {
-        alert("You've run out of Remove.bg credits. Please add more credits or switch to an alternative API.");
-        return null;
-      } else if (!res.ok) {
-        throw new Error(`API error: ${res.statusText}`);
-      }
-
+  
       return new Promise((resolve, reject) => {
         uploadTask.on(
           "state_changed",
@@ -161,9 +190,8 @@ const ItemUpload = () => {
           }
         );
       });
-
     } catch (error) {
-      console.log(error);
+      console.error(error);
       return null;
     }
   };
