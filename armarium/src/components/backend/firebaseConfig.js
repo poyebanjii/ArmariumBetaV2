@@ -5,15 +5,14 @@ import { getAnalytics } from 'firebase/analytics';
 import { getAuth , signInWithEmailAndPassword, setPersistence, browserLocalPersistence } from 'firebase/auth';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyC7BCbxCDv-Bj7rIo-UbRcGB2CWq1DDCYU",
-    authDomain: "armarium-6e5c2.firebaseapp.com",
-    databaseURL: "https://armarium-6e5c2-default-rtdb.firebaseio.com",
-    projectId: "armarium-6e5c2",
-    storageBucket: "armarium-6e5c2.appspot.com",
-    messagingSenderId: "1063159983320",
-    appId: "1:1063159983320:web:94d01bc6a0d9c5ba243bad",
-    measurementId: "G-QD9ZNLJ2D5"
-  };
+  apiKey: "AIzaSyA2Aik6r6OkxNb2dRwNqK5ySt1ObqRLaUU",
+  authDomain: "armarium-mvp-v2.firebaseapp.com",
+  projectId: "armarium-mvp-v2",
+  storageBucket: "armarium-mvp-v2.firebasestorage.app",
+  messagingSenderId: "1040040253196",
+  appId: "1:1040040253196:web:85f0bd3b94f71c0670db29",
+  measurementId: "G-22GSC3RPHN"
+};
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
