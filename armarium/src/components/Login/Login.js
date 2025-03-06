@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; 
+import SplashScreen from './SplashScreen';
 import '../styles/App.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Simulate loading time
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+  }, []);
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -44,34 +53,40 @@ function Login() {
 
   return (
     <div className="App">
-      <h2>ARMARIUM</h2>
-      <form onSubmit={handleLoginSubmit}>
-        <label>
-          Email:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <label>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <button type="submit">Login</button>
-      </form>
-      <br />
-      <Link to="/forgot-password">Forgot Password</Link>
-      <br />
-      <Link to="/register">Register</Link>
+      {loading ? (
+        <SplashScreen />
+      ) : (
+        <>
+          <h2>ARMARIUM</h2>
+          <form onSubmit={handleLoginSubmit}>
+            <label>
+              Email:
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </label>
+            <br />
+            <label>
+              Password:
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </label>
+            <br />
+            <button type="submit">Login</button>
+          </form>
+          <br />
+          <Link to="/forgot-password">Forgot Password</Link>
+          <br />
+          <Link to="/register">Register</Link>
+        </>
+      )}
     </div>
   );
 }
