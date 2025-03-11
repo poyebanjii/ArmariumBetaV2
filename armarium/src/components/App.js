@@ -6,7 +6,7 @@ import Register from './Login/Register';
 import ForgotPassword from './Login/ForgotPassowrd';
 import NewPassword from './Login/NewPassowrd';
 import Tinder from './clothing/Tinder';
-import Outfit from './clothing/Oufit';
+import Outfit from './clothing/Outfit';
 import Suggestions from './clothing/Suggestions';
 import ProfileSettings from './profile/ProfileSettings';
 import ImageUpload from './clothing/imageUpload';
