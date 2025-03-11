@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "armarium-e6655",
+    "default": "armarium-mvp-v2",
     "armarium": "armarium-e6655",
     "arm": "armarium-website"
   },
