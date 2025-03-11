@@ -8,11 +8,11 @@ jobs:
   build_and_preview:
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    env: 
+      CI: false 
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          echo "CI=false" >> $GITHUB_ENV
-          cd armarium && npm ci && npm run build
+      - run: cd armarium && npm ci && npm run build
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
