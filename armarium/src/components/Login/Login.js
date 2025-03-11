@@ -4,6 +4,7 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; 
 import '../styles/App.css';
+import '../styles/Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -43,35 +44,38 @@ function Login() {
   };
 
   return (
-    <div className="App">
-      <h2>ARMARIUM</h2>
-      <form onSubmit={handleLoginSubmit}>
-        <label>
-          Email:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <label>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <button type="submit">Login</button>
-      </form>
-      <br />
-      <Link to="/forgot-password">Forgot Password</Link>
-      <br />
-      <Link to="/register">Register</Link>
+    <div className="login-container">
+      <div className="logo">
+        <div className="logo-text">ARMARIUM</div>
+      </div>
+      <div className="login-box">
+        <form onSubmit={handleLoginSubmit}>
+          <div className="input-group">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="login-button">Sign in</button>
+        </form>
+        <div className="links">
+          <Link to="/forgot-password">Forgot Password</Link>
+          <Link to="/register">Register</Link>
+        </div>
+      </div>
+      <div className="footer-logo">A</div>
     </div>
   );
 }
