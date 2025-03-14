@@ -142,19 +142,19 @@ function Outfit() {
   const fetchData = async (user) => {
     await new Promise(resolve => setTimeout(resolve, DELAY));
     if (tops.length === 0) {
-      const topsCollection = await getDocs(collection(db, `Users/${user.uid}/tops/items`));
+      const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
       const topsData = topsCollection.docs.map(doc => doc.data().url); 
       setTops(topsData);
     }
 
     if (bottoms.length === 0) {
-      const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/bottoms/items`));
+      const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
       const bottomsData = bottomsCollection.docs.map(doc => doc.data().url); 
       setBottoms(bottomsData);
     }
 
     if (shoes.length === 0) {
-      const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/shoes/items`));
+      const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
       const shoesData = shoesCollection.docs.map(doc => doc.data().url); 
       setShoes(shoesData);
     }
