@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation } from "framer-motion"; 
-import '../styles/Outfits.css';
+import '../styles/CreateAOutfit.css';
 import '../styles/Modal.css';
 import Navbar from '../Navbar';
 import { collection, getDoc, getDocs,addDoc,getFirestore, doc, updateDoc } from 'firebase/firestore';
