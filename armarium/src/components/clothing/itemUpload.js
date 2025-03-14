@@ -8,7 +8,10 @@ import Navbar from '../Navbar';
 import Joyride from 'react-joyride';
 
 const ItemUpload = () => {
-  const [image, setImage] = useState(null);
+  const [items, setItems] = useState([
+    { file: null, title: '', tags: '', color: '', type: '', preview: null },
+  ]);
+  const [images, setImages] = useState([]);
   const [url, setUrl] = useState("");
   const [progress, setProgress] = useState(0);
   const [tags, setTags] = useState("");
@@ -36,62 +39,147 @@ const ItemUpload = () => {
     },
   ]);
 
-  const handleChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
+  const handleFileChange = (index, file) => {
+    const updatedItems = [...items];
+    updatedItems[index].file = file;
+    updatedItems[index].preview = URL.createObjectURL(file);
+    setItems(updatedItems);
   };
 
-  const handleUpload = () => {
+  // const handleChange = (e) => {
+  //   if (e.target.files[0]) {
+  //     setImages(e.target.files[0]);
+  //   }
+  // };
+
+  // const handleChange = (e) => {
+  //   if (e.target.files) {
+  //     setImages(Array.from(e.target.files)); // Convert FileList to an array
+  //   }
+  // };
+
+  const handleInputChange = (index, field, value) => {
+    const updatedItems = [...items];
+    updatedItems[index][field] = value;
+    setItems(updatedItems);
+  };
+
+  const addNewItem = () => {
+    setItems([...items, { file: null, title: '', tags: '', color: '', type: '', preview: null }]);
+  };
+
+  // const handleUpload = () => {
+  //   if (!auth.currentUser) {
+  //     console.error('User is not authenticated');
+  //     return;
+  //   }
+  //   const user = auth.currentUser;
+  
+  //   if (image) {
+  //     const storageRef = ref(storage, `images/${image.name}`);
+  //     const uploadTask = uploadBytesResumable(storageRef, image);
+  
+  //     uploadTask.on(
+  //       "state_changed",
+  //       (snapshot) => {
+  //         const progress = Math.round(
+  //           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+  //         );
+  //         setProgress(progress);
+  //       },
+  //       (error) => {
+  //         console.log(error);
+  //       },
+  //       () => {
+  //         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+  //           setUrl(url);
+  //           removeBackground(url).then((bgRemoveUrl) => {
+  //             const itemId = `${itemType}-${new Date().getTime()}`;
+  //             addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${itemType}/items`), {
+  //               url: bgRemoveUrl || url,
+  //               title: title,
+  //               tags: tags.split(',').map(tag => tag.trim()),
+  //               color: color,
+  //               itemId: itemId,
+  //               createdAt: serverTimestamp(),
+  //             }).then(() => {
+  //               logEvent(analytics, 'item_uploaded', {
+  //                 item_type: itemType,
+  //                 title: title,
+  //                 color: color,
+  //                 tags: tags.split(',').map(tag => tag.trim()),
+  //               });
+  //               console.log('Item uploaded and event logged');
+  //             }).catch((error) => {
+  //               console.error('Error logging event:', error);
+  //             });
+  //           });
+  //         });
+  //       }
+  //     );
+  //   }
+  // };
+
+  const handleUpload = async () => {
     if (!auth.currentUser) {
       console.error('User is not authenticated');
       return;
     }
     const user = auth.currentUser;
-  
-    if (image) {
-      const storageRef = ref(storage, `images/${image.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, image);
-  
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-          setProgress(progress);
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            setUrl(url);
-            removeBackground(url).then((bgRemoveUrl) => {
-              const itemId = `${itemType}-${new Date().getTime()}`;
-              addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${itemType}/items`), {
-                url: bgRemoveUrl || url,
-                title: title,
-                tags: tags.split(',').map(tag => tag.trim()),
-                color: color,
-                itemId: itemId,
+
+    const uploadPromises = items.map((item, index) => {
+      if (!item.file) {
+        console.error(`Item ${index + 1} is missing a file.`);
+        return Promise.resolve(); // Skip this item
+      }
+
+      if (!item.type) {
+        console.error(`Item ${index + 1} is missing a type.`);
+        return Promise.resolve(); // Skip this item
+      }
+
+      const storageRef = ref(storage, `images/${item.file.name}`);
+      const uploadTask = uploadBytesResumable(storageRef, item.file);
+
+      return new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progressValue = Math.round(
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            );
+            setProgress((prev) => ({
+              ...prev,
+              [item.file.name]: progressValue,
+            }));
+          },
+          (error) => {
+            console.error(error);
+            reject(error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+              addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${item.type}/items`), {
+                url: url,
+                title: item.title,
+                tags: item.tags.split(',').map((tag) => tag.trim()),
+                color: item.color,
                 createdAt: serverTimestamp(),
-              }).then(() => {
-                logEvent(analytics, 'item_uploaded', {
-                  item_type: itemType,
-                  title: title,
-                  color: color,
-                  tags: tags.split(',').map(tag => tag.trim()),
-                });
-                console.log('Item uploaded and event logged');
-              }).catch((error) => {
-                console.error('Error logging event:', error);
-              });
+              }).then(() => resolve(url));
             });
-          });
-        }
-      );
-    }
+          }
+        );
+      });
+    });
+
+    Promise.all(uploadPromises)
+      .then(() => {
+        console.log('All items uploaded successfully');
+        alert('All items uploaded successfully!');
+      })
+      .catch((error) => {
+        console.error('Error uploading items:', error);
+      });
   };
 
   const checkNewUser = async (user) => {
@@ -177,7 +265,7 @@ const ItemUpload = () => {
       const bgRemovedImageUrl = URL.createObjectURL(data);
       setBgRemove(bgRemovedImageUrl);
   
-      const storageRef = ref(storage, `images/bg-removed-${image.name}`);
+      const storageRef = ref(storage, `images/bg-removed-${images.name}`);
       const uploadTask = uploadBytesResumable(storageRef, data);
   
       return new Promise((resolve, reject) => {
@@ -200,48 +288,65 @@ const ItemUpload = () => {
     <div>
       <Navbar />
       <div className="App">
-        <h2>Upload an Item</h2>
-        <progress value={progress} max="100" />
-        <br />
-        <input type="file" id="choosefile" onChange={handleChange} required />
-        <br />
-        <select onChange={(e) => setItemType(e.target.value)} id="selecttype" value={itemType}>
-          <option value="top">Top</option>
-          <option value="bottom">Bottom</option>
-          <option value="shoes">Shoes</option>
-          <option value="toplayer">Top Layer</option>
-        </select>
-        <br />
-        <br />
-        <br />
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          id = "textinput"
-          required
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="Tags (comma separated)"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          required
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="Color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-          required
-        />
-        <br />
-        <button onClick={handleUpload} id="uploadbutton">Upload</button>
-        <br />
-        {url && <img src={bgRemove || url} alt="Uploaded" style={{ width: "300px" }} />}
+        {/* <h2>Upload an Item</h2>
+        <progress value={progress} max="100" /> */}
+        <h2>Upload Items</h2>
+        {items.map((item, index) => (
+        <div key={index} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '10px' }}>
+          <input
+            type="file"
+            onChange={(e) => handleFileChange(index, e.target.files[0])}
+            required
+          />
+          {item.preview && (
+            <div>
+              <img
+                src={item.preview}
+                alt="Preview"
+                style={{ width: '100px', height: 'auto', marginTop: '10px' }}
+              />
+            </div>
+          )}
+          <select
+            value={item.type}
+            onChange={(e) => handleInputChange(index, 'type', e.target.value)}
+            required
+          >
+            <option value="" disabled>
+              Select Type
+            </option>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="shoes">Shoes</option>
+            <option value="toplayer">Top Layer</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Title"
+            value={item.title}
+            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Tags (comma separated)"
+            value={item.tags}
+            onChange={(e) => handleInputChange(index, 'tags', e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Color"
+            value={item.color}
+            onChange={(e) => handleInputChange(index, 'color', e.target.value)}
+            required
+          />
+        </div>
+      ))}
+      <button onClick={addNewItem} style={{ marginBottom: '20px' }}>
+        + Add Another Item
+      </button>
+      <button onClick={handleUpload}>Upload All</button>
       </div>
       {/* Joyride tutorial */}
       <Joyride
