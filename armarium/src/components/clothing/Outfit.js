@@ -243,8 +243,6 @@ function Outfit() {
       await uploadBytes(topImageRef, await fetch(topImage).then(r => r.blob()));
       const topImageUrl = await getDownloadURL(topImageRef);
       
-      
-      
       // Upload bottom image
       const bottomImage = bottoms[bottomIndex];
       const bottomImageRef = ref(storage, `Users/${user.uid}/bottoms/${Date.now()}_${bottomIndex}.jpg`);

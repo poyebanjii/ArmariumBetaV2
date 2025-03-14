@@ -42,7 +42,7 @@ const Wardrobe = () => {
             await new Promise(resolve => setTimeout(resolve, DELAY));
 
             if (tops.length === 0) { 
-                const topsCollection = await getDocs(collection(db, `Users/${user.uid}/top/items`));
+                const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
                 const topsData = topsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -55,7 +55,7 @@ const Wardrobe = () => {
             }
 
             if (bottoms.length === 0) { 
-                const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/bottom/items`));
+                const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
                 const bottomsData = bottomsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -67,7 +67,7 @@ const Wardrobe = () => {
             }
 
             if (shoes.length === 0) { 
-                const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/shoes/items`));
+                const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
                 const shoesData = shoesCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -79,7 +79,7 @@ const Wardrobe = () => {
             }
 
             if (topLayers.length === 0) { 
-                const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}//toplayer/items`));
+                const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/toplayer/items`));
                 const topLayerData = topLayersCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -119,7 +119,7 @@ const Wardrobe = () => {
 
         await new Promise(resolve => setTimeout(resolve, DELAY));
         for (let { id, type } of clothesToDelete) {
-            const itemDoc = doc(db, `Users/${user.uid}//${type}/items`, id);
+            const itemDoc = doc(db, `Users/${user.uid}/ItemsCollection/${type}/items`, id);
             await deleteDoc(itemDoc);
             
             if (type === 'top') {                                                                                                                                                                               
