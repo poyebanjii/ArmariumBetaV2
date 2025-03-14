@@ -84,27 +84,13 @@
   
   .links a {
     display: block;
-    margin: 5px 0;
+    margin-top: 20px;
     color: #a52a2a;
     text-decoration: none;
+    transition: color 0.3s;
   }
   
   .links a:hover {
     text-decoration: underline;
   }
   
-  .footer-logo {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background-color: #228b22;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 1.5em;
-  }

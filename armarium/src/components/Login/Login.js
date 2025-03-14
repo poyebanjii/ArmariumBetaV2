@@ -18,7 +18,7 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('User logged in successfully');
-      alert('Login successful!');
+      //alert('Login successful!');
 
       // Check the accountSetup status
       const user = auth.currentUser;
@@ -75,7 +75,6 @@ function Login() {
           <Link to="/register">Register</Link>
         </div>
       </div>
-      <div className="footer-logo">A</div>
     </div>
   );
 }
