@@ -19,7 +19,7 @@ const EditClothing = () => {
         const user = auth.currentUser;
         const fetchData = async () => {
             if (type == 'top') {
-                const clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/tops/items`, clothingId);
+                const clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/top/items`, clothingId);
                 const clothingData = await getDoc(clothingDoc);
     
                 if (clothingData.exists()) {
@@ -36,7 +36,7 @@ const EditClothing = () => {
                 }
             }
             else if (type == 'bottom') {
-                const clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottoms/items`, clothingId);
+                const clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottom/items`, clothingId);
                 const clothingData = await getDoc(clothingDoc);
     
                 if (clothingData.exists()) {
@@ -105,9 +105,9 @@ const EditClothing = () => {
         
         let clothingDoc;
         if (type === 'top') {
-            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/tops/items`, clothingId);
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/top/items`, clothingId);
         } else if (type === 'bottom') {
-            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottoms/items`, clothingId);
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottom/items`, clothingId);
         } else if (type === 'shoes') {
             clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/shoes/items`, clothingId);
         } else {
@@ -149,9 +149,9 @@ const EditClothing = () => {
 
         let clothingDoc;
         if (type === 'top') {
-            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/tops/items`, clothingId);
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/top/items`, clothingId);
         } else if (type === 'bottom') {
-            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottoms/items`, clothingId);
+            clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/bottom/items`, clothingId);
         } else if (type === 'shoes') {
             clothingDoc = doc(db, `Users/${user.uid}/ItemsCollection/shoes/items`, clothingId);
         } else {

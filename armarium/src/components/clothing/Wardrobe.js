@@ -42,7 +42,7 @@ const Wardrobe = () => {
             await new Promise(resolve => setTimeout(resolve, DELAY));
 
             if (tops.length === 0) { 
-                const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/tops/items`));
+                const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
                 const topsData = topsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
@@ -55,7 +55,7 @@ const Wardrobe = () => {
             }
 
             if (bottoms.length === 0) { 
-                const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottoms/items`));
+                const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
                 const bottomsData = bottomsCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
