@@ -210,7 +210,7 @@ const EditClothing = () => {
             <Navbar />
             <h1>Edit Clothing</h1>
             <div>
-                {image && <img src={image} alt="Clothing" style={{ width: '150px', height: 'auto' }} />}
+                {image && <img src={image} alt="Clothing" style={{ width: '150px', height: 'auto',  }} />}
                 {tags.length > 0 && (
                     <div>
                         <h3>Current Tags:</h3>

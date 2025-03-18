@@ -244,8 +244,10 @@ const Wardrobe = () => {
                             src={top.url} 
                             alt={`Top ${index + 1}`} 
                             style={{ 
-                                width: '150px', 
-                                height: 'auto', 
+                                width: '100%', 
+                                height: '200px', 
+                                objectFit: 'cover', // Ensures the image maintains its aspect ratio
+                                borderRadius: '8px', // Adds rounded corners for better aesthetics
                                 border: clothesToDelete.some(item => item.id === top.id) ? '2px solid red' : 'none'
                             }}
                             onClick={() => handleDeleteClick({ id: top.id, type: 'top' })}
@@ -276,8 +278,10 @@ const Wardrobe = () => {
                             src={bottom.url} 
                             alt={`Bottom ${index + 1}`} 
                             style={{ 
-                                width: '150px', 
-                                height: 'auto', 
+                                width: '100%', 
+                                height: '200px', 
+                                objectFit: 'cover', 
+                                borderRadius: '8px', 
                                 border: clothesToDelete.some(item => item.id === bottom.id) ? '2px solid red' : 'none'
                             }}
                             onClick={() => handleDeleteClick({ id: bottom.id, type: 'bottom' })}
@@ -308,8 +312,10 @@ const Wardrobe = () => {
                             src={shoe.url} 
                             alt={`Shoe ${index + 1}`} 
                             style={{ 
-                                width: '150px', 
-                                height: 'auto', 
+                                width: '100%', 
+                                height: '200px', 
+                                objectFit: 'cover', // Ensures the image maintains its aspect ratio
+                                borderRadius: '8px', // Adds rounded corners for better aesthetics
                                 border: clothesToDelete.some(item => item.id === shoe.id) ? '2px solid red' : 'none'
                             }}
                             onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
@@ -340,8 +346,10 @@ const Wardrobe = () => {
                             src={toplayer.url} 
                             alt={`TopLayer ${index + 1}`} 
                             style={{ 
-                                width: '150px', 
-                                height: 'auto', 
+                                width: '100%', 
+                                height: '200px', 
+                                objectFit: 'cover', // Ensures the image maintains its aspect ratio
+                                borderRadius: '8px', // Adds rounded corners for better aesthetics
                                 border: clothesToDelete.some(item => item.id === toplayer.id) ? '2px solid red' : 'none'
                             }}
                             onClick={() => handleDeleteClick({ id: toplayer.id, type: 'toplayer' })}
