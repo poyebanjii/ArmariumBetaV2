@@ -19,7 +19,7 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('User logged in successfully');
-      //alert('Login successful!');
+      setError(''); // Clear any previous error messages
 
       // Check the accountSetup status
       const user = auth.currentUser;
