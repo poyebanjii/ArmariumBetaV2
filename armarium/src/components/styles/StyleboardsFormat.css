@@ -1,0 +1,24 @@
+.styleboards-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .styleboard-item {
+    width: 350px;
+  }
+  
+  .styleboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    justify-items: center;
+  }
+  
+  .styleboard-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+  }

@@ -4,7 +4,7 @@ import { db } from '../backend/firebaseConfig';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
-import '../styles/Styleboards.css'; 
+import '../styles/StyleboardsFormat.css'; 
 
 function Styleboards() {
   const [styleboards, setStyleboard] = useState([]);
