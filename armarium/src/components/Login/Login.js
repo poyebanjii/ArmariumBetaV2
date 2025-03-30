@@ -9,6 +9,7 @@ import '../styles/Login.css';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLoginSubmit = async (e) => {
@@ -39,7 +40,7 @@ function Login() {
       }
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('Error logging in. Please check your email and password.');
+      setError('Invalid email or password. Please try again.'); // Display error message
     }
   };
 
@@ -67,6 +68,7 @@ function Login() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            {error && <p className="error-message">{error}</p>}
           </div>
           <button type="submit" className="login-button">Sign in</button>
         </form>
