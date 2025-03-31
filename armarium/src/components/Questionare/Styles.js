@@ -66,10 +66,7 @@ function Styles() {
           <button
             key={style}
             onClick={() => handleStyleClick(style)}
-            style={{
-              backgroundColor: selectedStyles.includes(style) ? '#a52a2a' : '#d8a7a7',
-            }}
-            className='style-button'
+            className={'Form-Button' + (selectedStyles.includes(style) ? 'selected' : '')}
           >
             {style}
           </button>
@@ -84,12 +81,12 @@ function Styles() {
           placeholder="Insert your favorite styles"
           style={{ padding: '10px', width: '200px', marginRight: '10px' }}
         />
-        <button onClick={handleCustomStyleAdd} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+        <button onClick={handleCustomStyleAdd} className='Form-Button-Add'>
           Add
         </button>
       </div>
 
-      <button className="Form-Button"onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
+      <button className="Form-Submit"onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
         Next
       </button>
     </div>

@@ -10,6 +10,7 @@ function HeightAndWeight() {
   const [heightIn, setHeightIn] = useState('');
   const [heightFt, setHeightFt] = useState('');
   const [weight, setWeight] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleNext = async (e) => {

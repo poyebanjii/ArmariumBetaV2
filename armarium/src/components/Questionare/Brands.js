@@ -70,10 +70,7 @@ function Brands() {
               <button
                 key={brand}
                 onClick={() => handleBrandClick(brand)}
-                style={{
-                  backgroundColor: selectedBrands.includes(brand) ? '#a52a2a' : '#d8a7a7',
-                }}
-                className='Brands-List-button'
+                className={'Form-Button'+ (selectedBrands.includes(brand) ? 'selected' : '')}
               >
                 {brand}
               </button>
@@ -81,21 +78,34 @@ function Brands() {
           </div>
 
       <form onSubmit={handleCustomBrandSubmit} style={{ marginTop: '20px' }}>
-        <label style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ marginRight: '10px' }}>Insert your favorite brands:</span>
-          <input
-            type="text"
-            value={customBrand}
-            onChange={handleCustomBrandChange}
-            placeholder="Enter brand name"
-            style={{ padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }}
-          />
-        </label>
-        <button className='Form-Submit'type="submit" style={{ display: 'block', margin: '10px auto' }}>
-          Add Brand
-        </button>
+        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+    <label htmlFor="customBrandInput" style={{ fontWeight: 'bold' }}>
+      Insert your favorite brands:
+    </label>
+  </div>
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
+    <input
+      id="customBrandInput"
+      type="text"
+      value={customBrand}
+      onChange={handleCustomBrandChange}
+      placeholder="Enter brand name"
+      style={{
+        padding: '10px',
+        borderRadius: '5px',
+        border: '1px solid #ccc',
+        flex: '1', // Allow the input to take up available space
+        maxWidth: '300px', // Optional: Limit the input width
+      }}
+    />
+    <button
+      type="submit"
+      className='Form-Button-Add'
+    >
+      Add Brand
+    </button>
+  </div>
       </form>
-
       <button className = 'Form-Submit' onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
         Next
       </button>

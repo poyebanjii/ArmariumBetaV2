@@ -21,19 +21,51 @@
 
 
 .Form-Button {
-    width: 100%;
-    padding: 10px;
-    background-color: #d8a7a7;
-    border: none;
-    border-radius: 20px;
-    color: #590C0B;
-    font-size: 1em;
-    cursor: pointer;
+    width: 80px; /* Fixed width for circle */
+    height: 80px; /* Equal height for circle */
+    border-radius: 50%; /* Makes it circular */
+    border: none; /* Remove default border */
+    cursor: pointer; /* Hand on hover */
+    font-size: 1em; /* Adjust text size */
+    display: flex; /* Center text inside button */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease; /* Smooth color change */
   }
+
+  /* Selected button styling */
+.Form-Buttonselected {
+    width: 80px; /* Fixed width for circle */
+    height: 80px; /* Equal height for circle */
+    border-radius: 50%; /* Makes it circular */
+    border: none; /* Remove default border */
+    cursor: pointer; /* Hand on hover */
+    font-size: 1em; /* Adjust text size */
+    display: flex; /* Center text inside button */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease; /* Smooth color change */
+    background-color: #d8a7a7; /* Background when selected */
+}
+.Form-Button-Add{
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #d8a7a7;
+  border:none;
+  border-radius: 20px;
+  white-space: nowrap;
+
+}
+
   
   .Form-Button:hover {
     background-color: #c98f8f;
   }
+
+  .Form-Button-Add:hover {
+    background-color: #c98f8f;
+  }
+
 
   .input-group {
     margin-bottom: 15px;
@@ -60,7 +92,6 @@
     background-color: #d8a7a7;
     border: none;
     border-radius: 20px;
-    color: #590C0B;
     font-size: 1em;
     cursor: pointer;
 }

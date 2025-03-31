@@ -10,6 +10,7 @@ import '../styles/Forms.css';
 function UserInfo() {
     const [gender, setGender] = useState("-");
     const [skin, setSkin] = useState("-");
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const skinTones = [
@@ -45,7 +46,7 @@ function UserInfo() {
             alert('Error submitting information. Please try again.');
           }
         } else {
-          alert('Please select a gender and skin type.');
+          setError('Please select a gender and skin tone.');  
         }
       };
 
@@ -86,6 +87,7 @@ function UserInfo() {
     
             <button type="submit" className="confirmButton">Submit</button>
           </form>
+          {error && <p className="error-message">{error}</p>}
         </div>
         </div>
         </div>
