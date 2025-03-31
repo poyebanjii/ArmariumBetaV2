@@ -1,0 +1,22 @@
+.Brands-List-button {
+    width: 80px; /* Fixed width for circle */
+    height: 80px; /* Equal height for circle */
+    border-radius: 50%; /* Makes it circular */
+    border: none; /* Remove default border */
+    cursor: pointer; /* Hand on hover */
+    font-size: 1em; /* Adjust text size */
+    display: flex; /* Center text inside button */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease; /* Smooth color change */
+  }
+  
+  /* Selected state */
+  .Brands-List-button.selected {
+    background-color: #d8a7a7; /* Background when selected */
+  }
+  
+  /* Optional: Hover effect */
+  .Brands-List-button:hover {
+    background-color: #d8a7a7; /* Slightly darker gray on hover when not selected */
+  }

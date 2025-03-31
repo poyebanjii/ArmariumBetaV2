@@ -1,14 +1,14 @@
-.Register-container {
+.Form-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     height: 100vh;
     background-color: #f5f5f5;
     font-family: Arial, sans-serif;
   }
 
-.Register-box {
+.Form-box {
     background-color: white;
     padding: 30px;
     border: 2px solid #a52a2a;
@@ -16,10 +16,11 @@
     width: 300px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    margin-top: 120px; /* Adjusted to create space for the logo */
 }
 
 
-.Register-Button {
+.Form-Button {
     width: 100%;
     padding: 10px;
     background-color: #d8a7a7;
@@ -30,7 +31,7 @@
     cursor: pointer;
   }
   
-  .Register-Button:hover {
+  .Form-Button:hover {
     background-color: #c98f8f;
   }
 
@@ -52,8 +53,18 @@
     border-radius: 4px;
     box-sizing: border-box;
   }
-  
-  .links {
-    margin-top: 15px;
-    text-align: center;
+
+.Form-Submit{
+    width: 100%;
+    padding: 10px;
+    background-color: #d8a7a7;
+    border: none;
+    border-radius: 20px;
+    color: #590C0B;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.Form-Submit:hover {
+    background-color: #c98f8f;
   }

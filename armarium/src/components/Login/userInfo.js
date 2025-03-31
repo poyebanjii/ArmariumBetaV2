@@ -4,6 +4,8 @@ import { getAuth } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 import '../styles/App.css';
+import '../styles/userInfo.css';
+import '../styles/Forms.css';
 
 function UserInfo() {
     const [gender, setGender] = useState("-");
@@ -37,7 +39,6 @@ function UserInfo() {
             });
     
             console.log('User info submitted successfully');
-            alert('Information submitted successfully!');
             navigate('/heightAndWeight');
           } catch (error) {
             console.error('Error submitting user info:', error);
@@ -50,8 +51,13 @@ function UserInfo() {
 
 
       return (
-        <div className="App">
-          <h2>Gender</h2>
+        <div className="Form-container">
+          <div className="logo">
+            <div className="logo-text">ARMARIUM</div>
+          </div>
+          <h2 >Gender</h2>
+          <div className='Form-box'>
+          <div className='input-group'>
           <form onSubmit={handleSubmit}>
             <select onChange={(e) => setGender(e.target.value)} value={gender}>
               <option value="-">Select Gender</option>
@@ -78,8 +84,10 @@ function UserInfo() {
               ))}
             </div>
     
-            <button type="submit" className="btn btn-dark">Submit</button>
+            <button type="submit" className="confirmButton">Submit</button>
           </form>
+        </div>
+        </div>
         </div>
       );
 }

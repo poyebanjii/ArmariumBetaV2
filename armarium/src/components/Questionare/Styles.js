@@ -4,6 +4,8 @@ import { getAuth } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 import '../styles/App.css';
+import '../styles/Forms.css';
+import '../styles/Styles.css';
 
 function Styles() {
   const [selectedStyles, setSelectedStyles] = useState([]);
@@ -52,19 +54,22 @@ function Styles() {
   };
 
   return (
-    <div className="App">
-      <h3>What styles do you like?</h3>
+    <div className="Form-container">
+    <div className="logo">
+      <div className="logo-text">ARMARIUM</div>
+    </div>
+    <div className ="Form-box">
+      <div className ="input-group">
+      <h3 style={{textAlign:'center'}}>What styles do you like?</h3>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
         {stylesList.map((style) => (
           <button
             key={style}
             onClick={() => handleStyleClick(style)}
             style={{
-              backgroundColor: selectedStyles.includes(style) ? 'gray' : 'lightgray',
-              padding: '10px 20px',
-              border: 'none',
-              cursor: 'pointer',
+              backgroundColor: selectedStyles.includes(style) ? '#a52a2a' : '#d8a7a7',
             }}
+            className='style-button'
           >
             {style}
           </button>
@@ -84,9 +89,11 @@ function Styles() {
         </button>
       </div>
 
-      <button onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
+      <button className="Form-Button"onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
         Next
       </button>
+    </div>
+    </div>
     </div>
   );
 }

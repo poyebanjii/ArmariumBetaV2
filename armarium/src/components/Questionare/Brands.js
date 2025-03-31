@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
-import '../styles/App.css';
+//import '../styles/App.css';
+import '../styles/Forms.css';
+import '../styles/Brands.css';
 
 function Brands() {
   const [selectedBrands, setSelectedBrands] = useState([]);
@@ -57,24 +59,26 @@ function Brands() {
   };
 
   return (
-    <div className="App">
-      <h3>What brands do you like?</h3>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
-        {brandsList.map((brand) => (
-          <button
-            key={brand}
-            onClick={() => handleBrandClick(brand)}
-            style={{
-              backgroundColor: selectedBrands.includes(brand) ? 'gray' : 'lightgray',
-              padding: '10px 20px',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            {brand}
-          </button>
-        ))}
+    <div className="Form-container">
+      <div className="logo">
+        <div className="logo-text">ARMARIUM</div>
       </div>
+      <div className ="Form-box">
+        <div className ="input-group">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+            {brandsList.map((brand) => (
+              <button
+                key={brand}
+                onClick={() => handleBrandClick(brand)}
+                style={{
+                  backgroundColor: selectedBrands.includes(brand) ? '#a52a2a' : '#d8a7a7',
+                }}
+                className='Brands-List-button'
+              >
+                {brand}
+              </button>
+            ))}
+          </div>
 
       <form onSubmit={handleCustomBrandSubmit} style={{ marginTop: '20px' }}>
         <label style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -87,14 +91,16 @@ function Brands() {
             style={{ padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }}
           />
         </label>
-        <button type="submit" style={{ display: 'block', margin: '10px auto' }}>
+        <button className='Form-Submit'type="submit" style={{ display: 'block', margin: '10px auto' }}>
           Add Brand
         </button>
       </form>
 
-      <button onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
+      <button className = 'Form-Submit' onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
         Next
       </button>
+      </div>
+      </div>
     </div>
   );
 }

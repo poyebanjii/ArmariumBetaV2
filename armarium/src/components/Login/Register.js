@@ -74,7 +74,6 @@ function Register() {
       });
 
       console.log('User registered successfully');
-      alert('User registered successfully!');
       navigate('/userInfo'); // Redirect to the user information page after registration
     } catch (error) {
       console.error('Error registering user:', error);
