@@ -37,3 +37,63 @@
     background-color: #343a40;
     color: #ffffff;
   }
+
+/* Dropdown container */
+.dropdown-menu {
+  opacity: 0; /* Initially hidden */
+  visibility: hidden; /* Prevent interaction when hidden */
+  transform: translateY(-10px); /* Slide up effect */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition */
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1000;
+}
+
+/* Show dropdown when visible */
+.nav-item.dropdown:hover .dropdown-menu {
+  opacity: 1; /* Fully visible */
+  visibility: visible; /* Allow interaction */
+  transform: translateY(0); /* Reset slide effect */
+}
+
+/* Arrow pointing down */
+.nav-item.dropdown::after {
+  content: '▼'; /* Unicode for down arrow */
+  font-size: 0.8rem;
+  margin-left: 5px;
+  display: inline-block;
+  vertical-align: middle;
+  color: #333; /* Adjust arrow color */
+}
+
+/* Remove bullet points from the list */
+.dropdown-menu ul {
+  list-style-type: none; /* Removes bullet points */
+  padding: 0; /* Removes default padding */
+  margin: 0; /* Removes default margin */
+}
+
+/* Add a line under "My Clothes" */
+.dropdown-menu ul li {
+  padding: 10px 0; /* Adds spacing between items */
+  border-bottom: 1px solid #ccc; /* Adds a line under each item */
+}
+
+/* Remove the line under the last item */
+.dropdown-menu ul li:last-child {
+  border-bottom: none;
+}
+
+/* Optional: Add hover effect for links */
+.dropdown-menu ul li a {
+  text-decoration: none; /* Removes underline from links */
+  color: #333; /* Default text color */
+  transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.dropdown-menu ul li a:hover {
+  color: #a52a2a; /* Change color on hover */
+}
