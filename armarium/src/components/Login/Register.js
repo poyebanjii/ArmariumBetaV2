@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
-import '../styles/App.css';
+//import '../styles/App.css';
+import '../styles/Register.css';
 
 /**
  * The Register page where users can create their accounts.
@@ -73,7 +74,6 @@ function Register() {
       });
 
       console.log('User registered successfully');
-      alert('User registered successfully!');
       navigate('/userInfo'); // Redirect to the user information page after registration
     } catch (error) {
       console.error('Error registering user:', error);
@@ -82,8 +82,12 @@ function Register() {
   };
 
   return (
-    <div className="App">
-      <h2>ARMARIUM</h2>
+    <div className="Register-container">
+      <div className="logo">
+        <div className="logo-text">ARMARIUM</div>
+      </div>
+      <div className="Register-box">
+        <div className="input-group">
       <form onSubmit={handleRegisterSubmit}>
         <label>
           Username:
@@ -145,9 +149,15 @@ function Register() {
           />
         </label>
         <br />
-        <button type="submit">Register</button>
+        <button className="Register-Button" type="submit">Register</button>
       </form>
       <br />
+      <div className="links">
+        <a href="/login">Already have an account?</a>
+        <br />
+        </div>
+        </div>
+        </div>
     </div>
   );
 }

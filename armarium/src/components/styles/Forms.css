@@ -1,0 +1,102 @@
+.Form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: flex;
+    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+  }
+
+.Form-box {
+    background-color: white;
+    padding: 30px;
+    border: 2px solid #a52a2a;
+    border-radius: 10px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 120px; /* Adjusted to create space for the logo */
+}
+
+
+.Form-Button {
+    width: 80px; /* Fixed width for circle */
+    height: 80px; /* Equal height for circle */
+    border-radius: 50%; /* Makes it circular */
+    border: none; /* Remove default border */
+    cursor: pointer; /* Hand on hover */
+    font-size: 1em; /* Adjust text size */
+    display: flex; /* Center text inside button */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease; /* Smooth color change */
+  }
+
+  /* Selected button styling */
+.Form-Buttonselected {
+    width: 80px; /* Fixed width for circle */
+    height: 80px; /* Equal height for circle */
+    border-radius: 50%; /* Makes it circular */
+    border: none; /* Remove default border */
+    cursor: pointer; /* Hand on hover */
+    font-size: 1em; /* Adjust text size */
+    display: flex; /* Center text inside button */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease; /* Smooth color change */
+    background-color: #d8a7a7; /* Background when selected */
+}
+.Form-Button-Add{
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: #d8a7a7;
+  border:none;
+  border-radius: 20px;
+  white-space: nowrap;
+
+}
+
+  
+  .Form-Button:hover {
+    background-color: #c98f8f;
+  }
+
+  .Form-Button-Add:hover {
+    background-color: #c98f8f;
+  }
+
+
+  .input-group {
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #a52a2a;
+  }
+  
+  .input-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #a52a2a;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+  }
+
+.Form-Submit{
+    width: 100%;
+    padding: 10px;
+    background-color: #d8a7a7;
+    border: none;
+    border-radius: 20px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.Form-Submit:hover {
+    background-color: #c98f8f;
+  }

@@ -6,7 +6,11 @@ import Register from './Login/Register';
 import ForgotPassword from './Login/ForgotPassowrd';
 import NewPassword from './Login/NewPassowrd';
 import Tinder from './clothing/Tinder';
+<<<<<<< HEAD
 import Outfit from './clothing/Outfit';
+=======
+import Outfit from './clothing/CreateAOutfit';
+>>>>>>> 6bf18fbf82730d60f48402f270acb2dca8fc54b4
 import Suggestions from './clothing/Suggestions';
 import ProfileSettings from './profile/ProfileSettings';
 import ImageUpload from './clothing/imageUpload';
@@ -18,8 +22,12 @@ import Brands from './Questionare/Brands';
 import Styles from './Questionare/Styles';
 import Ocassions from './Questionare/Ocassions';
 import EditClothing from './clothing/EditClothing';
+<<<<<<< HEAD
 import Outfits from './clothing/Outfits';
 import Styleboards from './clothing/Styleboards';
+=======
+import Outfits from './clothing/MyOutfits';
+>>>>>>> 6bf18fbf82730d60f48402f270acb2dca8fc54b4
 import ProtectedRoute from './ProtectedRoute';
 
 /**
