@@ -1,46 +1,24 @@
-  .center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .outfit-outer {
-    width: 35%;
-    display: flex;
-    justify-content: center;
-    border: 2px solid #a52a2a;
-    border-radius: 10px;
-  }
-
-  .outfits-list {
-    padding: 0;
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+.outfits-list {
     list-style: none;
-    padding: 16px;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
   }
   
   .outfit-item {
-    width: 200px;
-    height: 560px;
-    background-color: grey;
-    border-radius: 5px;
+    width: 350px;
+  }
+  
+  .outfit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    justify-items: center;
   }
   
   .outfit-image {
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 150px;
     object-fit: cover;
-  }
-
-  .image-container {
-    margin: 10px;
-  }
-
-  .add-outfit {
-    width: 200px;
-    height: 560px;
-    background-color: #a52a2a;
-    border-radius: 5px;
   }
