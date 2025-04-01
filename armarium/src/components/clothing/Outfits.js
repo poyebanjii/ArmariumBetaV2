@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, deleteDoc, setDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
-import '../styles/Outfits.css'; 
+import '../styles/Outfits2.css'; 
 
 function Outfits() {
   const [outfits, setOutfits] = useState([]);
@@ -13,6 +13,8 @@ function Outfits() {
   const [searchInput, setSearchInput] = useState("");
   const [isDelete, setIsDelete] = useState(false);
   const [outfitToDelete, setOutfitToDelete] = useState([]);
+  const [styleboardState, setStyleboardState] = useState(false);
+  const [selectedOutfits, setSelectedOutfits] = useState([]);
   const [title, setTitle] = useState('');
   const navigate = useNavigate();
   const DELAY = 750;
@@ -47,6 +49,54 @@ function Outfits() {
 const handleSearchChange = (e) => {
   const inputValue = e.target.value.toLowerCase();
   setSearchInput(inputValue);
+}
+
+const createStyleboard = async () => {
+  const user = auth.currentUser;
+  if (!selectedOutfits.length) {
+    alert("No outfit has been selected.");
+    return;
+  }
+  const styleboardName = prompt("Enter a name for your styleboard:");
+  if (!styleboardName) return;
+
+  try {
+    await new Promise((resolve) => setTimeout(resolve, DELAY));
+    const styleboardRef = doc(collection(db, `Users/${user.uid}/Styleboards`));
+    await setDoc(styleboardRef, {
+      styleboardName,
+      outfits: selectedOutfits.map((outfit) => ({
+        id: outfit.id,
+        topImageUrl: outfit.topImageUrl,
+        bottomImageUrl: outfit.bottomImageUrl,
+        shoesImageUrl: outfit.shoesImageUrl,
+      })),
+      timestamp: new Date(),
+    });
+    console.log("Styleboard created successfully:", styleboardName);
+    setSelectedOutfits([]);
+    setStyleboardState(false);
+  } catch (error) {
+    console.error("Error creating styleboard:", error);
+    alert("Failed to create styleboard. Please try again.");
+  }
+ }
+
+ const addToStyleboardList = (outfits) => {
+  setSelectedOutfits(prevList => {
+      if (prevList.some(item => item.id === outfits.id)) {
+          return prevList.filter(item => item.id !== outfits.id);
+      } else {
+          return [...prevList, outfits];
+      }
+  });
+}
+
+const toggleStyleboard = () => {
+  if (styleboardState) {
+    setSelectedOutfits([]);
+  }
+  setStyleboardState(!styleboardState);
 }
 
 const handleDelete = async () => {
@@ -122,6 +172,14 @@ return (
     {isDelete && (
       <button onClick={handleDelete} style={{ marginLeft: '10px' }}>
         Confirm Delete
+      </button>
+    )}
+    <button onClick={toggleStyleboard}>
+      {styleboardState ? 'Cancel' : 'Create Styleboard'}
+    </button>
+    {styleboardState && (
+      <button onClick={createStyleboard} style={{ marginLeft: '20px' }}>
+        Save Styleboard
       </button>
     )}
 
