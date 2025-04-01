@@ -8,7 +8,7 @@ import '../styles/MyOutfits.css';
 
 function Outfits() {
   const [outfits, setOutfits] = useState([]);
-  const auth = getAuth(); 
+  const auth = getAuth();
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState("");
   const [isDelete, setIsDelete] = useState(false);
@@ -107,15 +107,14 @@ const toggleDelete = () => {
 return (
   <div>
     <Navbar /> 
+    <div className="center">
     <h1>My Outfits</h1>
-
     <input
       type="text"
       placeholder="Search outfits by title"
       value={searchInput}
-      onChange={handleSearchChange} 
+      onChange={handleSearchChange}
     />
-
     <button onClick={toggleDelete}>
       {isDelete ? 'Cancel' : 'Delete'}
     </button>
@@ -124,47 +123,46 @@ return (
         Confirm Delete
       </button>
     )}
-
-    <ul className="outfits-list">
-      {filteredOutfits().length > 0 ? (
-        filteredOutfits().map((outfit) => (
-          <li key={outfit.id} className="outfit-item">
-            <div className="image-container">
-              <h1>{outfit.outfitName}</h1>
-              <img 
-                src={outfit.topImageUrl} 
-                alt="Top"
-                className="outfit-image"
+    </div>
+    
+    <div className="center">
+      <div className="outfit-outer">
+        <ul className="outfits-list">
+        <li className="add-outfit"
+          onClick={() => navigate("/outfits")}></li>
+        {filteredOutfits().length > 0 ? (
+          filteredOutfits().map((outfit) => (
+            <li key={outfit.id} className="outfit-item">
+              <div className="image-container"
                 onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
                 style={{
                   border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
-                }}
-              />
-              <img 
-                src={outfit.bottomImageUrl} 
-                alt="Bottom" 
-                className="outfit-image"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
-                style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
-                }}
-              />
-              <img 
-                src={outfit.shoesImageUrl} 
-                alt="Shoes" 
-                className="outfit-image"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
-                style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
-                }}
-              />
-            </div>
-          </li>
-        ))
-      ) : (
-        <p>No outfits found.</p>
-      )}
-    </ul>
+                }}>
+                {/* <h1>{outfit.outfitName}</h1> */}
+                <img 
+                  src={outfit.topImageUrl} 
+                  alt="Top"
+                  className="outfit-image center"
+                />
+                <img 
+                  src={outfit.bottomImageUrl} 
+                  alt="Bottom" 
+                  className="outfit-image center"
+                />
+                <img 
+                  src={outfit.shoesImageUrl} 
+                  alt="Shoes" 
+                  className="outfit-image center"
+                />
+              </div>
+            </li>
+          ))
+        ) : (
+          <p>No outfits found.</p>
+        )}
+      </ul>
+      </div>
+    </div>
   </div>
 );
 }
