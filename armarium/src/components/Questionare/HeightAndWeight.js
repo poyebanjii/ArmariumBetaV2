@@ -46,44 +46,52 @@ function HeightAndWeight() {
   return (
     <div className="Form-container">
       <div className="logo">
-        <div className="logo-text">ARMARIUM</div>
+        <div className="logo-text">Sizing</div>
       </div>
       <div className="Form-box">
+        <h2>Input your sizing to understand body shape. This may be skipped.</h2>
         <div className="input-group">
-          <form onSubmit={handleNext}>
+          <form className = "Height-Weight-Form" onSubmit={handleNext}>
             <label>
               Height:
               <input
                 type="number"
                 value={heightFt}
                 onChange={(e) => setHeightFt(e.target.value)}
-                required
               />
-              ft.
             </label>
-            <br />
             <label>
-              Height:
+              Chest
               <input
                 type="number"
                 value={heightIn}
                 onChange={(e) => setHeightIn(e.target.value)}
-                required
               />
-              in.
             </label>
-            <br />
             <label>
-              Weight:
+              Waist
               <input
                 type="number"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
-                required
               />
-              lbs.
             </label>
-            <br />
+            <label>
+              Hips
+              <input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+              />
+            </label>
+            <label>
+              Inseam
+              <input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+              />
+            </label>
             <button type="submit" className='Form-Submit'>Next</button>
           </form>
           <br />
