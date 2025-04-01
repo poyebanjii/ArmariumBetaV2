@@ -4,11 +4,13 @@ import { getAuth } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 import '../styles/App.css';
+import '../styles/Forms.css';
 
 function HeightAndWeight() {
   const [heightIn, setHeightIn] = useState('');
   const [heightFt, setHeightFt] = useState('');
   const [weight, setWeight] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleNext = async (e) => {
@@ -42,44 +44,51 @@ function HeightAndWeight() {
   };
 
   return (
-    <div className="App">
-      <form onSubmit={handleNext}>
-        <label>
-          Height:
-          <input
-            type="number"
-            value={heightFt}
-            onChange={(e) => setHeightFt(e.target.value)}
-            required
-          />
-          ft.
-        </label>
-        <br />
-        <label>
-          Height:
-          <input
-            type="number"
-            value={heightIn}
-            onChange={(e) => setHeightIn(e.target.value)}
-            required
-          />
-          in.
-        </label>
-        <br />
-        <label>
-          Weight:
-          <input
-            type="number"
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            required
-          />
-          lbs.
-        </label>
-        <br />
-        <button type="submit">Next</button>
-      </form>
-      <br />
+    <div className="Form-container">
+      <div className="logo">
+        <div className="logo-text">ARMARIUM</div>
+      </div>
+      <div className="Form-box">
+        <div className="input-group">
+          <form onSubmit={handleNext}>
+            <label>
+              Height:
+              <input
+                type="number"
+                value={heightFt}
+                onChange={(e) => setHeightFt(e.target.value)}
+                required
+              />
+              ft.
+            </label>
+            <br />
+            <label>
+              Height:
+              <input
+                type="number"
+                value={heightIn}
+                onChange={(e) => setHeightIn(e.target.value)}
+                required
+              />
+              in.
+            </label>
+            <br />
+            <label>
+              Weight:
+              <input
+                type="number"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                required
+              />
+              lbs.
+            </label>
+            <br />
+            <button type="submit" className='Form-Submit'>Next</button>
+          </form>
+          <br />
+        </div>
+      </div>
     </div>
   );
 }

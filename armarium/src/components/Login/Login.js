@@ -4,10 +4,12 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; 
 import '../styles/App.css';
+import '../styles/Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLoginSubmit = async (e) => {
@@ -17,7 +19,7 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('User logged in successfully');
-      alert('Login successful!');
+      setError(''); // Clear any previous error messages
 
       // Check the accountSetup status
       const user = auth.currentUser;
@@ -38,40 +40,43 @@ function Login() {
       }
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('Error logging in. Please check your email and password.');
+      setError('Invalid email or password. Please try again.'); // Display error message
     }
   };
 
   return (
-    <div className="App">
-      <h2>ARMARIUM</h2>
-      <form onSubmit={handleLoginSubmit}>
-        <label>
-          Email:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <label>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <br />
-        <button type="submit">Login</button>
-      </form>
-      <br />
-      <Link to="/forgot-password">Forgot Password</Link>
-      <br />
-      <Link to="/register">Register</Link>
+    <div className="login-container">
+      <div className="logo">
+        <div className="logo-text">ARMARIUM</div>
+      </div>
+      <div className="login-box">
+        <form onSubmit={handleLoginSubmit}>
+          <div className="input-group">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {error && <p className="error-message">{error}</p>}
+          </div>
+          <button type="submit" className="login-button">Sign in</button>
+        </form>
+        <div className="links">
+          <Link to="/forgot-password">Forgot Password</Link>
+          <Link to="/register">Register</Link>
+        </div>
+      </div>
     </div>
   );
 }
