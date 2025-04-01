@@ -9,8 +9,6 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { auth, db, storage } from '../backend/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import Joyride from 'react-joyride';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 /**
  * The swipeable component for tops and bottoms
@@ -107,9 +105,6 @@ const toggleOutfitSelection = (outfitId) => {
     <>
       <div>
         <Navbar />
-        <button onClick={() => setShowModal(true)} id="save" className="btn btn-primary">
-          <FontAwesomeIcon icon={faPlus} />
-        </button>
       </div>
   
 
