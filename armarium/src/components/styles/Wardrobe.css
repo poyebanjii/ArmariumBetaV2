@@ -1,0 +1,38 @@
+/* Style for each row */
+.wardrobe-row {
+    display: flex;
+    gap: 15px; /* Adds space between items */
+    margin-bottom: 20px; /* Adds space below each row */
+  }
+  
+  /* Style for each item */
+  .wardrobe-item {
+    position: relative;
+    width: 150px; /* Fixed width for each item */
+  }
+  
+  /* Style for images */
+  .wardrobe-image {
+    width: 100%;
+    height: auto;
+    border: 1px solid #ccc; /* Optional: Adds a border around the image */
+    border-radius: 5px; /* Optional: Adds rounded corners */
+    cursor: pointer; /* Changes cursor to pointer */
+  }
+  
+  /* Style for delete button */
+  .delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .wardrobe-buttons{
+    height: 200px; /* Equal height for circle */
+  }
