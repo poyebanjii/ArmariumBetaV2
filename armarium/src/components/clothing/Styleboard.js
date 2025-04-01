@@ -107,7 +107,6 @@ const toggleOutfitSelection = (outfitId) => {
         <Navbar />
       </div>
   
-
       {/* Modal for selecting outfits */}
       <div className={`modal ${showModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog">

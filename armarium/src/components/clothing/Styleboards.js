@@ -7,7 +7,7 @@ import Navbar from '../Navbar';
 import '../styles/StyleboardsFormat.css'; 
 
 function Styleboards() {
-  const [styleboards, setStyleboard] = useState([]);
+  const [styleboards, setStyleboards] = useState([]);
   const auth = getAuth(); 
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState("");

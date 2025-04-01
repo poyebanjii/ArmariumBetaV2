@@ -19,7 +19,7 @@ import Styles from './Questionare/Styles';
 import Ocassions from './Questionare/Ocassions';
 import EditClothing from './clothing/EditClothing';
 import Outfits from './clothing/Outfits';
-import Styleboards from './clothing/Styleboard';
+import Styleboards from './clothing/Styleboards';
 import ProtectedRoute from './ProtectedRoute';
 
 /**
