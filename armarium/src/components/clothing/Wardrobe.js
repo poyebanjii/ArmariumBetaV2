@@ -22,7 +22,7 @@ const Wardrobe = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const DELAY = 750;
-    
+
     const filteredClothes = (clothes) => {
         return clothes.filter(clothing => {
             const matchesTitle = clothing.title && clothing.title.toLowerCase().includes(searchInput.toLowerCase());
@@ -32,16 +32,16 @@ const Wardrobe = () => {
     };
 
     const displayedClothes = isTop ? filteredClothes(tops) :
-                         isBottom ? filteredClothes(bottoms) :
-                         isShoes ? filteredClothes(shoes) :
-                         isTopLayer ? filteredClothes(topLayers) :
-                         [];
-                         
+        isBottom ? filteredClothes(bottoms) :
+            isShoes ? filteredClothes(shoes) :
+                isTopLayer ? filteredClothes(topLayers) :
+                    [];
+
     const fetchData = async (user) => {
         try {
             await new Promise(resolve => setTimeout(resolve, DELAY));
 
-            if (tops.length === 0) { 
+            if (tops.length === 0) {
                 const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
                 const topsData = topsCollection.docs.map(doc => ({
                     id: doc.id,
@@ -54,7 +54,7 @@ const Wardrobe = () => {
                 setTops(topsData);
             }
 
-            if (bottoms.length === 0) { 
+            if (bottoms.length === 0) {
                 const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
                 const bottomsData = bottomsCollection.docs.map(doc => ({
                     id: doc.id,
@@ -66,7 +66,7 @@ const Wardrobe = () => {
                 setBottoms(bottomsData);
             }
 
-            if (shoes.length === 0) { 
+            if (shoes.length === 0) {
                 const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
                 const shoesData = shoesCollection.docs.map(doc => ({
                     id: doc.id,
@@ -78,7 +78,7 @@ const Wardrobe = () => {
                 setShoes(shoesData);
             }
 
-            if (topLayers.length === 0) { 
+            if (topLayers.length === 0) {
                 const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/toplayer/items`));
                 const topLayerData = topLayersCollection.docs.map(doc => ({
                     id: doc.id,
@@ -102,7 +102,7 @@ const Wardrobe = () => {
             if (user) {
                 fetchData(user).then(() => setLoading(false));
             } else {
-                navigate('/login'); 
+                navigate('/login');
             }
         });
 
@@ -121,8 +121,8 @@ const Wardrobe = () => {
         for (let { id, type } of clothesToDelete) {
             const itemDoc = doc(db, `Users/${user.uid}/ItemsCollection/${type}/items`, id);
             await deleteDoc(itemDoc);
-            
-            if (type === 'top') {                                                                                                                                                                               
+
+            if (type === 'top') {
                 setTops(tops.filter((item) => item.id !== id));
             }
             else if (type === 'bottom') {
@@ -211,11 +211,11 @@ const Wardrobe = () => {
     return (
         <div>
             <Navbar />
-            <input 
-                type="text" 
-                placeholder="Search by title or tags..." 
-                value={searchInput} 
-                onChange={handleSearchChange} 
+            <input
+                type="text"
+                placeholder="Search by title or tags..."
+                value={searchInput}
+                onChange={handleSearchChange}
             />
             <NavLink onClick={handleShowTops} style={{ marginRight: '10px', cursor: 'pointer' }}>
                 Tops
@@ -239,17 +239,18 @@ const Wardrobe = () => {
             )}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {isTop && displayedClothes.map((top, index) => (
-                    <div key={top.id} style={{ position: 'relative' }}>
-                        <img 
-                            src={top.url} 
-                            alt={`Top ${index + 1}`} 
-                            style={{ 
-                                width: '150px', 
-                                height: 'auto', 
+                    <div key={top.id} style={{ position: 'relative', textAlign: 'center' }}>
+                        <img
+                            src={top.url}
+                            alt={`Top ${index + 1}`}
+                            style={{
+                                width: '150px',
+                                height: 'auto',
                                 border: clothesToDelete.some(item => item.id === top.id) ? '2px solid red' : 'none'
                             }}
                             onClick={() => handleDeleteClick({ id: top.id, type: 'top' })}
                         />
+                        <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{top.title}</p>
                         {isDelete && (
                             <button
                                 onClick={() => addToDeleteList({ id: top.id, type: 'top' })}
@@ -271,17 +272,18 @@ const Wardrobe = () => {
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {isBottom && displayedClothes.map((bottom, index) => (
-                    <div key={bottom.id} style={{ position: 'relative' }}>
-                        <img 
-                            src={bottom.url} 
-                            alt={`Bottom ${index + 1}`} 
-                            style={{ 
-                                width: '150px', 
-                                height: 'auto', 
+                    <div key={bottom.id} style={{ position: 'relative', textAlign: 'center' }}>
+                        <img
+                            src={bottom.url}
+                            alt={`Bottom ${index + 1}`}
+                            style={{
+                                width: '150px',
+                                height: 'auto',
                                 border: clothesToDelete.some(item => item.id === bottom.id) ? '2px solid red' : 'none'
                             }}
                             onClick={() => handleDeleteClick({ id: bottom.id, type: 'bottom' })}
                         />
+                        <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{bottom.title}</p>
                         {isDelete && (
                             <button
                                 onClick={() => addToDeleteList({ id: bottom.id, type: 'bottom' })}
@@ -304,12 +306,12 @@ const Wardrobe = () => {
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {isShoes && displayedClothes.map((shoe, index) => (
                     <div key={shoe.id} style={{ position: 'relative' }}>
-                        <img 
-                            src={shoe.url} 
-                            alt={`Shoe ${index + 1}`} 
-                            style={{ 
-                                width: '150px', 
-                                height: 'auto', 
+                        <img
+                            src={shoe.url}
+                            alt={`Shoe ${index + 1}`}
+                            style={{
+                                width: '150px',
+                                height: 'auto',
                                 border: clothesToDelete.some(item => item.id === shoe.id) ? '2px solid red' : 'none'
                             }}
                             onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
@@ -334,21 +336,22 @@ const Wardrobe = () => {
                 ))}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isTopLayer && displayedClothes.map((toplayer, index) => (
-                    <div key={toplayer.id} style={{ position: 'relative' }}>
-                        <img 
-                            src={toplayer.url} 
-                            alt={`TopLayer ${index + 1}`} 
-                            style={{ 
-                                width: '150px', 
-                                height: 'auto', 
-                                border: clothesToDelete.some(item => item.id === toplayer.id) ? '2px solid red' : 'none'
+                {isShoes && displayedClothes.map((shoe, index) => (
+                    <div key={shoe.id} style={{ position: 'relative', textAlign: 'center' }}>
+                        <img
+                            src={shoe.url}
+                            alt={`Shoe ${index + 1}`}
+                            style={{
+                                width: '150px',
+                                height: 'auto',
+                                border: clothesToDelete.some(item => item.id === shoe.id) ? '2px solid red' : 'none'
                             }}
-                            onClick={() => handleDeleteClick({ id: toplayer.id, type: 'toplayer' })}
+                            onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
                         />
+                        <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{shoe.title}</p>
                         {isDelete && (
                             <button
-                                onClick={() => addToDeleteList({ id: toplayer.id, type: 'toplayer' })}
+                                onClick={() => addToDeleteList({ id: shoe.id, type: 'shoes' })}
                                 style={{
                                     position: 'absolute',
                                     top: '5px',
@@ -359,7 +362,7 @@ const Wardrobe = () => {
                                     cursor: 'pointer'
                                 }}
                             >
-                                {clothesToDelete.some(item => item.id === toplayer.id) ? 'Remove' : 'Select'}
+                                {clothesToDelete.some(item => item.id === shoe.id) ? 'Remove' : 'Select'}
                             </button>
                         )}
                     </div>
