@@ -24,7 +24,7 @@ const Wardrobe = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const DELAY = 750;
-    
+
     const filteredClothes = (clothes) => {
         return clothes.filter(clothing => {
             const matchesTitle = clothing.title && clothing.title.toLowerCase().includes(searchInput.toLowerCase());
@@ -34,16 +34,16 @@ const Wardrobe = () => {
     };
 
     const displayedClothes = isTop ? filteredClothes(tops) :
-                         isBottom ? filteredClothes(bottoms) :
-                         isShoes ? filteredClothes(shoes) :
-                         isTopLayer ? filteredClothes(topLayers) :
-                         [];
-                         
+        isBottom ? filteredClothes(bottoms) :
+            isShoes ? filteredClothes(shoes) :
+                isTopLayer ? filteredClothes(topLayers) :
+                    [];
+
     const fetchData = async (user) => {
         try {
             await new Promise(resolve => setTimeout(resolve, DELAY));
 
-            if (tops.length === 0) { 
+            if (tops.length === 0) {
                 const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
                 const topsData = topsCollection.docs.map(doc => ({
                     id: doc.id,
@@ -56,7 +56,7 @@ const Wardrobe = () => {
                 setTops(topsData);
             }
 
-            if (bottoms.length === 0) { 
+            if (bottoms.length === 0) {
                 const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
                 const bottomsData = bottomsCollection.docs.map(doc => ({
                     id: doc.id,
@@ -68,7 +68,7 @@ const Wardrobe = () => {
                 setBottoms(bottomsData);
             }
 
-            if (shoes.length === 0) { 
+            if (shoes.length === 0) {
                 const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
                 const shoesData = shoesCollection.docs.map(doc => ({
                     id: doc.id,
@@ -80,7 +80,7 @@ const Wardrobe = () => {
                 setShoes(shoesData);
             }
 
-            if (topLayers.length === 0) { 
+            if (topLayers.length === 0) {
                 const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/toplayer/items`));
                 const topLayerData = topLayersCollection.docs.map(doc => ({
                     id: doc.id,
@@ -104,7 +104,7 @@ const Wardrobe = () => {
             if (user) {
                 fetchData(user).then(() => setLoading(false));
             } else {
-                navigate('/login'); 
+                navigate('/login');
             }
         });
 
@@ -123,8 +123,8 @@ const Wardrobe = () => {
         for (let { id, type } of clothesToDelete) {
             const itemDoc = doc(db, `Users/${user.uid}/ItemsCollection/${type}/items`, id);
             await deleteDoc(itemDoc);
-            
-            if (type === 'top') {                                                                                                                                                                               
+
+            if (type === 'top') {
                 setTops(tops.filter((item) => item.id !== id));
             }
             else if (type === 'bottom') {
