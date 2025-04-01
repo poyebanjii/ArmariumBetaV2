@@ -6,6 +6,8 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { collection, addDoc, getDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import Navbar from '../Navbar';
 import Joyride from 'react-joyride';
+import { Center } from 'framer/render/presentation/Frame/DeprecatedFrame.js';
+import '../styles/Forms.css';
 
 const ItemUpload = () => {
   const [items, setItems] = useState([
@@ -287,12 +289,14 @@ const ItemUpload = () => {
   return (
     <div>
       <Navbar />
-      <div className="App">
+      <div className="Form-container">
         {/* <h2>Upload an Item</h2>
         <progress value={progress} max="100" /> */}
-        <h2>Upload Items</h2>
+        <div className='Form-box'>
+          <div className='input-group'>
+        <h2 style={{ textAlign: 'center' }}>Upload Items</h2>
         {items.map((item, index) => (
-        <div key={index} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '10px' }}>
+        <div key={index} style={{ marginBottom: '20px', padding: '20px' }}>
           <input
             type="file"
             onChange={(e) => handleFileChange(index, e.target.files[0])}
@@ -311,6 +315,11 @@ const ItemUpload = () => {
             value={item.type}
             onChange={(e) => handleInputChange(index, 'type', e.target.value)}
             required
+            style={{
+              display: 'block', // Makes the select box a block element
+              margin: '0 auto', // Centers it horizontally
+              marginBottom: '10px', // Adds some space below the select box
+            }}
           >
             <option value="" disabled>
               Select Type
@@ -343,10 +352,10 @@ const ItemUpload = () => {
           />
         </div>
       ))}
-      <button onClick={addNewItem} style={{ marginBottom: '20px' }}>
+      <button className= 'Form-Submit'onClick={addNewItem} style={{ marginBottom: '20px' }}>
         + Add Another Item
       </button>
-      <button onClick={handleUpload}>Upload All</button>
+      <button className = 'Form-Submit' onClick={handleUpload}>Upload All</button>
       </div>
       {/* Joyride tutorial */}
       <Joyride
@@ -361,6 +370,8 @@ const ItemUpload = () => {
           }
         }}
       />
+      </div>
+      </div>
     </div>
   );
 };
