@@ -62,17 +62,22 @@ const createStyleboard = async () => {
 
   try {
     await new Promise((resolve) => setTimeout(resolve, DELAY));
-    const styleboardRef = doc(collection(db, `Users/${user.uid}/Styleboards`));
-    await setDoc(styleboardRef, {
-      styleboardName,
-      outfits: selectedOutfits.map((outfit) => ({
+    for (const outfit of selectedOutfits){
+      const outfitPath = `Users/Styleboards/${user.uid}/${styleboardName}/${outfit.outfitName}`;
+      console.log(`Creating path for outfit: ${outfit.outfitName}`);
+      const outfitRef = doc(db, outfitPath);
+      await setDoc(outfitRef, {
         id: outfit.id,
-        topImageUrl: outfit.topImageUrl,
-        bottomImageUrl: outfit.bottomImageUrl,
-        shoesImageUrl: outfit.shoesImageUrl,
-      })),
-      timestamp: new Date(),
-    });
+        outfitName: outfit.outfitName,
+        images: {
+          top: outfit.topImageUrl,
+          bottom: outfit.bottomImageUrl,
+          shoes: outfit.shoesImageUrl
+        },
+        timestamp: new Date(),
+      });
+      console.log(`Outfit "${outfit.outfitName}" saved successfully at path: ${outfitPath}`);
+    }
     console.log("Styleboard created successfully:", styleboardName);
     setSelectedOutfits([]);
     setStyleboardState(false);
@@ -193,27 +198,57 @@ return (
                 src={outfit.topImageUrl} 
                 alt="Top"
                 className="outfit-image"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
+                onClick={() =>
+                  styleboardState
+                    ? addToStyleboardList(outfit)
+                    : isDelete
+                    ? addToDeleteList(outfit)
+                    : navigate(`/editOutfit/${outfit.id}`) 
+                }
                 style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
+                  border: outfitToDelete.some(item => item.id === outfit.id)
+                    ? '2px solid red'
+                    : selectedOutfits.some(item => item.id === outfit.id)
+                    ? '2px solid blue'
+                    : 'none',
                 }}
               />
               <img 
                 src={outfit.bottomImageUrl} 
                 alt="Bottom" 
                 className="outfit-image"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
+                onClick={() =>
+                  styleboardState
+                    ? addToStyleboardList(outfit)
+                    : isDelete
+                    ? addToDeleteList(outfit)
+                    : navigate(`/editOutfit/${outfit.id}`)
+                }
                 style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
+                  border: outfitToDelete.some(item => item.id === outfit.id)
+                    ? '2px solid red'
+                    : selectedOutfits.some(item => item.id === outfit.id)
+                    ? '2px solid blue'
+                    : 'none',
                 }}
               />
               <img 
                 src={outfit.shoesImageUrl} 
                 alt="Shoes" 
                 className="outfit-image"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
+                onClick={() =>
+                  styleboardState
+                    ? addToStyleboardList(outfit)
+                    : isDelete
+                    ? addToDeleteList(outfit)
+                    : navigate(`/editOutfit/${outfit.id}`)
+                }
                 style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
+                  border: outfitToDelete.some(item => item.id === outfit.id)
+                    ? '2px solid red'
+                    : selectedOutfits.some(item => item.id === outfit.id)
+                    ? '2px solid blue'
+                    : 'none',
                 }}
               />
             </div>
