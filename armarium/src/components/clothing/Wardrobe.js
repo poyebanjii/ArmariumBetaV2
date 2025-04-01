@@ -211,32 +211,35 @@ const Wardrobe = () => {
     return (
         <div>
             <Navbar />
+            <div className='wardrobe-header'>
             <input 
                 type="text" 
                 placeholder="Search by title or tags..." 
                 value={searchInput} 
                 onChange={handleSearchChange} 
+                className='wardrobe-search'
             />
-            <NavLink onClick={handleShowTops} style={{ marginRight: '10px', cursor: 'pointer' }}>
+            <NavLink className="nav-link" onClick={handleShowTops} >
                 Tops
             </NavLink>
-            <NavLink onClick={handleShowBottoms} style={{ cursor: 'pointer' }}>
+            <NavLink  className="nav-link" onClick={handleShowBottoms} >
                 Bottoms
             </NavLink>
-            <NavLink onClick={handleShowShoes} style={{ marginRight: '10px', cursor: 'pointer' }}>
+            <NavLink   className="nav-link" onClick={handleShowShoes} >
                 Shoes
             </NavLink>
-            <NavLink onClick={handleShowTopLayers} style={{ marginRight: '10px', cursor: 'pointer' }}>
+            <NavLink  className="nav-link" onClick={handleShowTopLayers} >
                 Top Layer
             </NavLink>
-            <button onClick={toggleDelete}>
+            <button className="nav-link"  onClick={toggleDelete}>
                 {isDelete ? 'Cancel' : 'Delete'}
             </button>
             {isDelete && (
-                <button onClick={handleDelete} style={{ marginLeft: '10px' }}>
+                <button className="nav-link" onClick={handleDelete} >
                     Confirm Delete
                 </button>
             )}
+            </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 {isTop && displayedClothes.map((top, index) => (
                     <div key={top.id} style={{ position: 'relative' }}>
