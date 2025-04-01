@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../backend/firebaseConfig";
 import { db } from '../backend/firebaseConfig'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +15,10 @@ function Outfits() {
   const [searchInput, setSearchInput] = useState("");
   const [isDelete, setIsDelete] = useState(false);
   const [outfitToDelete, setOutfitToDelete] = useState([]);
+  const [styleboardState, setStyleboardState] = useState(false);
+  const [selectedOutfits, setSelectedOutfits] = useState([]);
+  const [showStyleboardModal, setShowStyleboardModal] = useState(false);
+  const [styleboardName, setStyleboardName] = useState('');
   const [title, setTitle] = useState('');
   const navigate = useNavigate();
   const DELAY = 750;
@@ -47,6 +53,76 @@ function Outfits() {
 const handleSearchChange = (e) => {
   const inputValue = e.target.value.toLowerCase();
   setSearchInput(inputValue);
+}
+
+const createStyleboard = async () => {
+  const user = auth.currentUser;
+  if (!selectedOutfits.length) {
+    alert("No outfit has been selected.");
+    return;
+  }
+  if (!styleboardName) return;
+
+  try {
+    await new Promise((resolve) => setTimeout(resolve, DELAY));
+
+    for (const outfit of selectedOutfits) {
+      // Define the original outfit path and the new styleboard path
+      const originalOutfitPath = `Users/${user.uid}/Outfits/${outfit.id}/${outfit.outfitName}`;
+      const styleboardPath = `Users/Styleboards/${user.uid}/${styleboardName}/${outfit.outfitName}`;
+
+      console.log(`Reusing images from path: ${originalOutfitPath}`);
+      console.log(`Creating styleboard path: ${styleboardPath}`);
+
+      // Upload images to Firebase Storage
+      const imageTypes = ["topImageUrl", "bottomImageUrl", "shoesImageUrl"];
+      const uploadedImages = {};
+
+      for (const type of imageTypes) {
+        const imageUrl = outfit[type];
+        const fileName = type.replace("ImageUrl", ""); // e.g., "topImageUrl" -> "top"
+        const storageRef = ref(storage, `${styleboardPath}/${fileName}.jpg`);
+
+        // Fetch the image as a blob
+        const imageBlob = await fetch(imageUrl).then((res) => res.blob());
+
+        // Upload the image to Firebase Storage
+        await uploadBytes(storageRef, imageBlob);
+
+        // Get the download URL for the uploaded image
+        const downloadUrl = await getDownloadURL(storageRef);
+        uploadedImages[fileName] = downloadUrl;
+
+        console.log(`Uploaded ${fileName} image to: ${downloadUrl}`);
+      }
+
+      console.log(`Outfit "${outfit.outfitName}" added to styleboard at path: ${styleboardPath}`);
+    }
+
+    console.log("Styleboard created successfully:", styleboardName);
+    setSelectedOutfits([]);
+    setStyleboardState(false);
+  } catch (error) {
+    console.error("Error creating styleboard:", error);
+    alert("Failed to create styleboard. Please try again.");
+  }
+};
+
+ const addToStyleboardList = (outfits) => {
+  setSelectedOutfits(prevList => {
+      if (prevList.some(item => item.id === outfits.id)) {
+          return prevList.filter(item => item.id !== outfits.id);
+      } else {
+          return [...prevList, outfits];
+      }
+  });
+}
+
+const toggleStyleboard = () => {
+  if (styleboardState) {
+    setSelectedOutfits([]);
+  }
+  setStyleboardState(!styleboardState);
 }
 
 const handleDelete = async () => {
@@ -124,6 +200,14 @@ return (
         Confirm Delete
       </button>
     )}
+    <button onClick={toggleStyleboard}>
+      {styleboardState ? 'Cancel' : 'Create Styleboard'}
+    </button>
+    {styleboardState && (
+      <button onClick={() => setShowStyleboardModal(true)} style={{ marginLeft: '20px' }}>
+        Save Styleboard
+      </button>
+    )}
 
     <ul className="outfits-list">
       {filteredOutfits().length > 0 ? (
@@ -135,27 +219,57 @@ return (
                 src={outfit.topImageUrl} 
                 alt="Top"
                 className="outfit-image"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
+                onClick={() =>
+                  styleboardState
+                    ? addToStyleboardList(outfit)
+                    : isDelete
+                    ? addToDeleteList(outfit)
+                    : navigate(`/editOutfit/${outfit.id}`) 
+                }
                 style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
+                  border: outfitToDelete.some(item => item.id === outfit.id)
+                    ? '2px solid red'
+                    : selectedOutfits.some(item => item.id === outfit.id)
+                    ? '2px solid blue'
+                    : 'none',
                 }}
               />
               <img 
                 src={outfit.bottomImageUrl} 
                 alt="Bottom" 
                 className="outfit-image"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
+                onClick={() =>
+                  styleboardState
+                    ? addToStyleboardList(outfit)
+                    : isDelete
+                    ? addToDeleteList(outfit)
+                    : navigate(`/editOutfit/${outfit.id}`)
+                }
                 style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
+                  border: outfitToDelete.some(item => item.id === outfit.id)
+                    ? '2px solid red'
+                    : selectedOutfits.some(item => item.id === outfit.id)
+                    ? '2px solid blue'
+                    : 'none',
                 }}
               />
               <img 
                 src={outfit.shoesImageUrl} 
                 alt="Shoes" 
                 className="outfit-image"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
+                onClick={() =>
+                  styleboardState
+                    ? addToStyleboardList(outfit)
+                    : isDelete
+                    ? addToDeleteList(outfit)
+                    : navigate(`/editOutfit/${outfit.id}`)
+                }
                 style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
+                  border: outfitToDelete.some(item => item.id === outfit.id)
+                    ? '2px solid red'
+                    : selectedOutfits.some(item => item.id === outfit.id)
+                    ? '2px solid blue'
+                    : 'none',
                 }}
               />
             </div>
@@ -164,6 +278,37 @@ return (
       ) : (
         <p>No outfits found.</p>
       )}
+
+      <div className={`modal ${showStyleboardModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Create Styleboard</h5>
+              <button type="button" className="btn-close" onClick={() => setShowStyleboardModal(false)}>×</button>
+            </div>
+
+            <div className="modal-body">
+              <p>Enter a name for your styleboard:</p>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Styleboard name"
+                value={styleboardName}
+                onChange={(e) => setStyleboardName(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn btn-primary" onClick={createStyleboard}>
+                Save Styleboard
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={() => setShowStyleboardModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </ul>
   </div>
 );
