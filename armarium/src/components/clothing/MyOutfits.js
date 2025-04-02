@@ -10,7 +10,7 @@ import '../styles/MyOutfits.css';
 
 function Outfits() {
   const [outfits, setOutfits] = useState([]);
-  const auth = getAuth();
+  const auth = getAuth(); 
   const [loading, setLoading] = useState(true);
   const [searchInput, setSearchInput] = useState("");
   const [isDelete, setIsDelete] = useState(false);
@@ -182,15 +182,17 @@ const toggleDelete = () => {
 
 return (
   <div>
-    <Navbar /> 
+    <Navbar />
     <div className="center">
     <h1>My Outfits</h1>
+
     <input
       type="text"
       placeholder="Search outfits by title"
       value={searchInput}
-      onChange={handleSearchChange}
+      onChange={handleSearchChange} 
     />
+
     <button onClick={toggleDelete}>
       {isDelete ? 'Cancel' : 'Delete'}
     </button>
@@ -200,6 +202,16 @@ return (
       </button>
     )}
     </div>
+
+    <button onClick={toggleStyleboard}>
+      {styleboardState ? 'Cancel' : 'Create Styleboard'}
+    </button>
+    {styleboardState && (
+      <button onClick={() => setShowStyleboardModal(true)} style={{ marginLeft: '20px' }}>
+        Save Styleboard
+      </button>
+    )}
+    <h1>{styleboardState}</h1>
     
     <div className="center">
       <div className="outfit-outer">
@@ -210,10 +222,14 @@ return (
           filteredOutfits().map((outfit) => (
             <li key={outfit.id} className="outfit-item">
               <div className="image-container"
-                onClick={() => isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
+                onClick={() => styleboardState ? addToStyleboardList(outfit)
+                  : isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
                 style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
+                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red'
+                    : selectedOutfits.some(item => item.id === outfit.id) ? '2px solid blue'
+                    : 'none'
                 }}>
+                {/* <h1>{outfit.outfitName}</h1> */}
                 <img 
                   src={outfit.topImageUrl} 
                   alt="Top"
@@ -235,6 +251,36 @@ return (
         ) : (
           <p>No outfits found.</p>
         )}
+      <div className={`modal ${showStyleboardModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">
+        <div className="modal-dialog">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Create Styleboard</h5>
+              <button type="button" className="btn-close" onClick={() => setShowStyleboardModal(false)}>×</button>
+            </div>
+
+            <div className="modal-body">
+              <p>Enter a name for your styleboard:</p>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Styleboard name"
+                value={styleboardName}
+                onChange={(e) => setStyleboardName(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-footer">
+                <button type="button" className="btn btn-primary" onClick={createStyleboard}>
+                  Save Styleboard
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowStyleboardModal(false)}>
+                  Cancel
+                </button>
+            </div>
+            </div>
+          </div>
+        </div>
       </ul>
       </div>
     </div>
