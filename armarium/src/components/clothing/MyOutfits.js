@@ -182,7 +182,8 @@ const toggleDelete = () => {
 
 return (
   <div>
-    <Navbar /> 
+    <Navbar />
+    <div className="center">
     <h1>My Outfits</h1>
 
     <input
@@ -200,6 +201,8 @@ return (
         Confirm Delete
       </button>
     )}
+    </div>
+
     <button onClick={toggleStyleboard}>
       {styleboardState ? 'Cancel' : 'Create Styleboard'}
     </button>
@@ -208,77 +211,46 @@ return (
         Save Styleboard
       </button>
     )}
-
-    <ul className="outfits-list">
-      {filteredOutfits().length > 0 ? (
-        filteredOutfits().map((outfit) => (
-          <li key={outfit.id} className="outfit-item">
-            <div className="image-container">
-              <h1>{outfit.outfitName}</h1>
-              <img 
-                src={outfit.topImageUrl} 
-                alt="Top"
-                className="outfit-image"
-                onClick={() =>
-                  styleboardState
-                    ? addToStyleboardList(outfit)
-                    : isDelete
-                    ? addToDeleteList(outfit)
-                    : navigate(`/editOutfit/${outfit.id}`) 
-                }
+    <h1>{styleboardState}</h1>
+    
+    <div className="center">
+      <div className="outfit-outer">
+        <ul className="outfits-list">
+        <li className="add-outfit"
+          onClick={() => navigate("/outfits")}></li>
+        {filteredOutfits().length > 0 ? (
+          filteredOutfits().map((outfit) => (
+            <li key={outfit.id} className="outfit-item">
+              <div className="image-container"
+                onClick={() => styleboardState ? addToStyleboardList(outfit)
+                  : isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
                 style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id)
-                    ? '2px solid red'
-                    : selectedOutfits.some(item => item.id === outfit.id)
-                    ? '2px solid blue'
-                    : 'none',
-                }}
-              />
-              <img 
-                src={outfit.bottomImageUrl} 
-                alt="Bottom" 
-                className="outfit-image"
-                onClick={() =>
-                  styleboardState
-                    ? addToStyleboardList(outfit)
-                    : isDelete
-                    ? addToDeleteList(outfit)
-                    : navigate(`/editOutfit/${outfit.id}`)
-                }
-                style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id)
-                    ? '2px solid red'
-                    : selectedOutfits.some(item => item.id === outfit.id)
-                    ? '2px solid blue'
-                    : 'none',
-                }}
-              />
-              <img 
-                src={outfit.shoesImageUrl} 
-                alt="Shoes" 
-                className="outfit-image"
-                onClick={() =>
-                  styleboardState
-                    ? addToStyleboardList(outfit)
-                    : isDelete
-                    ? addToDeleteList(outfit)
-                    : navigate(`/editOutfit/${outfit.id}`)
-                }
-                style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id)
-                    ? '2px solid red'
-                    : selectedOutfits.some(item => item.id === outfit.id)
-                    ? '2px solid blue'
-                    : 'none',
-                }}
-              />
-            </div>
-          </li>
-        ))
-      ) : (
-        <p>No outfits found.</p>
-      )}
-
+                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red'
+                    : selectedOutfits.some(item => item.id === outfit.id) ? '2px solid blue'
+                    : 'none'
+                }}>
+                {/* <h1>{outfit.outfitName}</h1> */}
+                <img 
+                  src={outfit.topImageUrl} 
+                  alt="Top"
+                  className="outfit-image center"
+                />
+                <img 
+                  src={outfit.bottomImageUrl} 
+                  alt="Bottom" 
+                  className="outfit-image center"
+                />
+                <img 
+                  src={outfit.shoesImageUrl} 
+                  alt="Shoes" 
+                  className="outfit-image center"
+                />
+              </div>
+            </li>
+          ))
+        ) : (
+          <p>No outfits found.</p>
+        )}
       <div className={`modal ${showStyleboardModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog">
           <div className="modal-content">
@@ -299,17 +271,19 @@ return (
             </div>
 
             <div className="modal-footer">
-              <button type="button" className="btn btn-primary" onClick={createStyleboard}>
-                Save Styleboard
-              </button>
-              <button type="button" className="btn btn-secondary" onClick={() => setShowStyleboardModal(false)}>
-                Cancel
-              </button>
+                <button type="button" className="btn btn-primary" onClick={createStyleboard}>
+                  Save Styleboard
+                </button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowStyleboardModal(false)}>
+                  Cancel
+                </button>
+            </div>
             </div>
           </div>
         </div>
+      </ul>
       </div>
-    </ul>
+    </div>
   </div>
 );
 }
