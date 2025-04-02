@@ -3,7 +3,7 @@ import { collection, getDocs, query, where, doc, deleteDoc } from 'firebase/fire
 import { db } from '../backend/firebaseConfig'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { ref, listAll, getDownloadURL } from "firebase/storage";
+import { ref, listAll, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "../backend/firebaseConfig";
 import Navbar from '../Navbar';
 import '../styles/StyleboardsFormat.css'; 
@@ -47,13 +47,12 @@ function Styleboards() {
           console.log("Fetching outfit:", outfitName);
           const images = {};
   
-          // List all files directly inside the outfit folder
           const imageFilesSnapshot = await listAll(outfitFolderRef);
   
           for (const imageFileRef of imageFilesSnapshot.items) {
-            const fileName = imageFileRef.name.replace(".jpg", ""); // Remove file extension
-            const downloadUrl = await getDownloadURL(imageFileRef); // Get the download URL
-            images[fileName] = downloadUrl; // Use the file name (e.g., "top", "bottom", "shoes") as the key
+            const fileName = imageFileRef.name.replace(".jpg", "");
+            const downloadUrl = await getDownloadURL(imageFileRef); 
+            images[fileName] = downloadUrl; 
           }
   
           outfits.push({ name: outfitName, images });
@@ -88,10 +87,35 @@ const handleDelete = async () => {
     await new Promise((resolve) => setTimeout(resolve, DELAY));
 
     for (const styleboard of styleboardToDelete) {
+      console.log("Starting deletion for styleboard:", styleboard.id);
+
+      // Delete all files in the styleboard folder from Firebase Storage
+      const styleboardFolderRef = ref(storage, `Users/Styleboards/${user.uid}/${styleboard.id}`);
+      const filesSnapshot = await listAll(styleboardFolderRef);
+
+      for (const fileRef of filesSnapshot.items) {
+        console.log("Deleting file:", fileRef.fullPath);
+        await deleteObject(fileRef); 
+      }
+
+      // Delete all subfolders
+      for (const folderRef of filesSnapshot.prefixes) {
+        console.log("Deleting subfolder:", folderRef.fullPath);
+        const subfolderSnapshot = await listAll(folderRef);
+
+        for (const subfileRef of subfolderSnapshot.items) {
+          console.log("Deleting file in subfolder:", subfileRef.fullPath);
+          await deleteObject(subfileRef); // Delete each file in the subfolder
+        }
+      }
+
+      console.log("All files and subfolders deleted for styleboard:", styleboard.id);
+
+      // Delete the styleboard document from Firestore
       const styleboardDocRef = doc(db, `Users/${user.uid}/Styleboards`, styleboard.id);
-      console.log("Attempting to delete:", styleboardDocRef.path); 
+      console.log("Attempting to delete Firestore document:", styleboardDocRef.path);
       await deleteDoc(styleboardDocRef);
-      console.log("Styleboard deleted successfully:", styleboard.id);
+      console.log("Firestore document deleted for styleboard:", styleboard.id);
     }
 
     setStyleboards((prevStyleboards) =>
@@ -102,6 +126,7 @@ const handleDelete = async () => {
 
     setStyleboardToDelete([]);
     setIsDelete(false); 
+    console.log("Deletion process completed.");
   } catch (error) {
     console.error("Error deleting styleboard:", error);
     alert("Failed to delete styleboard. Please try again.");
