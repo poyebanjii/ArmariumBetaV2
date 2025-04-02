@@ -214,7 +214,6 @@ return (
                 style={{
                   border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red' : 'none'
                 }}>
-                {/* <h1>{outfit.outfitName}</h1> */}
                 <img 
                   src={outfit.topImageUrl} 
                   alt="Top"
