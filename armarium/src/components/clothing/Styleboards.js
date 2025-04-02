@@ -3,6 +3,8 @@ import { collection, getDocs, query, where, doc, deleteDoc } from 'firebase/fire
 import { db } from '../backend/firebaseConfig'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
+import { ref, listAll, getDownloadURL } from "firebase/storage";
+import { storage } from "../backend/firebaseConfig";
 import Navbar from '../Navbar';
 import '../styles/StyleboardsFormat.css'; 
 
@@ -18,32 +20,58 @@ function Styleboards() {
   const DELAY = 750;
 
   const fetchStyleboards = async (user) => {
-    if (user) {
-      const userId = user.uid;  
-      const q = query(collection(db, 'Users', userId, 'Styleboards'));
-      
-      const querySnapshot = await getDocs(q);
-      const styleboardsList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setStyleboards(styleboardsList);
-      setTitle(querySnapshot.styleboardName);
-      console.log(styleboardsList)
-    } else {
+    if (!user) {
       console.log("No user logged in");
+      return;
+    }
+  
+    try {
+      const userId = user.uid;
+      const styleboardsPath = `Users/Styleboards/${userId}`;
+      const styleboardsRef = ref(storage, styleboardsPath);
+  
+      const styleboardsList = [];
+      const styleboardsSnapshot = await listAll(styleboardsRef);
+  
+      console.log("Styleboards snapshot:", styleboardsSnapshot);
+  
+      for (const folderRef of styleboardsSnapshot.prefixes) {
+        const styleboardName = folderRef.name;
+        console.log("Fetching styleboard:", styleboardName);
+        const outfits = [];
+  
+        const outfitFoldersSnapshot = await listAll(folderRef);
+  
+        for (const outfitFolderRef of outfitFoldersSnapshot.prefixes) {
+          const outfitName = outfitFolderRef.name;
+          console.log("Fetching outfit:", outfitName);
+          const images = {};
+  
+          // List all files directly inside the outfit folder
+          const imageFilesSnapshot = await listAll(outfitFolderRef);
+  
+          for (const imageFileRef of imageFilesSnapshot.items) {
+            const fileName = imageFileRef.name.replace(".jpg", ""); // Remove file extension
+            const downloadUrl = await getDownloadURL(imageFileRef); // Get the download URL
+            images[fileName] = downloadUrl; // Use the file name (e.g., "top", "bottom", "shoes") as the key
+          }
+  
+          outfits.push({ name: outfitName, images });
+        }
+  
+        styleboardsList.push({
+          id: folderRef.name,
+          styleboardName,
+          outfits,
+        });
+      }
+  
+      setStyleboards(styleboardsList);
+      console.log("Fetched styleboards:", styleboardsList);
+    } catch (error) {
+      console.error("Error fetching styleboards from storage:", error);
     }
   };
-
-  const filteredStyleboards = () => {
-    if (!styleboards) return []; 
-    return styleboards.filter(styleboard => {
-      const matchesTitle = styleboard.styleboardName && styleboard.styleboardName.toLowerCase().includes(searchInput.toLowerCase());
-      return matchesTitle;
-    });
-};
-
-
 const handleSearchChange = (e) => {
   const inputValue = e.target.value.toLowerCase();
   setSearchInput(inputValue);
@@ -61,13 +89,19 @@ const handleDelete = async () => {
 
     for (const styleboard of styleboardToDelete) {
       const styleboardDocRef = doc(db, `Users/${user.uid}/Styleboards`, styleboard.id);
+      console.log("Attempting to delete:", styleboardDocRef.path); 
       await deleteDoc(styleboardDocRef);
       console.log("Styleboard deleted successfully:", styleboard.id);
     }
 
-    setStyleboardToDelete([]);  
-    setIsDelete(false);    
-    await fetchStyleboards(user); 
+    setStyleboards((prevStyleboards) =>
+      prevStyleboards.filter(
+        (styleboard) => !styleboardToDelete.some((item) => item.id === styleboard.id)
+      )
+    );
+
+    setStyleboardToDelete([]);
+    setIsDelete(false); 
   } catch (error) {
     console.error("Error deleting styleboard:", error);
     alert("Failed to delete styleboard. Please try again.");
@@ -85,12 +119,16 @@ const addToDeleteList = (styleboards) => {
 }
 
 const toggleDelete = () => {
+  console.log("Toggling delete mode. Current state:", isDelete); 
   if (isDelete) {
     setStyleboardToDelete([]);
   }
   setIsDelete(!isDelete);
 };
 
+const handleStyleboardClick = (styleboard) => {
+  navigate(`/styleboard/${styleboard.id}`, { state: { styleboard } });
+};
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -125,42 +163,75 @@ return (
       </button>
     )}
 
+
     <ul className="styleboards-list">
-      {filteredStyleboards().length > 0 ? (
-        filteredStyleboards().map((styleboard) => (
-          <li key={styleboard.id} className="styleboard-item">
-            <div className="image-container">
-              <h1>{styleboard.styleboardName}</h1>
-              <img 
-                src={styleboard.topImageUrl} 
-                alt="Top"
-                className="styleboard-image"
-                onClick={() => isDelete ? addToDeleteList(styleboard) : navigate(`/editStyleboard/${styleboard.id}`)}
-                style={{
-                  border: styleboardToDelete.some(item => item.id === styleboard.id) ? '2px solid red' : 'none'
-                }}
-              />
-              <img 
-                src={styleboard.bottomImageUrl} 
-                alt="Bottom" 
-                className="styleboard-image"
-                onClick={() => isDelete ? addToDeleteList(styleboard) : navigate(`/editStyleboard/${styleboard.id}`)}
-                style={{
-                  border: styleboardToDelete.some(item => item.id === styleboard.id) ? '2px solid red' : 'none'
-                }}
-              />
-              <img 
-                src={styleboard.shoesImageUrl} 
-                alt="Shoes" 
-                className="styleboard-image"
-                onClick={() => isDelete ? addToDeleteList(styleboard) : navigate(`/editStyleboard/${styleboard.id}`)}
-                style={{
-                  border: styleboardToDelete.some(item => item.id === styleboard.id) ? '2px solid red' : 'none'
-                }}
-              />
-            </div>
-          </li>
-        ))
+      {styleboards.length > 0 ? (
+        styleboards.map((styleboard) => {
+          const isSelected = styleboardToDelete.some((item) => item.id === styleboard.id); 
+
+          return (
+            <li
+              key={styleboard.id}
+              className="styleboard-item"
+              onClick={() => {
+                if (!isDelete) {
+                  console.log("Navigating to styleboard:", styleboard.id); 
+                  handleStyleboardClick(styleboard);
+                }
+              }}
+              style={{
+                cursor: 'pointer',
+                border: isSelected ? '2px solid red' : '1px solid #ccc', 
+                padding: '10px',
+                margin: '10px',
+              }}
+            >
+              <div className="image-container">
+                <h1>{styleboard.styleboardName}</h1>
+                {styleboard.outfits.length > 0 && (
+                  <div>
+                    {styleboard.outfits[0].images.top && (
+                      <img
+                        src={styleboard.outfits[0].images.top}
+                        alt="Top"
+                        className="styleboard-image"
+                      />
+                    )}
+                    {styleboard.outfits[0].images.bottom ? (
+                      <img
+                        src={styleboard.outfits[0].images.bottom}
+                        alt="Bottom"
+                        className="styleboard-image"
+                      />
+                    ) : (
+                      <p>No bottom image available</p>
+                    )}
+                    {styleboard.outfits[0].images.shoes && (
+                      <img
+                        src={styleboard.outfits[0].images.shoes}
+                        alt="Shoes"
+                        className="styleboard-image"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+              {isDelete && (
+                <div
+                  onClick={(e) => e.stopPropagation()} // Prevent navigation when clicking the checkbox
+                  style={{ display: 'inline-block', marginTop: '10px' }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isSelected} 
+                    onChange={() => addToDeleteList(styleboard)} // Toggle selection
+                  />
+                  <label style={{ marginLeft: '5px' }}>Select for Deletion</label>
+                </div>
+              )}
+            </li>
+          );
+        })
       ) : (
         <p>No styleboards found.</p>
       )}

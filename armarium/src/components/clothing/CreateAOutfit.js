@@ -390,7 +390,7 @@ function Outfit() {
         </div>
       </div>
   
-      {/* Modal for saving outfit */}
+      {/* Modal for saving outfit TODO, COPY MODAL FOR FOLDER*/}
       <div className={`modal ${showModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">
         <div className="modal-dialog">
           <div className="modal-content">
