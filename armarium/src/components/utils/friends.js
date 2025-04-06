@@ -1,4 +1,4 @@
-import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig';
 
 /**
@@ -8,30 +8,33 @@ import { db } from '../backend/firebaseConfig';
  * @returns {Promise<string>} - A message indicating the result.
  */
 export const sendFriendRequest = async (fromUserId, toUsername) => {
-    try {
-      // 1. Find recipient user by username
-      const usersRef = doc(db, 'usernames', toUsername); // optional index collection
-      const userDoc = await getDoc(usersRef);
-  
-      if (!userDoc.exists()) {
-        return 'User not found.';
+  try {
+      // Query the Users collection for the username
+      const usersRef = collection(db, 'Users');
+      const q = query(usersRef, where('username', '==', toUsername));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+          return 'User not found.';
       }
-  
-      const toUserId = userDoc.data().uid;
-  
+
+      // Get the recipient's user ID
+      const userDoc = querySnapshot.docs[0];
+      const toUserId = userDoc.id;
+
       if (toUserId === fromUserId) {
-        return "You can't send a friend request to yourself.";
+          return "You can't send a friend request to yourself.";
       }
-  
-      // 2. Add fromUserId to the recipient's friendRequests array
+
+      // Add fromUserId to the recipient's friendRequests array
       const toUserRef = doc(db, 'Users', toUserId);
       await updateDoc(toUserRef, {
-        friendRequests: arrayUnion(fromUserId),
+          friendRequests: arrayUnion(fromUserId),
       });
-  
+
       return 'Friend request sent!';
-    } catch (error) {
+  } catch (error) {
       console.error('Error sending friend request:', error);
       return 'Failed to send friend request.';
-    }
-  };
+  }
+};
