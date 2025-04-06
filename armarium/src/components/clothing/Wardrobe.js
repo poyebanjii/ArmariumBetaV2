@@ -51,7 +51,7 @@ const Wardrobe = () => {
                     tags: doc.data().tags,
                     url: doc.data().url
                 }));
-                console.log("clothiing doc:", user.uid);
+                console.log("clothing doc:", user.uid);
                 console.log(topsData);
                 setTops(topsData);
             }
