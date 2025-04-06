@@ -53,7 +53,7 @@ function Navbar() {
               </NavLink>
             </li>
             <li
-              className="nav-item dropdown"
+              className="nav-link dropdown"
               id="wardrobe-link"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
