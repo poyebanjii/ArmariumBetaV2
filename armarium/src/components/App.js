@@ -22,6 +22,7 @@ import Styleboards from './clothing/Styleboards';
 import StyleboardPage from './clothing/StyleboardPage';
 import Outfits from './clothing/MyOutfits';
 import ProtectedRoute from './ProtectedRoute';
+import FriendRequests from './profile/FriendRequests';
 
 /**
  * The routers for linking to different pages.
@@ -45,6 +46,7 @@ function App() {
         <Route path="/profileSettings" element={<ProtectedRoute element={<ProfileSettings />} />} />
         <Route path="/imageUpload" element={<ProtectedRoute element={<ImageUpload />} />} />
         <Route path="/itemUpload" element={<ProtectedRoute element={<ItemUpload />} />} />
+        <Route path="/friendRequests" element={<ProtectedRoute element={<FriendRequests />} />} />
         <Route path="/userInfo" element={<ProtectedRoute element={<UserInfo />} />} />
         <Route path="/wardrobe" element={<ProtectedRoute element={<Wardrobe />} />} />
         <Route path="/heightAndWeight" element={<ProtectedRoute element={<HeightAndWeight />} />} />
