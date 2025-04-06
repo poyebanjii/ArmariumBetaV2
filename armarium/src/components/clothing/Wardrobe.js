@@ -5,6 +5,8 @@ import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
 import '../styles/Loading.css';
+import '../styles/Wardrobe.css';
+import { Center } from 'framer/render/presentation/Frame/DeprecatedFrame.js';
 
 const Wardrobe = () => {
     const [tops, setTops] = useState([]);
@@ -211,161 +213,141 @@ const Wardrobe = () => {
     return (
         <div>
             <Navbar />
-            <input
-                type="text"
-                placeholder="Search by title or tags..."
-                value={searchInput}
-                onChange={handleSearchChange}
-            />
-            <NavLink onClick={handleShowTops} style={{ marginRight: '10px', cursor: 'pointer' }}>
-                Tops
-            </NavLink>
-            <NavLink onClick={handleShowBottoms} style={{ cursor: 'pointer' }}>
-                Bottoms
-            </NavLink>
-            <NavLink onClick={handleShowShoes} style={{ marginRight: '10px', cursor: 'pointer' }}>
-                Shoes
-            </NavLink>
-            <NavLink onClick={handleShowTopLayers} style={{ marginRight: '10px', cursor: 'pointer' }}>
-                Top Layer
-            </NavLink>
-            <button onClick={toggleDelete}>
+            <div className="wardrobe-header">
+                <input 
+                type="text" 
+                placeholder="Search by title or tags..." 
+                value={searchInput} 
+                onChange={handleSearchChange} 
+                className="wardrobe-search"
+                />
+                <button className="nav-link" onClick={toggleDelete}>
                 {isDelete ? 'Cancel' : 'Delete'}
-            </button>
-            {isDelete && (
-                <button onClick={handleDelete} style={{ marginLeft: '10px' }}>
+                </button>
+                {isDelete && (
+                <button className="nav-link" onClick={handleDelete}>
                     Confirm Delete
                 </button>
-            )}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isTop && displayedClothes.map((top, index) => (
-                    <div key={top.id} style={{ position: 'relative', textAlign: 'center' }}>
-                        <img
-                            src={top.url}
-                            alt={`Top ${index + 1}`}
-                            style={{
-                                width: '150px',
-                                height: 'auto',
-                                border: clothesToDelete.some(item => item.id === top.id) ? '2px solid red' : 'none'
-                            }}
-                            onClick={() => handleDeleteClick({ id: top.id, type: 'top' })}
-                        />
-                        <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{top.title}</p>
-                        {isDelete && (
-                            <button
-                                onClick={() => addToDeleteList({ id: top.id, type: 'top' })}
-                                style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {clothesToDelete.some(item => item.id === top.id) ? 'Remove' : 'Select'}
-                            </button>
-                        )}
-                    </div>
-                ))}
+                )}
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isBottom && displayedClothes.map((bottom, index) => (
-                    <div key={bottom.id} style={{ position: 'relative', textAlign: 'center' }}>
-                        <img
-                            src={bottom.url}
-                            alt={`Bottom ${index + 1}`}
-                            style={{
-                                width: '150px',
-                                height: 'auto',
-                                border: clothesToDelete.some(item => item.id === bottom.id) ? '2px solid red' : 'none'
-                            }}
-                            onClick={() => handleDeleteClick({ id: bottom.id, type: 'bottom' })}
+            {/* Tops Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                    <h3>Tops</h3>
+                    <button className="add-nav-link" onClick={handleShowTops}>
+                        Add
+                    </button>
+                </div>
+                <div className="wardrobe-content-row">
+                    {filteredClothes(tops).map((top, index) => (
+                    <div key={top.id} className="wardrobe-item">
+                        <img 
+                        src={top.url} 
+                        alt={`Top ${index + 1}`} 
+                        className="wardrobe-image"
+                        onClick={() => handleDeleteClick({ id: top.id, type: 'top' })}
                         />
-                        <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{bottom.title}</p>
                         {isDelete && (
-                            <button
-                                onClick={() => addToDeleteList({ id: bottom.id, type: 'bottom' })}
-                                style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {clothesToDelete.some(item => item.id === bottom.id) ? 'Remove' : 'Select'}
-                            </button>
+                        <button
+                            onClick={() => addToDeleteList({ id: top.id, type: 'top' })}
+                            className="delete-button"
+                        >
+                            {clothesToDelete.some(item => item.id === top.id) ? 'Remove' : 'Select'}
+                        </button>
                         )}
                     </div>
-                ))}
+                    ))}
+                </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isShoes && displayedClothes.map((shoe, index) => (
-                    <div key={shoe.id} style={{ position: 'relative' }}>
-                        <img
-                            src={shoe.url}
-                            alt={`Shoe ${index + 1}`}
-                            style={{
-                                width: '150px',
-                                height: 'auto',
-                                border: clothesToDelete.some(item => item.id === shoe.id) ? '2px solid red' : 'none'
-                            }}
-                            onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
+
+            {/* Bottoms Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                    <h3>Bottoms</h3>
+                    <button className="add-nav-link" onClick={handleShowTops}>
+                        Add
+                    </button>
+                </div>
+                <div className="wardrobe-content-row">
+                    {filteredClothes(bottoms).map((bottom, index) => (
+                    <div key={bottom.id} className="wardrobe-item">
+                        <img 
+                        src={bottom.url} 
+                        alt={`Bottom ${index + 1}`} 
+                        className="wardrobe-image"
+                        onClick={() => handleDeleteClick({ id: bottom.id, type: 'bottom' })}
                         />
                         {isDelete && (
-                            <button
-                                onClick={() => addToDeleteList({ id: shoe.id, type: 'shoes' })}
-                                style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {clothesToDelete.some(item => item.id === shoe.id) ? 'Remove' : 'Select'}
-                            </button>
+                        <button
+                            onClick={() => addToDeleteList({ id: bottom.id, type: 'bottom' })}
+                            className="delete-button"
+                        >
+                            {clothesToDelete.some(item => item.id === bottom.id) ? 'Remove' : 'Select'}
+                        </button>
                         )}
                     </div>
-                ))}
+                    ))}
+                </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isTopLayer && displayedClothes.map((topLayers, index) => (
-                    <div key={topLayers.id} style={{ position: 'relative' }}>
-                        <img
-                            src={topLayers.url}
-                            alt={`Toplayer ${index + 1}`}
-                            style={{
-                                width: '150px',
-                                height: 'auto',
-                                border: clothesToDelete.some(item => item.id === topLayers.id) ? '2px solid red' : 'none'
-                            }}
-                            onClick={() => handleDeleteClick({ id: topLayers.id, type: 'toplayer' })}
+
+            {/* Shoes Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                    <h3>Shoes</h3>
+                    <button className="add-nav-link" onClick={handleShowTops}>
+                        Add
+                    </button>
+                </div>
+                <div className="wardrobe-content-row">
+                {filteredClothes(shoes).map((shoe, index) => (
+                    <div key={shoe.id} className="wardrobe-item">
+                        <img 
+                        src={shoe.url} 
+                        alt={`Shoe ${index + 1}`} 
+                        className="wardrobe-image"
+                        onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
                         />
                         {isDelete && (
-                            <button
-                                onClick={() => addToDeleteList({ id: topLayers.id, type: 'toplayer' })}
-                                style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {clothesToDelete.some(item => item.id === topLayers.id) ? 'Remove' : 'Select'}
-                            </button>
+                        <button
+                            onClick={() => addToDeleteList({ id: shoe.id, type: 'shoes' })}
+                            className="delete-button"
+                        >
+                            {clothesToDelete.some(item => item.id === shoe.id) ? 'Remove' : 'Select'}
+                        </button>
                         )}
                     </div>
-                ))}
+                    ))}
+                </div>
+            </div>
+
+            {/* Top Layers Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                        <h3>Top Layers</h3>
+                        <button className="add-nav-link" onClick={handleShowTops}>
+                            Add
+                        </button>
+                </div>
+                <div className="wardrobe-content-row">
+                    {filteredClothes(topLayers).map((toplayer, index) => (
+                    <div key={toplayer.id} className="wardrobe-item">
+                        <img 
+                        src={toplayer.url} 
+                        alt={`TopLayer ${index + 1}`} 
+                        className="wardrobe-image"
+                        onClick={() => handleDeleteClick({ id: toplayer.id, type: 'toplayer' })}
+                        />
+                        {isDelete && (
+                        <button
+                            onClick={() => addToDeleteList({ id: toplayer.id, type: 'toplayer' })}
+                            className="delete-button"
+                        >
+                            {clothesToDelete.some(item => item.id === toplayer.id) ? 'Remove' : 'Select'}
+                        </button>
+                        )}
+                    </div>
+                    ))}
+                </div>
             </div>
         </div>
     );
