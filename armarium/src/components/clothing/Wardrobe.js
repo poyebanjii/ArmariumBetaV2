@@ -49,7 +49,7 @@ const Wardrobe = () => {
                     tags: doc.data().tags,
                     url: doc.data().url
                 }));
-                console.log("clothiing doc:", user.uid);
+                console.log("clothing doc:", user.uid);
                 console.log(topsData);
                 setTops(topsData);
             }
@@ -336,22 +336,21 @@ const Wardrobe = () => {
                 ))}
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isShoes && displayedClothes.map((shoe, index) => (
-                    <div key={shoe.id} style={{ position: 'relative', textAlign: 'center' }}>
+                {isTopLayer && displayedClothes.map((topLayers, index) => (
+                    <div key={topLayers.id} style={{ position: 'relative' }}>
                         <img
-                            src={shoe.url}
-                            alt={`Shoe ${index + 1}`}
+                            src={topLayers.url}
+                            alt={`Toplayer ${index + 1}`}
                             style={{
                                 width: '150px',
                                 height: 'auto',
-                                border: clothesToDelete.some(item => item.id === shoe.id) ? '2px solid red' : 'none'
+                                border: clothesToDelete.some(item => item.id === topLayers.id) ? '2px solid red' : 'none'
                             }}
-                            onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
+                            onClick={() => handleDeleteClick({ id: topLayers.id, type: 'toplayer' })}
                         />
-                        <p style={{ marginTop: '5px', fontSize: '14px', color: '#333' }}>{shoe.title}</p>
                         {isDelete && (
                             <button
-                                onClick={() => addToDeleteList({ id: shoe.id, type: 'shoes' })}
+                                onClick={() => addToDeleteList({ id: topLayers.id, type: 'toplayer' })}
                                 style={{
                                     position: 'absolute',
                                     top: '5px',
@@ -362,7 +361,7 @@ const Wardrobe = () => {
                                     cursor: 'pointer'
                                 }}
                             >
-                                {clothesToDelete.some(item => item.id === shoe.id) ? 'Remove' : 'Select'}
+                                {clothesToDelete.some(item => item.id === topLayers.id) ? 'Remove' : 'Select'}
                             </button>
                         )}
                     </div>
