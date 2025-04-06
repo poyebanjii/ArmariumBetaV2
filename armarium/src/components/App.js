@@ -20,7 +20,7 @@ import Ocassions from './Questionare/Ocassions';
 import EditClothing from './clothing/EditClothing';
 import Outfits from './clothing/MyOutfits';
 import ProtectedRoute from './ProtectedRoute';
-import UserProfile from './profile/UserProfile'; // ✅ Import UserProfile
+import UserProfile from './profile/UserProfile';
 
 /**
  * The routers for linking to different pages.
