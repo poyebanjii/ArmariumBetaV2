@@ -57,6 +57,11 @@ function Navbar() {
               {isDropdownVisible && <Dropdown />}
             </li>
             <li className="nav-item">
+              <NavLink className="nav-link" id="friend-requests-link" to="/friendRequests" end>
+                Social
+              </NavLink>
+            </li>
+            <li className="nav-item">
               <a className="nav-link" id="upload-link" href="https://docs.google.com/forms/d/1vh_fvJm27AYNRzrLfdTZajZctn0Fr6Tdb4QUMaBo8NA/edit" target="_blank" rel="noopener noreferrer">
                 Feedback
               </a>
