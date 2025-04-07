@@ -4,8 +4,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
+import ItemUpload from './itemUpload';
 import '../styles/Loading.css';
 import '../styles/Wardrobe.css';
+import '../styles/Forms.css';
 import { Center } from 'framer/render/presentation/Frame/DeprecatedFrame.js';
 
 const Wardrobe = () => {
@@ -20,10 +22,22 @@ const Wardrobe = () => {
     const [isDelete, setIsDelete] = useState(false);
     const [clothesToDelete, setClothesToDelete] = useState([]);
     const [searchInput, setSearchInput] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedType, setSelectedType] = useState('');
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const DELAY = 750;
+
+    const handleShowModal = (type) => {
+        setSelectedType(type);
+        setIsModalOpen(true);
+        document.body.classList.add('modal-open'); // Prevent scrolling
+    };
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        document.body.classList.remove('modal-open'); // Allow scrolling
+    };
 
     const filteredClothes = (clothes) => {
         return clothes.filter(clothing => {
@@ -230,11 +244,21 @@ const Wardrobe = () => {
                 </button>
                 )}
             </div>
+            {isModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <ItemUpload type={selectedType}/>
+                        <button className="modal-close" onClick={handleCloseModal}>
+                            Close
+                        </button>
+                    </div>
+            </div>
+            )}
             {/* Tops Row */}
             <div className="wardrobe-row">
                 <div className='Add-Button'>
                     <h3>Tops</h3>
-                    <button className="add-nav-link" onClick={handleShowTops}>
+                    <button className="add-nav-link" onClick={() => handleShowModal('top')}>
                         Add
                     </button>
                 </div>
@@ -264,7 +288,7 @@ const Wardrobe = () => {
             <div className="wardrobe-row">
                 <div className='Add-Button'>
                     <h3>Bottoms</h3>
-                    <button className="add-nav-link" onClick={handleShowTops}>
+                    <button className="add-nav-link" onClick={() => handleShowModal('bottom')}>
                         Add
                     </button>
                 </div>
@@ -294,7 +318,7 @@ const Wardrobe = () => {
             <div className="wardrobe-row">
                 <div className='Add-Button'>
                     <h3>Shoes</h3>
-                    <button className="add-nav-link" onClick={handleShowTops}>
+                    <button className="add-nav-link" onClick={() => handleShowModal('shoes')}>
                         Add
                     </button>
                 </div>
@@ -324,7 +348,7 @@ const Wardrobe = () => {
             <div className="wardrobe-row">
                 <div className='Add-Button'>
                         <h3>Top Layers</h3>
-                        <button className="add-nav-link" onClick={handleShowTops}>
+                        <button className="add-nav-link" onClick={() => handleShowModal('toplayer')}>
                             Add
                         </button>
                 </div>

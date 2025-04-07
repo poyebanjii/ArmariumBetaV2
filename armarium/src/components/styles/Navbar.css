@@ -12,12 +12,12 @@
   .navbar-nav {
     display: flex;
     align-items: center;
+    list-style: none;
   }
   
   .nav-item {
     list-style: none;
     margin-right: 20px;
-    font-weight: bold;
   }
 
   
@@ -27,7 +27,7 @@
     padding: 8px 12px;
     border-radius: 4px;
     transition: background-color 0.3s, color 0.3s;
-    border:none;
+    border: none;
     background: none;
     font-size: 16px;
     font-weight: bold;
@@ -60,19 +60,22 @@
   color:white;
 }
 
-.nav-item.dropdown {
+.nav-link.dropdown {
   color: white; /* Dropdown text color */
+  padding: 8px 12px; /* Padding for dropdown */
+  border-radius: 4px;
+  margin-right: 20px;
 }
 
 /* Show dropdown when visible */
-.nav-item.dropdown:hover .dropdown-menu {
+.nav-link.dropdown:hover .dropdown-menu {
   opacity: 1; /* Fully visible */
   visibility: visible; /* Allow interaction */
   transform: translateY(0); /* Reset slide effect */
 }
 
 /* Arrow pointing down */
-.nav-item.dropdown::after {
+.nav-link.dropdown::after {
   content: '▼'; /* Unicode for down arrow */
   font-size: 0.8rem;
   margin-left: 5px;
