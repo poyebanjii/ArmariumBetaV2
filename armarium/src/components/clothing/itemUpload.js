@@ -9,7 +9,7 @@ import Joyride from 'react-joyride';
 import { Center } from 'framer/render/presentation/Frame/DeprecatedFrame.js';
 import '../styles/Forms.css';
 
-const ItemUpload = () => {
+const ItemUpload = ({type}) => {
   const [items, setItems] = useState([
     { file: null, title: '', tags: '', color: '', type: '', preview: null },
   ]);
@@ -47,6 +47,12 @@ const ItemUpload = () => {
     updatedItems[index].preview = URL.createObjectURL(file);
     setItems(updatedItems);
   };
+
+  useEffect(() => {
+    setItems((prevItems) =>
+      prevItems.map((item => ({ ...item, type: type || '' })))
+    );
+  }, [type]);
 
   // const handleChange = (e) => {
   //   if (e.target.files[0]) {
@@ -288,10 +294,6 @@ const ItemUpload = () => {
 
   return (
     <div>
-      <Navbar />
-      <div className="Form-container">
-        {/* <h2>Upload an Item</h2>
-        <progress value={progress} max="100" /> */}
         <div className='Form-box'>
           <div className='input-group'>
         <h2 style={{ textAlign: 'center' }}>Upload Items</h2>
@@ -370,7 +372,6 @@ const ItemUpload = () => {
           }
         }}
       />
-      </div>
       </div>
     </div>
   );
