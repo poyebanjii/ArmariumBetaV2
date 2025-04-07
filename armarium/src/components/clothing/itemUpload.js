@@ -293,7 +293,6 @@ const ItemUpload = ({type}) => {
   };
 
   return (
-    <div>
         <div className='Form-box'>
           <div className='input-group'>
         <h2 style={{ textAlign: 'center' }}>Upload Items</h2>
@@ -354,7 +353,7 @@ const ItemUpload = ({type}) => {
           />
         </div>
       ))}
-      <button className= 'Form-Submit'onClick={addNewItem} style={{ marginBottom: '20px' }}>
+      <button className= 'Form-Submit' onClick={addNewItem} style={{ marginBottom: '20px' }}>
         + Add Another Item
       </button>
       <button className = 'Form-Submit' onClick={handleUpload}>Upload All</button>
@@ -373,7 +372,6 @@ const ItemUpload = ({type}) => {
         }}
       />
       </div>
-    </div>
   );
 };
 

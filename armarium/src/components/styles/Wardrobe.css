@@ -121,15 +121,6 @@
   overflow-y: auto; /* Enables vertical scrolling if content overflows */
 }
 
-.modal-content h2 {
-  margin-bottom: 20px;
-}
-
-.modal-content label {
-  display: block;
-  margin-bottom: 10px;
-  text-align: left;
-}
 
 .modal-content input,
 .modal-content select {
@@ -140,28 +131,21 @@
   border-radius: 5px;
 }
 
-.modal-buttons {
-  display: flex;
-  justify-content: space-between;
+body.modal-open {
+  overflow: hidden; /* Prevents background scrolling when modal is open */
 }
 
-.modal-buttons button {
-  padding: 10px 20px;
+.modal-close{
+  margin-top: 20px;
+  width: 100%; /* Width of the square */
+  padding: 10px;
+  background-color: #d8a7a7;
   border: none;
-  border-radius: 5px;
+  border-radius: 20px;
+  font-size: 1em; 
   cursor: pointer;
 }
 
-.modal-buttons button[type="submit"] {
-  background-color: #4caf50;
-  color: white;
-}
-
-.modal-buttons button[type="button"] {
-  background-color: #f44336;
-  color: white;
-}
-
-body.modal-open {
-  overflow: hidden; /* Prevents background scrolling when modal is open */
+.modal-close:hover {
+  background-color: #c98f8f; /* Darker background on hover */
 }

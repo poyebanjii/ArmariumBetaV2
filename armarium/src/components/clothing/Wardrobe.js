@@ -247,13 +247,10 @@ const Wardrobe = () => {
             {isModalOpen && (
                 <div className="modal-overlay">
                     <div className="modal-content">
-                        <h2>Upload Items</h2>
                         <ItemUpload type={selectedType}/>
-                        <div className="input-group">
-                        <button type="Form-Submit" onClick={handleCloseModal}>
+                        <button className="modal-close" onClick={handleCloseModal}>
                             Close
                         </button>
-                        </div>
                     </div>
             </div>
             )}

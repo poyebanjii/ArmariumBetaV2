@@ -47,11 +47,6 @@ function Navbar() {
               </NavLink>
             </li>
             */}
-            <li className="nav-item">
-              <NavLink className="nav-link" id="upload-link" to="/itemUpload" end>
-                Upload
-              </NavLink>
-            </li>
             <li
               className="nav-link dropdown"
               id="wardrobe-link"
