@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import '../styles/UserProfile.css';
 
@@ -11,6 +11,8 @@ export default function UserProfile() {
   const [userData, setUserData] = useState(null);
   const [friends, setFriends] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedMeasurements, setEditedMeasurements] = useState({ height: '', weight: '' });
 
   const navigate = useNavigate();
 
@@ -21,39 +23,34 @@ export default function UserProfile() {
         navigate('/login');
         return;
       }
-  
-      // Fetch main user profile data
+
       const userRef = doc(db, 'Users', user.uid);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         setUserData(userSnap.data());
       }
-  
-      // Fetch measurements from subcollection
+
       const measurementsQuery = query(
         collection(db, 'Users', user.uid, 'measurements')
       );
       const measurementsSnap = await getDocs(measurementsQuery);
-      
+
       if (!measurementsSnap.empty) {
-        // Optionally sort by timestamp if needed
         const sortedMeasurements = measurementsSnap.docs
           .map(doc => ({ id: doc.id, ...doc.data() }))
           .sort((a, b) => b.timestamp?.toMillis() - a.timestamp?.toMillis());
-  
+
         const latest = sortedMeasurements[0];
-        setUserData(prev => ({ ...prev, ...latest })); // Merge measurements into userData
+        setUserData(prev => ({ ...prev, ...latest }));
       }
-  
-      // Fetch friends
+
       const friendsQuery = query(
         collection(db, 'Users'),
         where('friends', 'array-contains', user.uid)
       );
       const friendsSnap = await getDocs(friendsQuery);
       setFriends(friendsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-  
-      // Fetch messages
+
       const messagesQuery = query(
         collection(db, 'messages'),
         where('to', '==', user.uid)
@@ -61,11 +58,40 @@ export default function UserProfile() {
       const messagesSnap = await getDocs(messagesQuery);
       setMessages(messagesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     };
-  
+
     fetchProfileData();
   }, [navigate]);
-  
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+    setEditedMeasurements({
+      height: userData?.height || '',
+      weight: userData?.weight || '',
+    });
+  };
+
+  const handleSaveClick = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userRef = doc(db, 'Users', user.uid);
+    await updateDoc(userRef, {
+      height: editedMeasurements.height,
+      weight: editedMeasurements.weight,
+    });
+
+    setUserData(prev => ({
+      ...prev,
+      height: editedMeasurements.height,
+      weight: editedMeasurements.weight,
+    }));
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedMeasurements(prev => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="profile-container">
@@ -85,11 +111,40 @@ export default function UserProfile() {
       <div className="measurements-box">
         <div className="measurements-header">
           <h3>Your measurements</h3>
-          <button>Edit</button>
+          {isEditing ? (
+            <button onClick={handleSaveClick}>Save</button>
+          ) : (
+            <button onClick={handleEditClick}>Edit</button>
+          )}
         </div>
         <div className="measurements-grid">
-          <p>Height: {userData?.height ? `${userData.height} in` : '#'}</p>
-          <p>Weight: {userData?.weight ? `${userData.weight} lbs` : '#'}</p>
+          {isEditing ? (
+            <>
+              <label>
+                Height:
+                <input
+                  type="text"
+                  name="height"
+                  value={editedMeasurements.height}
+                  onChange={handleInputChange}
+                />
+              </label>
+              <label>
+                Weight:
+                <input
+                  type="text"
+                  name="weight"
+                  value={editedMeasurements.weight}
+                  onChange={handleInputChange}
+                />
+              </label>
+            </>
+          ) : (
+            <>
+              <p>Height: {userData?.height ? `${userData.height} in` : '#'}</p>
+              <p>Weight: {userData?.weight ? `${userData.weight} lbs` : '#'}</p>
+            </>
+          )}
         </div>
       </div>
 
