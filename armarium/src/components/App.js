@@ -24,6 +24,7 @@ import Outfits from './clothing/MyOutfits';
 import ProtectedRoute from './ProtectedRoute';
 import FriendRequests from './profile/FriendRequests';
 import UserProfile from './profile/UserProfile';
+import ClothesLibSearch from './clothing/ClothesLibSearch';
 
 /**
  * The routers for linking to different pages.
@@ -57,6 +58,7 @@ function App() {
         <Route path="/editClothing/:clothingId/:type" element={<ProtectedRoute element={<EditClothing />} />} />
         <Route path="/wardrobeOutfits/:userId" element={<ProtectedRoute element={<Outfits />} />} />
         <Route path="/profile" element={<ProtectedRoute element={<UserProfile />} />} />
+        <Route path="/add-clothes" element={<ProtectedRoute element={<ClothesLibSearch />} />} />
       </Routes>
     </Router>
   );
