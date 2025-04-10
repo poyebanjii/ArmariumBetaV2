@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './Login/Login'
+import Login from './Login/Login';
 import Register from './Login/Register';
 import ForgotPassword from './Login/ForgotPassowrd';
 import NewPassword from './Login/NewPassowrd';
@@ -23,6 +23,7 @@ import StyleboardPage from './clothing/StyleboardPage';
 import Outfits from './clothing/MyOutfits';
 import ProtectedRoute from './ProtectedRoute';
 import FriendRequests from './profile/FriendRequests';
+import UserProfile from './profile/UserProfile';
 
 /**
  * The routers for linking to different pages.
@@ -55,9 +56,6 @@ function App() {
         <Route path="/occasions" element={<ProtectedRoute element={<Ocassions />} />} />
         <Route path="/editClothing/:clothingId/:type" element={<ProtectedRoute element={<EditClothing />} />} />
         <Route path="/wardrobeOutfits/:userId" element={<ProtectedRoute element={<Outfits />} />} />
-        <Route path="/wardrobeStyleboards/:userId" element={<ProtectedRoute element={<Styleboards />} />} />
-        <Route path="/" element={<Styleboards />} />
-        <Route path="/styleboard/:id" element={<StyleboardPage />} />
       </Routes>
     </Router>
   );
