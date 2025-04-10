@@ -5,6 +5,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
 //import '../styles/App.css';
 import '../styles/Register.css';
+import '../styles/Forms.css';
 
 /**
  * The Register page where users can create their accounts.
@@ -82,11 +83,11 @@ function Register() {
   };
 
   return (
-    <div className="Register-container">
+    <div className="Form-container">
       <div className="logo">
         <div className="logo-text">ARMARIUM</div>
       </div>
-      <div className="Register-box">
+      <div className="Form-box">
         <div className="input-group">
       <form onSubmit={handleRegisterSubmit}>
         <label>

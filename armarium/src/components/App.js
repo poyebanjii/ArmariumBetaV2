@@ -18,8 +18,11 @@ import Brands from './Questionare/Brands';
 import Styles from './Questionare/Styles';
 import Ocassions from './Questionare/Ocassions';
 import EditClothing from './clothing/EditClothing';
+import Styleboards from './clothing/Styleboards';
+import StyleboardPage from './clothing/StyleboardPage';
 import Outfits from './clothing/MyOutfits';
 import ProtectedRoute from './ProtectedRoute';
+import FriendRequests from './profile/FriendRequests';
 import UserProfile from './profile/UserProfile';
 
 /**
@@ -44,6 +47,7 @@ function App() {
         <Route path="/profileSettings" element={<ProtectedRoute element={<ProfileSettings />} />} />
         <Route path="/imageUpload" element={<ProtectedRoute element={<ImageUpload />} />} />
         <Route path="/itemUpload" element={<ProtectedRoute element={<ItemUpload />} />} />
+        <Route path="/friendRequests" element={<ProtectedRoute element={<FriendRequests />} />} />
         <Route path="/userInfo" element={<ProtectedRoute element={<UserInfo />} />} />
         <Route path="/wardrobe" element={<ProtectedRoute element={<Wardrobe />} />} />
         <Route path="/heightAndWeight" element={<ProtectedRoute element={<HeightAndWeight />} />} />
@@ -52,7 +56,6 @@ function App() {
         <Route path="/occasions" element={<ProtectedRoute element={<Ocassions />} />} />
         <Route path="/editClothing/:clothingId/:type" element={<ProtectedRoute element={<EditClothing />} />} />
         <Route path="/wardrobeOutfits/:userId" element={<ProtectedRoute element={<Outfits />} />} />
-        <Route path="/profile" element={<ProtectedRoute element={<UserProfile />} />} />
       </Routes>
     </Router>
   );

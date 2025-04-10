@@ -14,7 +14,7 @@
   }
   
   .logo {
-    background-color: #B21D1A;
+    background-color: #a52a2a;
     width: 100%;
     height: 100px;
     display: flex;
@@ -95,7 +95,7 @@
   }
   
 .error-message {
-    color: #B21D1A;
+    color: #a52a2a;
     margin-top: 10px;
     font-size: 0.9em;
     text-align: center;
