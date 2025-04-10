@@ -3,6 +3,7 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, updateDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import '../styles/UserProfile.css';
+import Navbar from '../Navbar';
 
 const db = getFirestore();
 const auth = getAuth();
@@ -94,82 +95,85 @@ export default function UserProfile() {
   };
 
   return (
-    <div className="profile-container">
-      <div className="profile-header">
-        <h1>Hi, {userData?.username || 'User'}.</h1>
-        <span className="profile-star">★</span>
-      </div>
-
-      <h2 className="weekly-title">Your <span className="weekly-highlight">weekly</span> styles</h2>
-
-      <div className="style-bubbles">
-        {['Artsy', 'Classic', 'Vintage', 'Edgy', 'Comfortable'].map((style, idx) => (
-          <div key={idx} className={`bubble bubble-${idx}`}>{style}</div>
-        ))}
-      </div>
-
-      <div className="measurements-box">
-        <div className="measurements-header">
-          <h3>Your measurements</h3>
-          {isEditing ? (
-            <button onClick={handleSaveClick}>Save</button>
-          ) : (
-            <button onClick={handleEditClick}>Edit</button>
-          )}
+    <div>
+      <Navbar />
+      <div className="profile-container">
+        <div className="profile-header">
+          <h1>Hi, {userData?.username || 'User'}.</h1>
+          <span className="profile-star">★</span>
         </div>
-        <div className="measurements-grid">
-          {isEditing ? (
-            <>
-              <label>
-                Height:
-                <input
-                  type="text"
-                  name="height"
-                  value={editedMeasurements.height}
-                  onChange={handleInputChange}
-                />
-              </label>
-              <label>
-                Weight:
-                <input
-                  type="text"
-                  name="weight"
-                  value={editedMeasurements.weight}
-                  onChange={handleInputChange}
-                />
-              </label>
-            </>
-          ) : (
-            <>
-              <p>Height: {userData?.height ? `${userData.height} in` : '#'}</p>
-              <p>Weight: {userData?.weight ? `${userData.weight} lbs` : '#'}</p>
-            </>
-          )}
+
+        <h2 className="weekly-title">Your <span className="weekly-highlight">weekly</span> styles</h2>
+
+        <div className="style-bubbles">
+          {['Artsy', 'Classic', 'Vintage', 'Edgy', 'Comfortable'].map((style, idx) => (
+            <div key={idx} className={`bubble bubble-${idx}`}>{style}</div>
+          ))}
         </div>
-      </div>
 
-      <div className="profile-section">
-        <h3>Friends</h3>
-        <ul>
-          {friends.length ? friends.map(f => (
-            <li key={f.id}>{f.username} ({f.email})</li>
-          )) : <li>No friends found.</li>}
-        </ul>
-      </div>
+        <div className="measurements-box">
+          <div className="measurements-header">
+            <h3>Your measurements</h3>
+            {isEditing ? (
+              <button onClick={handleSaveClick}>Save</button>
+            ) : (
+              <button onClick={handleEditClick}>Edit</button>
+            )}
+          </div>
+          <div className="measurements-grid">
+            {isEditing ? (
+              <>
+                <label>
+                  Height:
+                  <input
+                    type="text"
+                    name="height"
+                    value={editedMeasurements.height}
+                    onChange={handleInputChange}
+                  />
+                </label>
+                <label>
+                  Weight:
+                  <input
+                    type="text"
+                    name="weight"
+                    value={editedMeasurements.weight}
+                    onChange={handleInputChange}
+                  />
+                </label>
+              </>
+            ) : (
+              <>
+                <p>Height: {userData?.height ? `${userData.height} in` : '#'}</p>
+                <p>Weight: {userData?.weight ? `${userData.weight} lbs` : '#'}</p>
+              </>
+            )}
+          </div>
+        </div>
 
-      <div className="profile-section">
-        <h3>Messages</h3>
-        <ul>
-          {messages.length ? messages.map(m => (
-            <li key={m.id}><strong>From:</strong> {m.from} - {m.content}</li>
-          )) : <li>No messages found.</li>}
-        </ul>
-      </div>
+        <div className="profile-section">
+          <h3>Friends</h3>
+          <ul>
+            {friends.length ? friends.map(f => (
+              <li key={f.id}>{f.username} ({f.email})</li>
+            )) : <li>No friends found.</li>}
+          </ul>
+        </div>
 
-      <div className="indicator-row">
-        <div className="indicator" />
-        <div className="indicator" />
-        <div className="indicator" />
+        <div className="profile-section">
+          <h3>Messages</h3>
+          <ul>
+            {messages.length ? messages.map(m => (
+              <li key={m.id}><strong>From:</strong> {m.from} - {m.content}</li>
+            )) : <li>No messages found.</li>}
+          </ul>
+        </div>
+
+        <div className="indicator-row">
+          <div className="indicator" />
+          <div className="indicator" />
+          <div className="indicator" />
+        </div>
       </div>
     </div>
   );

@@ -55,14 +55,14 @@ function Navbar() {
               {isDropdownVisible && <Dropdown />}
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link" id="profile-link" to="/profile" end>
-                Profile
-              </NavLink>
-            </li>
-            <li className="nav-item">
               <a className="nav-link" id="upload-link" href="https://docs.google.com/forms/d/1vh_fvJm27AYNRzrLfdTZajZctn0Fr6Tdb4QUMaBo8NA/edit" target="_blank" rel="noopener noreferrer">
                 Feedback
               </a>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" id="profile-link" to="/profile" end>
+                Profile
+              </NavLink>
             </li>
             <li className="nav-item">
               <button className="nav-link btn btn-link" id="signout-button" onClick={handleLogout}>
