@@ -56,6 +56,7 @@ function App() {
         <Route path="/occasions" element={<ProtectedRoute element={<Ocassions />} />} />
         <Route path="/editClothing/:clothingId/:type" element={<ProtectedRoute element={<EditClothing />} />} />
         <Route path="/wardrobeOutfits/:userId" element={<ProtectedRoute element={<Outfits />} />} />
+        <Route path="/profile" element={<ProtectedRoute element={<UserProfile />} />} />
       </Routes>
     </Router>
   );
