@@ -24,31 +24,51 @@ function FriendRequests() {
     const [debounceTimeout, setDebounceTimeout] = useState(null);
 
     useEffect(() => {
-        const fetchFriendRequests = async () => {
+        const fetchFriends = async () => {
             try {
-                if (!currentUserId) {
-                    console.error('currentUserId is undefined');
-                    return;
-                }
-
+                if (!currentUserId) return;
+    
+                // Get the user document to access the friends array
                 const userRef = doc(db, 'Users', currentUserId);
                 const userDoc = await getDoc(userRef);
-
-                if (userDoc.exists()) {
-                    const data = userDoc.data();
-                    console.log('Fetched friendRequests:', data.friendRequests); // Debugging
-                    setFriendRequests(data.friendRequests || []);
-                } else {
-                    console.error('User document does not exist');
+                
+                if (!userDoc.exists() || !userDoc.data().friends) {
+                    setFriends([]);
+                    return;
                 }
+                
+                const friendsArray = userDoc.data().friends || [];
+                
+                // Fetch details for each friend
+                const friendsDetails = await Promise.all(
+                    friendsArray.map(async (friendId) => {
+                        const friendRef = doc(db, 'Users', friendId);
+                        const friendDoc = await getDoc(friendRef);
+                        
+                        if (friendDoc.exists()) {
+                            const data = friendDoc.data();
+                            return {
+                                id: friendId,
+                                username: data.username || 'Unknown User'
+                            };
+                        } else {
+                            return {
+                                id: friendId,
+                                username: 'Unknown User'
+                            };
+                        }
+                    })
+                );
+                
+                setFriends(friendsDetails);
             } catch (error) {
-                console.error('Error fetching friend requests:', error);
+                console.error('Error fetching friends:', error);
             } finally {
-                setLoading(false);
+                setLoading(false); // Set loading to false after fetching friends
             }
         };
 
-        fetchFriendRequests();
+        fetchFriends();
     }, [currentUserId]);
 
     useEffect(() => {
@@ -79,32 +99,6 @@ function FriendRequests() {
         }
     }, [friendRequests]);
 
-    // const handleAccept = async (requesterId) => {
-    //     const currentUserRef = doc(db, 'Users', currentUserId);
-    //     const currentUserFriendDoc = doc(db, 'Users', currentUserId, 'friends', requesterId);
-    //     const requesterFriendDoc = doc(db, 'Users', requesterId, 'friends', currentUserId);
-
-    //     try {
-    //         // Add each user to the other's friends list
-    //         await setDoc(currentUserFriendDoc, {
-    //             timestamp: new Date(),
-    //         });
-
-    //         await setDoc(requesterFriendDoc, {
-    //             timestamp: new Date(),
-    //         });
-
-    //         // Remove friend request from array
-    //         await updateDoc(currentUserRef, {
-    //             friendRequests: arrayRemove(requesterId),
-    //         });
-    
-    //         setFriendRequests((prev) => prev.filter((id) => id !== requesterId));
-    //     } catch (error) {
-    //         console.error('Error accepting friend request:', error);
-    //     }
-    // };
-
     const updateFriendRequestDetails = async (updatedFriendRequests) => {
         try {
             const details = await Promise.all(
@@ -128,29 +122,64 @@ function FriendRequests() {
     };
 
     const handleAccept = async (requesterId) => {
-        console.log('Accepting friend request from:', requesterId); // Debugging
+        console.log('Accepting friend request from:', requesterId);
     
         const currentUserRef = doc(db, 'Users', currentUserId);
-        const currentUserFriendDoc = doc(db, 'Users', currentUserId, 'friends', requesterId);
-        const requesterFriendDoc = doc(db, 'Users', requesterId, 'friends', currentUserId);
-    
+        const requesterRef = doc(db, 'Users', requesterId);
+        
         try {
-            // Add each user to the other's friends list
-            await setDoc(currentUserFriendDoc, {
-                timestamp: new Date(),
-            });
-            console.log('Added to current user\'s friends list'); // Debugging
-    
-            await setDoc(requesterFriendDoc, {
-                timestamp: new Date(),
-            });
-            console.log('Added to requester\'s friends list'); // Debugging
-    
-            // Remove friend request from array
-            await updateDoc(currentUserRef, {
-                friendRequests: arrayRemove(requesterId),
-            });
-            console.log('Removed friend request from current user\'s friendRequests array'); // Debugging
+            // Get requester's username
+            const requesterDoc = await getDoc(requesterRef);
+            const requesterData = requesterDoc.exists() ? requesterDoc.data() : {};
+            const requesterUsername = requesterData.username || 'Unknown User';
+            
+            // Get current user's username
+            const currentUserDoc = await getDoc(currentUserRef);
+            const currentUserData = currentUserDoc.exists() ? currentUserDoc.data() : {};
+            const currentUsername = currentUserData.username || 'Unknown User';
+            
+            console.log('Creating friend subcollections...');
+            
+            // Create the subcollection documents with more information
+            try {
+                // Create a document in the current user's friends subcollection
+                const currentUserFriendDoc = doc(db, 'Users', currentUserId, 'friends', requesterId);
+                await setDoc(currentUserFriendDoc, {
+                    username: requesterUsername,
+                    timestamp: new Date(),
+                });
+                console.log('Added to current user\'s friends subcollection');
+                
+                // Create a document in the requester's friends subcollection
+                const requesterFriendDoc = doc(db, 'Users', requesterId, 'friends', currentUserId);
+                await setDoc(requesterFriendDoc, {
+                    username: currentUsername,
+                    timestamp: new Date(),
+                });
+                console.log('Added to requester\'s friends subcollection');
+            } catch (error) {
+                console.error('Error creating friend subcollections:', error);
+                throw error;
+            }
+            
+            // Also add to friends arrays in the main documents for easier querying
+            try {
+                // Add requester to current user's friends array
+                await updateDoc(currentUserRef, {
+                    friends: arrayUnion(requesterId),
+                    friendRequests: arrayRemove(requesterId), // Remove from friend requests
+                });
+                console.log('Updated current user document');
+                
+                // Add current user to requester's friends array
+                await updateDoc(requesterRef, {
+                    friends: arrayUnion(currentUserId),
+                });
+                console.log('Updated requester document');
+            } catch (error) {
+                console.error('Error updating friends arrays:', error);
+                throw error;
+            }
     
             // Update the state to remove the accepted friend request
             setFriendRequests((prev) => {
@@ -158,24 +187,46 @@ function FriendRequests() {
                 updateFriendRequestDetails(updatedRequests); // Update friendRequestDetails
                 return updatedRequests;
             });
-            console.log('Updated state to remove accepted friend request'); // Debugging
+            console.log('Updated state to remove accepted friend request');
         } catch (error) {
             console.error('Error accepting friend request:', error);
         }
     };
 
-    // const handleReject = async (requesterId) => {
+    // const handleAccept = async (requesterId) => {
+    //     console.log('Accepting friend request from:', requesterId); // Debugging
+    
     //     const currentUserRef = doc(db, 'Users', currentUserId);
-
+    //     const currentUserFriendDoc = doc(db, 'Users', currentUserId, 'friends', requesterId);
+    //     const requesterFriendDoc = doc(db, 'Users', requesterId, 'friends', currentUserId);
+    
     //     try {
-    //         // Remove the requester from the friendRequests array
+    //         // Add each user to the other's friends list
+    //         await setDoc(currentUserFriendDoc, {
+    //             timestamp: new Date(),
+    //         });
+    //         console.log('Added to current user\'s friends list'); // Debugging
+    
+    //         await setDoc(requesterFriendDoc, {
+    //             timestamp: new Date(),
+    //         });
+    //         console.log('Added to requester\'s friends list'); // Debugging
+    
+    //         // Remove friend request from array
     //         await updateDoc(currentUserRef, {
     //             friendRequests: arrayRemove(requesterId),
     //         });
-
-    //         setFriendRequests((prev) => prev.filter((id) => id !== requesterId));
+    //         console.log('Removed friend request from current user\'s friendRequests array'); // Debugging
+    
+    //         // Update the state to remove the accepted friend request
+    //         setFriendRequests((prev) => {
+    //             const updatedRequests = prev.filter((id) => id !== requesterId);
+    //             updateFriendRequestDetails(updatedRequests); // Update friendRequestDetails
+    //             return updatedRequests;
+    //         });
+    //         console.log('Updated state to remove accepted friend request'); // Debugging
     //     } catch (error) {
-    //         console.error('Error rejecting friend request:', error);
+    //         console.error('Error accepting friend request:', error);
     //     }
     // };
 
@@ -293,6 +344,21 @@ function FriendRequests() {
                         </div>
                     ))
                 )}
+                {/* Friends List UI - new section */}
+                <h2>My Friends</h2>
+                <div className="friends-list">
+                    {friends.length === 0 ? (
+                        <p>You don't have any friends yet.</p>
+                    ) : (
+                        <ul>
+                            {friends.map(friend => (
+                                <li key={friend.id} className="friend-item">
+                                    <p>{friend.username}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </div>
         </>
     );
