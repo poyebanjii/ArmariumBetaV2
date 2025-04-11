@@ -165,17 +165,27 @@ const ItemUpload = ({type}) => {
             console.error(error);
             reject(error);
           },
-          () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-              addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${item.type}/items`), {
-                url: url,
+          async () => {
+            try {
+              const url = await getDownloadURL(uploadTask.snapshot.ref);
+  
+              // Call removeBackground here
+              const bgRemovedUrl = await removeBackground(url);
+  
+              // Save the processed image URL (or original if background removal fails) to Firestore
+              await addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${item.type}/items`), {
+                url: bgRemovedUrl || url, // Use the background-removed URL if available
                 title: item.title,
                 tags: item.tags.split(',').map((tag) => tag.trim()),
                 color: item.color,
                 createdAt: serverTimestamp(),
-              }).then(() => resolve(url));
-            });
-          }
+              });
+  
+              resolve(url);
+            } catch (error) {
+              console.error('Error during upload or background removal:', error);
+              reject(error);
+            }}
         );
       });
     });
