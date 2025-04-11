@@ -33,7 +33,7 @@ function Outfits() {
         id: doc.id,
         ...doc.data(),
       }));
-        setOutfits(outfitsList);
+      setOutfits(outfitsList);
       setTitle(querySnapshot.outfitName);
       console.log(outfitsList)
     } else {
@@ -208,21 +208,22 @@ return (
 
     <div className="center">
       {isDelete && (
-        <button onClick={handleDelete} style={{ marginLeft: '10px' }}>
+        <button className="styleboard-button" onClick={handleDelete}>
           Confirm Delete
         </button>
       )}
-
     </div>
 
-    <button onClick={toggleStyleboard}>
+    <div className="center">
+    <button className="styleboard-button" onClick={toggleStyleboard}>
       {styleboardState ? 'Cancel' : 'Create Styleboard'}
     </button>
     {styleboardState && (
-      <button onClick={() => setShowStyleboardModal(true)} style={{ marginLeft: '20px' }}>
+      <button className="styleboard-button" onClick={() => setShowStyleboardModal(true)}>
         Save Styleboard
       </button>
     )}
+    </div>
     
     <div className="center">
       <div className="outfit-outer">

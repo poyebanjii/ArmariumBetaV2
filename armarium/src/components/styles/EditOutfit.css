@@ -49,6 +49,7 @@
 
   .edit-outfit-container {
     width: 30%;
+    margin-bottom: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
