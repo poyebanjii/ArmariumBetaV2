@@ -1,39 +1,153 @@
 .navbar {
-    background-color: #f8f9fa;
+    background-color: #a52a2a;
     padding: 10px 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     top: 0;
-    width: 100%;
+    width: flex;
     z-index: 1000;
+    margin-bottom: 20px;
+    font-size:large;
   }
   
   .navbar-nav {
     display: flex;
     align-items: center;
+    list-style: none;
   }
   
   .nav-item {
     list-style: none;
     margin-right: 20px;
   }
+
   
   .nav-link {
     text-decoration: none;
-    color: black;
+    color: White;
     padding: 8px 12px;
     border-radius: 4px;
     transition: background-color 0.3s, color 0.3s;
-    border:none;
+    border: none;
     background: none;
     font-size: 16px;
+    font-weight: bold;
+    font-size: large;
   }
   
   .nav-link:hover {
-    background-color: #343a40;
+    background-color: #d8a7a7;
     color: #ffffff;
   }
   
   .nav-link.active {
-    background-color: #343a40;
+    background-color: #d8a7a7;
     color: #ffffff;
   }
+
+/* Dropdown container */
+.dropdown-menu {
+  opacity: 0; /* Initially hidden */
+  visibility: hidden; /* Prevent interaction when hidden */
+  transform: translateY(-10px); /* Slide up effect */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth transition */
+  position: absolute;
+  background-color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  border-radius: 5px;
+  z-index: 1000;
+  font-weight: bold;
+  color:white;
+}
+
+.nav-link.dropdown {
+  color: white; /* Dropdown text color */
+  padding: 8px 12px; /* Padding for dropdown */
+  border-radius: 4px;
+  margin-right: 20px;
+}
+
+/* Show dropdown when visible */
+.nav-link.dropdown:hover .dropdown-menu {
+  opacity: 1; /* Fully visible */
+  visibility: visible; /* Allow interaction */
+  transform: translateY(0); /* Reset slide effect */
+}
+
+/* Arrow pointing down */
+.nav-link.dropdown::after {
+  content: '▼'; /* Unicode for down arrow */
+  font-size: 0.8rem;
+  margin-left: 5px;
+  display: inline-block;
+  vertical-align: middle;
+  color: white; /* Adjust arrow color */
+
+}
+
+/* Remove bullet points from the list */
+.dropdown-menu ul {
+  list-style-type: none; /* Removes bullet points */
+  padding: 0; /* Removes default padding */
+  margin: 0; /* Removes default margin */
+}
+
+/* Add a line under "My Clothes" */
+.dropdown-menu ul li {
+  padding: 10px 0; /* Adds spacing between items */
+  border-bottom: 1px solid #ccc; /* Adds a line under each item */
+}
+
+/* Remove the line under the last item */
+.dropdown-menu ul li:last-child {
+  border-bottom: none;
+}
+
+/* Optional: Add hover effect for links */
+.dropdown-menu ul li a {
+  text-decoration: none; /* Removes underline from links */
+  color: #333; /* Default text color */
+  transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.dropdown-menu ul li a:hover {
+  color: black; /* Change color on hover */
+}
+
+/* Style for the wardrobe-header container */
+.wardrobe-header {
+  display: flex;
+  justify-content: flex-start; /* Centers the NavLinks horizontally */
+  gap: 15px; /* Adds space between the NavLinks */
+  margin-bottom: 20px; /* Adds space below the header */
+}
+
+/* Style for the NavLinks */
+.wardrobe-header .nav-link {
+  display: inline-block;
+  padding: 10px 20px; /* Adds padding to make them look like buttons */
+  background-color: #a52a2a; /* Button background color */
+  color: white; /* Text color */
+  text-decoration: none; /* Removes underline */
+  border-radius: 5px; /* Adds rounded corners */
+  font-weight: bold; /* Makes the text bold */
+  font-size: 1rem; /* Adjusts font size */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+  cursor: pointer; /* Changes cursor to pointer */
+}
+
+/* Hover effect for NavLinks */
+.wardrobe-header .nav-link:hover {
+  background-color: #d8a7a7 /* Darker background on hover */
+}
+
+
+/* Style for the search input */
+.wardrobe-search {
+  flex: 1; /* Allows the input to take up available space */
+  max-width: 300px; /* Optional: Set a maximum width */
+  padding: 10px; /* Adds padding inside the input */
+  border-radius: 5px; /* Adds rounded corners */
+  border: 1px solid #ccc; /* Adds a border */
+  margin-left: 20px;
+}

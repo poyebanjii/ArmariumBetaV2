@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
-import './styles/Navbar.css'; 
+import './styles/Navbar.css';
 import Dropdown from './Dropdown';
 import { getAuth, signOut } from 'firebase/auth'; // Import Firebase Authentication
 function Navbar() {
@@ -9,8 +9,8 @@ function Navbar() {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const handleLogout = async (e) => {
     e.preventDefault();
-    
-  
+
+
     try {
       await signOut(auth);
       navigate('/login'); // Redirect to login page after successful sign-out
@@ -47,24 +47,29 @@ function Navbar() {
               </NavLink>
             </li>
             */}
-            <li className="nav-item">
-              <NavLink className="nav-link" id="upload-link" to="/itemUpload" end>
-                Upload
-              </NavLink>
-            </li>
             <li
-              className="nav-item dropdown"
+              className="nav-link dropdown"
               id="wardrobe-link"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
-                Wardrobe
+              Wardrobe
               {isDropdownVisible && <Dropdown />}
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" id="friend-requests-link" to="/friendRequests" end>
+                Social
+              </NavLink>
             </li>
             <li className="nav-item">
               <a className="nav-link" id="upload-link" href="https://docs.google.com/forms/d/1vh_fvJm27AYNRzrLfdTZajZctn0Fr6Tdb4QUMaBo8NA/edit" target="_blank" rel="noopener noreferrer">
                 Feedback
               </a>
+            </li>
+            <li className="nav-item">
+              <NavLink className="nav-link" id="profile-link" to="/profile" end>
+                Profile
+              </NavLink>
             </li>
             <li className="nav-item">
               <button className="nav-link btn btn-link" id="signout-button" onClick={handleLogout}>
