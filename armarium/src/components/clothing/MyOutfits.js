@@ -6,7 +6,7 @@ import { db } from '../backend/firebaseConfig';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
-import '../styles/MyOutfits.css'; 
+import '../styles/MyOutfits.css';
 
 function Outfits() {
   const [outfits, setOutfits] = useState([]);
@@ -33,7 +33,7 @@ function Outfits() {
         id: doc.id,
         ...doc.data(),
       }));
-      setOutfits(outfitsList);
+        setOutfits(outfitsList);
       setTitle(querySnapshot.outfitName);
       console.log(outfitsList)
     } else {
@@ -184,23 +184,35 @@ return (
   <div>
     <Navbar />
     <div className="center">
-    <h1>My Outfits</h1>
+    <h1 className="page-title">My Outfits</h1>
+    </div>
 
-    <input
-      type="text"
-      placeholder="Search outfits by title"
-      value={searchInput}
-      onChange={handleSearchChange} 
-    />
+    <div className="center">
+      <input
+        type="text"
+        placeholder="Search outfits by title"
+        value={searchInput}
+        onChange={handleSearchChange} 
+      />
+    </div>
 
-    <button onClick={toggleDelete}>
-      {isDelete ? 'Cancel' : 'Delete'}
-    </button>
-    {isDelete && (
-      <button onClick={handleDelete} style={{ marginLeft: '10px' }}>
-        Confirm Delete
-      </button>
-    )}
+    <div className="center">
+      <img
+        src={isDelete ? "trashcan.png" : "trashcan.png"}
+        alt={isDelete ? "Delete Mode" : "Default Mode"}
+        onClick={toggleDelete}
+        className="mode-image"
+        style={{ border: isDelete ? '2px solid red' : 'none'}}
+      />
+    </div>
+
+    <div className="center">
+      {isDelete && (
+        <button onClick={handleDelete} style={{ marginLeft: '10px' }}>
+          Confirm Delete
+        </button>
+      )}
+
     </div>
 
     <button onClick={toggleStyleboard}>
@@ -211,25 +223,27 @@ return (
         Save Styleboard
       </button>
     )}
-    <h1>{styleboardState}</h1>
     
     <div className="center">
       <div className="outfit-outer">
         <ul className="outfits-list">
-        <li className="add-outfit"
-          onClick={() => navigate("/outfits")}></li>
+        <li className="add-outfit center" onClick={() => navigate("/outfits")}>
+          <div className="circle">
+            <div className="horizontal-plus"></div>
+            <div className="vertical-plus"></div>
+          </div>
+        </li>
         {filteredOutfits().length > 0 ? (
           filteredOutfits().map((outfit) => (
-            <li key={outfit.id} className="outfit-item">
-              <div className="image-container"
-                onClick={() => styleboardState ? addToStyleboardList(outfit)
-                  : isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`)}
-                style={{
-                  border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red'
-                    : selectedOutfits.some(item => item.id === outfit.id) ? '2px solid blue'
-                    : 'none'
-                }}>
-                {/* <h1>{outfit.outfitName}</h1> */}
+            <li key={outfit.id} className="outfit-item"
+            onClick={() => styleboardState ? addToStyleboardList(outfit)
+              : isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`, { state: { outfitName: outfit.outfitName}})}
+            style={{
+              border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red'
+                : selectedOutfits.some(item => item.id === outfit.id) ? '2px solid blue'
+                : '2px solid whitesmoke'
+            }}>
+              <div className="image-container">
                 <img 
                   src={outfit.topImageUrl} 
                   alt="Top"
@@ -246,6 +260,7 @@ return (
                   className="outfit-image center"
                 />
               </div>
+              <h1 className="outfit-title">{outfit.outfitName}</h1>
             </li>
           ))
         ) : (

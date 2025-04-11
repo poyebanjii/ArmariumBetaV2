@@ -22,6 +22,7 @@ import Styleboards from './clothing/Styleboards';
 import StyleboardPage from './clothing/StyleboardPage';
 import Outfits from './clothing/MyOutfits';
 import ProtectedRoute from './ProtectedRoute';
+import EditOutfit from './clothing/EditOutfit';
 
 /**
  * The routers for linking to different pages.
@@ -56,6 +57,7 @@ function App() {
         <Route path="/wardrobeStyleboards/:userId" element={<ProtectedRoute element={<Styleboards />} />} />
         <Route path="/" element={<Styleboards />} />
         <Route path="/styleboard/:id" element={<StyleboardPage />} />
+        <Route path="/editOutfit/:outfitId" element={<EditOutfit />} />
       </Routes>
     </Router>
   );

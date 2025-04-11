@@ -1,0 +1,78 @@
+.left-button {
+    background-color: white;
+    border: 2px solid #a52a2a;
+    width:30%;
+    padding: 1.5% 3%;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    cursor: pointer;
+    font-size: 100%;
+    color: #a52a2a;
+  }
+  
+  .right-button {
+    background-color: white;
+    border: 2px solid #a52a2a;
+    border-left: none;
+    width:30%;
+    padding: 1.5% 3%;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    cursor: pointer;
+    font-size: 100%;
+    color: #a52a2a;
+  }
+
+  .left-button:hover, .right-button:hover {
+    background-color: grey;
+  }
+
+  .edit-outfit-container {
+    width: 30%;
+    height:3000px;
+  }
+
+  .bottom-tab {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(248, 249, 250, 0.8);
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .tab-buttons {
+    width: 100%;
+  }
+  
+  .tab-button {
+    background-color: #a52a2a;
+    color: white;
+    border: none;
+    border-radius: 5px 5px 0px 0px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .tab-button:hover {
+    background-color: #8b0000;
+  }
+
+  .tab-content {
+    width: 100%;
+    border-top: 2px solid #a52a2a;
+  }
+
+  .item-list {
+    
+  }
