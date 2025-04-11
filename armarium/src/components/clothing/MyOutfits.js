@@ -237,7 +237,7 @@ return (
           filteredOutfits().map((outfit) => (
             <li key={outfit.id} className="outfit-item"
             onClick={() => styleboardState ? addToStyleboardList(outfit)
-              : isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`, { state: { outfitName: outfit.outfitName}})}
+              : isDelete ? addToDeleteList(outfit) : navigate(`/editOutfit/${outfit.id}`, { state: { outfitName: outfit.outfitName, outfitId: outfit.id}})}
             style={{
               border: outfitToDelete.some(item => item.id === outfit.id) ? '2px solid red'
                 : selectedOutfits.some(item => item.id === outfit.id) ? '2px solid blue'
