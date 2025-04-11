@@ -22,6 +22,7 @@ import Styleboards from './clothing/Styleboards';
 import StyleboardPage from './clothing/StyleboardPage';
 import Outfits from './clothing/MyOutfits';
 import ProtectedRoute from './ProtectedRoute';
+import EditOutfit from './clothing/EditOutfit';
 import FriendRequests from './profile/FriendRequests';
 import UserProfile from './profile/UserProfile';
 
@@ -56,6 +57,10 @@ function App() {
         <Route path="/occasions" element={<ProtectedRoute element={<Ocassions />} />} />
         <Route path="/editClothing/:clothingId/:type" element={<ProtectedRoute element={<EditClothing />} />} />
         <Route path="/wardrobeOutfits/:userId" element={<ProtectedRoute element={<Outfits />} />} />
+        <Route path="/wardrobeStyleboards/:userId" element={<ProtectedRoute element={<Styleboards />} />} />
+        <Route path="/" element={<Styleboards />} />
+        <Route path="/styleboard/:id" element={<StyleboardPage />} />
+        <Route path="/editOutfit/:outfitId" element={<EditOutfit />} />
         <Route path="/profile" element={<ProtectedRoute element={<UserProfile />} />} />
       </Routes>
     </Router>
