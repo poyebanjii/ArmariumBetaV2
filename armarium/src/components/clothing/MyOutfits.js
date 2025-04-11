@@ -68,32 +68,50 @@ const createStyleboard = async () => {
 
     for (const outfit of selectedOutfits) {
       // Define the original outfit path and the new styleboard path
-      const originalOutfitPath = `Users/${user.uid}/Outfits/${outfit.id}/${outfit.outfitName}`;
       const styleboardPath = `Users/Styleboards/${user.uid}/${styleboardName}/${outfit.outfitName}`;
 
-      console.log(`Reusing images from path: ${originalOutfitPath}`);
       console.log(`Creating styleboard path: ${styleboardPath}`);
 
-      // Upload images to Firebase Storage
-      const imageTypes = ["topImageUrl", "bottomImageUrl", "shoesImageUrl"];
+      // Upload images to Firebase STORAGE
+      const imageTypes = ["topImageUrl", "bottomImageUrl", "shoesImageUrl", "topLayerUrl", "accessoryUrl"];
       const uploadedImages = {};
 
       for (const type of imageTypes) {
         const imageUrl = outfit[type];
-        const fileName = type.replace("ImageUrl", ""); // e.g., "topImageUrl" -> "top"
-        const storageRef = ref(storage, `${styleboardPath}/${fileName}.jpg`);
 
-        // Fetch the image as a blob
-        const imageBlob = await fetch(imageUrl).then((res) => res.blob());
+        if (Array.isArray(imageUrl)) {
+          // image Urls
+          for (let i = 0; i < imageUrl.length; i++) {
+            const fileName = `${type.replace("Url", "")}_${i}`; // Renames image when rewriting, can sort layers/accessories by new name
+            const storageRef = ref(storage, `${styleboardPath}/${fileName}.jpg`);
 
-        // Upload the image to Firebase Storage
-        await uploadBytes(storageRef, imageBlob);
+            const imageBlob = await fetch(imageUrl[i]).then((res) => res.blob());
 
-        // Get the download URL for the uploaded image
-        const downloadUrl = await getDownloadURL(storageRef);
-        uploadedImages[fileName] = downloadUrl;
+            await uploadBytes(storageRef, imageBlob);
 
-        console.log(`Uploaded ${fileName} image to: ${downloadUrl}`);
+            const downloadUrl = await getDownloadURL(storageRef);
+            if (!uploadedImages[type]) uploadedImages[type] = [];
+            uploadedImages[type].push(downloadUrl);
+
+            console.log(`Uploaded ${fileName} image to: ${downloadUrl}`);
+          }
+        } else if (imageUrl) {
+          // Handle single image URLs (e.g., topImageUrl, bottomImageUrl, shoesImageUrl)
+          const fileName = type.replace("ImageUrl", ""); // e.g., "topImageUrl" -> "top"
+          const storageRef = ref(storage, `${styleboardPath}/${fileName}.jpg`);
+
+          // Fetch the image as a blob
+          const imageBlob = await fetch(imageUrl).then((res) => res.blob());
+
+          // Upload the image to Firebase Storage
+          await uploadBytes(storageRef, imageBlob);
+
+          // Get the download URL for the uploaded image
+          const downloadUrl = await getDownloadURL(storageRef);
+          uploadedImages[fileName] = downloadUrl;
+
+          console.log(`Uploaded ${fileName} image to: ${downloadUrl}`);
+        }
       }
 
       console.log(`Outfit "${outfit.outfitName}" added to styleboard at path: ${styleboardPath}`);
@@ -260,6 +278,22 @@ return (
                   alt="Shoes" 
                   className="outfit-image center"
                 />
+                {outfit.topLayerUrl && outfit.topLayerUrl.map((url, index) => (
+                  <img
+                    key={`topLayer-${index}`}
+                    src={url}
+                    alt={`Top Layer ${index + 1}`}
+                    className="outfit-image center"
+                  />
+                ))}
+                {outfit.accessoryUrl && outfit.accessoryUrl.map((url, index) => (
+                  <img
+                    key={`accessory-${index}`}
+                    src={url}
+                    alt={`Accessory ${index + 1}`}
+                    className="outfit-image center"
+                  />
+                ))}
               </div>
               <h1 className="outfit-title">{outfit.outfitName}</h1>
             </li>
