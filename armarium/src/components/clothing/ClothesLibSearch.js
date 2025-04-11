@@ -1,47 +1,118 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  addDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import Navbar from '../Navbar';
 import '../styles/ClothesLibSearch.css';
 
-const MOCK_CLOTHES = {
-  tops: [
-    { id: 1, name: 'Red T-Shirt', image: 'https://via.placeholder.com/100x120?text=Top+1' },
-    { id: 2, name: 'White Blouse', image: 'https://via.placeholder.com/100x120?text=Top+2' },
-    { id: 3, name: 'Denim Jacket', image: 'https://via.placeholder.com/100x120?text=Top+3' }
-  ],
-  bottoms: [
-    { id: 4, name: 'Blue Jeans', image: 'https://via.placeholder.com/100x120?text=Bottom+1' },
-    { id: 5, name: 'Black Skirt', image: 'https://via.placeholder.com/100x120?text=Bottom+2' },
-    { id: 6, name: 'Cargo Pants', image: 'https://via.placeholder.com/100x120?text=Bottom+3' }
-  ],
-  shoes: [
-    { id: 7, name: 'Sneakers', image: 'https://via.placeholder.com/100x120?text=Shoes+1' },
-    { id: 8, name: 'Heels', image: 'https://via.placeholder.com/100x120?text=Shoes+2' },
-    { id: 9, name: 'Boots', image: 'https://via.placeholder.com/100x120?text=Shoes+3' }
-  ],
-  other: [
-    { id: 10, name: 'Hat', image: 'https://via.placeholder.com/100x120?text=Other+1' },
-    { id: 11, name: 'Scarf', image: 'https://via.placeholder.com/100x120?text=Other+2' },
-    { id: 12, name: 'Watch', image: 'https://via.placeholder.com/100x120?text=Other+3' }
-  ]
+const db = getFirestore();
+const auth = getAuth();
+
+const normalizeCategory = (cat) => {
+  const map = {
+    tops: 'top',
+    bottoms: 'bottom',
+    shoes: 'shoes',
+    accessory: 'accessory',
+  };
+  return map[cat.toLowerCase()] || cat.toLowerCase();
 };
 
 const AddClothesPage = () => {
-  const [category, setCategory] = useState('tops');
+  const [category, setCategory] = useState('');
+  const [clothingItems, setClothingItems] = useState({});
   const [selectedItems, setSelectedItems] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchClothingItems = async () => {
+      const rootRef = collection(db, 'DefaultItemCollection');
+      const categorySnapshots = await getDocs(rootRef);
+
+      const updatedItems = {};
+      for (const categoryDoc of categorySnapshots.docs) {
+        const catName = categoryDoc.id;
+        const itemsRef = collection(db, `DefaultItemCollection/${catName}/Items`);
+        const itemSnapshots = await getDocs(itemsRef);
+
+        updatedItems[catName] = itemSnapshots.docs.map((doc) => ({
+          id: doc.id,
+          name: doc.data().title,
+          image: doc.data().url,
+          color: doc.data().color || '',
+          tags: doc.data().tags || [],
+        }));
+      }
+
+      setClothingItems(updatedItems);
+      const firstCategory = Object.keys(updatedItems)[0] || '';
+      setCategory(firstCategory);
+    };
+
+    fetchClothingItems();
+  }, []);
 
   const handleSelectItem = (id) => {
-    setSelectedItems(prev =>
-      prev.includes(id)
-        ? prev.filter(item => item !== id)
-        : [...prev, id]
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
-  const handleAddSelected = () => {
-    console.log('Selected Items:', selectedItems); // Future use
+  const handleAddSelected = async () => {
+    const user = auth.currentUser;
+    if (!user) {
+      alert('You must be logged in to add items.');
+      return;
+    }
+
+    const normalizedCategory = normalizeCategory(category);
+    const itemsToAdd = clothingItems[category]?.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+
+    if (!itemsToAdd || itemsToAdd.length === 0) {
+      alert('No items selected.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      for (const item of itemsToAdd) {
+        const collectionRef = collection(
+          db,
+          `Users/${user.uid}/ItemsCollection/${normalizedCategory}/items`
+        );
+        const itemData = {
+          title: item.name,
+          url: item.image,
+          color: item.color,
+          tags: item.tags,
+          createdAt: serverTimestamp(),
+        };
+
+        await addDoc(collectionRef, itemData);
+        console.log(`Added item to wardrobe: ${item.name}`);
+      }
+
+      alert('Items successfully added to your wardrobe.');
+      setSelectedItems([]);
+    } catch (err) {
+      console.error('Error adding items:', err);
+      alert('Failed to add one or more items. Check console for details.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const categories = ['tops', 'bottoms', 'shoes', 'other'];
+  const categories = Object.keys(clothingItems);
+
+  if (!category || !clothingItems[category]) return null;
 
   return (
     <div className="page-container">
@@ -65,7 +136,7 @@ const AddClothesPage = () => {
         </div>
 
         <div className="cards-grid">
-          {MOCK_CLOTHES[category].map(item => (
+          {clothingItems[category]?.map((item) => (
             <div
               key={item.id}
               className={`card ${selectedItems.includes(item.id) ? 'selected' : ''}`}
@@ -78,8 +149,8 @@ const AddClothesPage = () => {
         </div>
 
         <div className="add-button-container">
-          <button className="add-button" onClick={handleAddSelected}>
-            Add Selected Items
+          <button className="add-button" onClick={handleAddSelected} disabled={loading}>
+            {loading ? 'Adding...' : 'Add Selected Items'}
           </button>
         </div>
       </div>
