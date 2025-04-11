@@ -93,10 +93,17 @@ function Outfit() {
   const [topIndex, setTopIndex] = useState(0);
   const [bottomIndex, setBottomIndex] = useState(0);
   const [shoesIndex, setShoesIndex] = useState(0);
+  const [topLayerIndex, setTopLayerIndex] = useState(0);
+  const [accessoryIndex, setAccessoryIndex] = useState(0);
   const [tops, setTops] = useState([]);
   const [bottoms, setBottoms] = useState([]);
   const [shoes, setShoes] = useState([]);
+  const [topLayers, setTopLayers] = useState([]);
+  const [accessories, setAccessories] = useState([]);
   const [isLocked, setIsLocked] = useState({ top: false, bottom: false, shoes: false, all: false });
+  const [showAddModal, setShowAddModal] = useState(false); 
+  const [selectedTopLayers, setSelectedTopLayers] = useState([]);
+  const [selectedAccessories, setSelectedAccessories] = useState([]); 
   const DELAY = 650;
   const user = auth.currentUser;
   const [loading, setLoading] = useState(true);
@@ -157,6 +164,18 @@ function Outfit() {
       const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
       const shoesData = shoesCollection.docs.map(doc => doc.data().url); 
       setShoes(shoesData);
+    }
+
+    if (topLayers.length === 0) {
+      const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/topLayer/items`));
+      const topLayersData = topLayersCollection.docs.map(doc => doc.data().url);
+      setTopLayers(topLayersData);
+    }
+  
+    if (accessories.length === 0) {
+      const accessoriesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/accessory/items`));
+      const accessoriesData = accessoriesCollection.docs.map(doc => doc.data().url);
+      setAccessories(accessoriesData);
     }
   }
 
@@ -224,53 +243,59 @@ function Outfit() {
     });
 
     return () => unsubscribe();
-}, []);
+  }, []);
 
   const saveOutfit = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
-
+  
     if (!user) {
       alert('Please log in to save your outfit.');
       return;
     }
-
+  
     try {
-      //Rewrite to save itemid instead of url to user's outfits collection
-      // Upload top image
       const topImage = tops[topIndex];
-      const topImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/tops/${Date.now()}_${topIndex}.jpg`);
-      await uploadBytes(topImageRef, await fetch(topImage).then(r => r.blob()));
-      const topImageUrl = await getDownloadURL(topImageRef);
-      
-      
-      
-      // Upload bottom image
       const bottomImage = bottoms[bottomIndex];
-      const bottomImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/bottoms/${Date.now()}_${bottomIndex}.jpg`);
-      await uploadBytes(bottomImageRef, await fetch(bottomImage).then(r => r.blob()));
-      const bottomImageUrl = await getDownloadURL(bottomImageRef);
-
       const shoesImage = shoes[shoesIndex];
-      const shoesImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/shoes/${Date.now()}_${shoesIndex}.jpg`);
-      await uploadBytes(shoesImageRef, await fetch(shoesImage).then(r => r.blob()));
-      const shoesImageUrl = await getDownloadURL(shoesImageRef);
-
+  
+      // Upload selected top layers
+      const topLayerUrls = [];
+      for (let i = 0; i < selectedTopLayers.length; i++) {
+        const topLayerImage = selectedTopLayers[i];
+        const topLayerRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/topLayers/${Date.now()}_${i}.jpg`);
+        await uploadBytes(topLayerRef, await fetch(topLayerImage).then(r => r.blob()));
+        const topLayerUrl = await getDownloadURL(topLayerRef);
+        topLayerUrls.push(topLayerUrl);
+      }
+  
+      // Upload selected accessories
+      const accessoryUrls = [];
+      for (let i = 0; i < selectedAccessories.length; i++) {
+        const accessoryImage = selectedAccessories[i];
+        const accessoryRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/accessories/${Date.now()}_${i}.jpg`);
+        await uploadBytes(accessoryRef, await fetch(accessoryImage).then(r => r.blob()));
+        const accessoryUrl = await getDownloadURL(accessoryRef);
+        accessoryUrls.push(accessoryUrl);
+      }
+  
+      // Save outfit to Firestore
       await addDoc(collection(db, `Users/${user.uid}/Outfits`), {
-        topImageUrl,
-        bottomImageUrl,
-        shoesImageUrl,
+        topImageUrl: topImage,
+        bottomImageUrl: bottomImage,
+        shoesImageUrl: shoesImage,
+        topLayerUrls,
+        accessoryUrls,
         outfitName,
         timestamp: new Date()
       });
-
-    
-      // Store URLs in Firestore
-    
+  
       console.log('Outfit saved successfully');
       alert('Outfit saved successfully!');
       setShowModal(false);
       setOutfitName('');
+      setSelectedTopLayers([]); // Clear selected top layers
+      setSelectedAccessories([]); // Clear selected accessories
     } catch (error) {
       console.error('Error saving outfit:', error);
       alert('Error saving outfit. Please try again.');
@@ -324,15 +349,123 @@ function Outfit() {
         <Navbar />
         <div className="App" id="homepage">
           <h1>Outfits</h1>
-          <button onClick={toggleOneLock} id="lockall">
-            {isLocked.all ? 'Unlock All' : 'Lock All'}
-          </button>
-  
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginLeft: '100px' }}>
+            <button onClick={toggleOneLock} id="lockbutton">
+              {isLocked.all ? 'Unlock All' : 'Lock All'}
+            </button>
+            <button 
+              onClick={() => setShowAddModal(true)} 
+              className="circle-btn"
+              style={{ marginLeft: '15px' }}
+            >
+              <span className="plus-icon">+</span>
+            </button>
+          </div>
+
           <br />
-  
+
           <button onClick={toggleLockTop} id='lockbutton' disabled={isLocked.all}>
             {isLocked.top ? 'Unlock Top' : 'Lock Top'}
           </button>
+
+          {showAddModal && (
+            <div className="modal d-block" tabIndex="-1" role="dialog">
+              <div className="modal-dialog modal-lg">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h2 className="modal-title">Add Top Layers and Accessories</h2>
+                    <button type="button" className="close-btn" onClick={() => setShowAddModal(false)}>X</button>
+                  </div>
+                  <div className="modal-body">
+                    <div className="swipeable-container-wrapper">
+                      {/* Top Layer Section */}
+                      <div className="swipeable-section">
+                        <div className="swipeable-container topLayer">
+                          <h3>Top Layers</h3>
+                          <SwipeableImage
+                            key={topLayerIndex}
+                            image={topLayers[topLayerIndex]}
+                            handleSwipe={(direction) => {
+                              if (direction === "left") {
+                                setTopLayerIndex((prevIndex) => (prevIndex + 1) % topLayers.length);
+                              } else if (direction === "right") {
+                                setTopLayerIndex((prevIndex) => (prevIndex - 1 + topLayers.length) % topLayers.length);
+                              }
+                            }}
+                            isLocked={false}
+                            isAllLocked={false}
+                            itemLength={topLayers.length}
+                          />
+                          <button
+                            onClick={() => {
+                              const selectedImage = topLayers[topLayerIndex];
+                              if (!selectedTopLayers.includes(selectedImage)) {
+                                setSelectedTopLayers((prev) => [...prev, selectedImage]);
+                              }
+                            }}
+                          >
+                            Add Top Layer
+                          </button>
+                        </div>
+                        <div className="selected-items-box">
+                          <h3>Selected Top Layers</h3>
+                          <div className="selected-items">
+                            {selectedTopLayers.map((url, index) => (
+                              <img key={index} src={url} alt={`Top Layer ${index + 1}`} className="selected-image" />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Accessory Section */}
+                      <div className="swipeable-section">
+                        <div className="swipeable-container accessory">
+                          <h3>Accessories</h3>
+                          <SwipeableImage
+                            key={accessoryIndex}
+                            image={accessories[accessoryIndex]}
+                            handleSwipe={(direction) => {
+                              if (direction === "left") {
+                                setAccessoryIndex((prevIndex) => (prevIndex + 1) % accessories.length);
+                              } else if (direction === "right") {
+                                setAccessoryIndex((prevIndex) => (prevIndex - 1 + accessories.length) % accessories.length);
+                              }
+                            }}
+                            isLocked={false}
+                            isAllLocked={false}
+                            itemLength={accessories.length}
+                          />
+                          <button
+                            onClick={() => {
+                              const selectedImage = accessories[accessoryIndex];
+                              if (!selectedAccessories.includes(selectedImage)) {
+                                setSelectedAccessories((prev) => [...prev, selectedImage]);
+                              }
+                            }}
+                          >
+                            Add Accessory
+                          </button>
+                        </div>
+                        <div className="selected-items-box">
+                          <h3>Selected Accessories</h3>
+                          <div className="selected-items">
+                            {selectedAccessories.map((url, index) => (
+                              <img key={index} src={url} alt={`Accessory ${index + 1}`} className="selected-image" />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button className="done-btn" onClick={() => setShowAddModal(false)}>
+                      Done
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
   
           <div className="outfit-card">
             <div className="swipeable-container top">
@@ -417,6 +550,27 @@ function Outfit() {
           </div>
         </div>
       </div>
+
+      {/* Fixed Containers for Top Layers and Accessories */}
+        <div style={{ flex: 0.4, marginLeft: '20px' }}>
+          <div>
+            <h3>Selected Top Layers</h3>
+            <div className="selected-items">
+              {selectedTopLayers.map((url, index) => (
+                <img key={index} src={url} alt={`Top Layer ${index + 1}`} className="selected-image" />
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3>Selected Accessories</h3>
+            <div className="selected-items">
+              {selectedAccessories.map((url, index) => (
+                <img key={index} src={url} alt={`Accessory ${index + 1}`} className="selected-image" />
+              ))}
+            </div>
+          </div>
+        </div>
   
       {/* Joyride tutorial */}
       <Joyride

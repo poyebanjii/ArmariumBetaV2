@@ -1,42 +1,255 @@
 .App {
-    text-align: center;
-  }
-  
-  .outfit-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 600px; /* Set height to ensure it's visible */
-    margin: auto; /* Center the card */
-    border: 1px solid #ddd; /* Add border for visibility */
-    padding: 20px; /* Add padding */
-  }
-  
-  .swipeable-container {
-    width: 300px;
-    height: 300px;
-    margin: 20px;
-    overflow: hidden;
-    position: relative; /* Ensure absolute positioning works */
-  }
-  
-  .swipeable-container.top {
-    height: 50%; /* Adjust height for better visibility */
-    border-bottom: 1px solid #ddd; /* Add a divider between top and bottom */
-  }
-  
-  .swipeable-container.bottom {
-    height: 50%; /* Adjust height for better visibility */
-    border-bottom: 1px solid #ddd; /* Add a divider between top and bottom */
-  }
+  text-align: center;
+}
 
-  .swipeable-container.shoes {
-    height: 50%; /* Adjust height for better visibility */
-  }
-  
-  .swipeable-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* Ensure the images fit properly */
-  }
+.App .circle-btn {
+  all: unset; /* Reset all inherited and default styles */
+  background-color: #ff4d4d; /* Red background */
+  color: white;
+  border: none; /* Remove any border */
+  outline: none; /* Remove focus outline */
+  border-radius: 50%; /* Make it a circle */
+  width: 40px; /* Equal width and height for a perfect circle */
+  height: 40px;
+  font-size: 24px; /* Adjust font size for the "+" icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.App .circle-btn:hover {
+  background-color: #e63939; /* Darker red on hover */
+}
+
+.outfit-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 600px; /* Set height to ensure it's visible */
+  margin: auto; /* Center the card */
+  border: 1px solid #ddd; /* Add border for visibility */
+  padding: 20px; /* Add padding */
+}
+
+.swipeable-container {
+  width: 300px;
+  height: 300px;
+  margin: 20px;
+  overflow: hidden;
+  position: relative; /* Ensure absolute positioning works */
+  padding: 10px;
+}
+
+.swipeable-container.top {
+  height: 50%; /* Adjust height for better visibility */
+  border-bottom: 1px solid #ddd; /* Add a divider between top and bottom */
+}
+
+.swipeable-container.bottom {
+  height: 50%; /* Adjust height for better visibility */
+  border-bottom: 1px solid #ddd; /* Add a divider between top and bottom */
+}
+
+.swipeable-container.shoes {
+  height: 50%; /* Adjust height for better visibility */
+}
+
+.swipeable-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Ensure the images fit properly */
+}
+
+.selected-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 300px; /* Limit height */
+  overflow-y: auto; /* Add scroll if content overflows */
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.selected-items img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Wrapper for swipeable containers inside the modal */
+.swipeable-container-wrapper {
+  display: flex;
+  flex-direction: column; /* Stack Top Layers and Accessories sections vertically */
+  gap: 30px; /* Add spacing between Top Layers and Accessories sections */
+  width: 100%; /* Ensure the wrapper spans the full width */
+  align-items: center; /* Center the sections horizontally */
+}
+
+.swipeable-section {
+  display: flex; /* Make the children side by side */
+  justify-content: space-between; /* Add space between the two containers */
+  align-items: center; /* Align items vertically */
+  gap: 40px; /* Add spacing between the two containers */
+  width: 80%; /* Limit the width of the section to center it in the modal */
+}
+
+/* Styling for Top Layers and Accessories swipeable containers */
+.swipeable-container.topLayer,
+.swipeable-container.accessory {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.swipeable-container h3 {
+  margin-bottom: 10px;
+}
+
+.swipeable-container button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.swipeable-container button:hover {
+  background-color: #0056b3;
+}
+
+.modal-dialog.modal-lg {
+  max-width: 60%; /* Increase the width of the modal */
+  height: auto; /* Allow height to adjust based on content */
+  margin: auto; /* Center the modal */
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+  padding: 20px; /* Add padding inside the modal */
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column; /* Stack sections vertically */
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+  gap: 30px; /* Add spacing between sections */
+  padding: 20px; /* Add padding inside the modal */
+  width: 100%; /* Ensure the modal body spans the full width */
+}
+
+/* Styling for the Done button */
+.App .done-btn {
+  all: unset; /* Reset all inherited and default styles */
+  background-color: #ff4d4d; /* Red background */
+  color: white;
+  border: none; /* Remove any border */
+  border-radius: 50px; /* Make it rounded */
+  padding: 10px 20px; /* Add padding for size */
+  font-size: 16px; /* Adjust font size for readability */
+  display: inline-block; /* Ensure the button wraps around the text */
+  text-align: center; /* Center the text */
+  cursor: pointer; /* Add pointer cursor on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+.App .done-btn:hover {
+  background-color: #e63939; /* Darker red on hover */
+}
+
+/* Styling for the X (close) button */
+.App .modal-header .close-btn {
+  all: unset; /* Reset all inherited and default styles */
+  right: 150px;
+  background-color: #ff4d4d; /* Red background */
+  color: white;
+  border: none; /* Remove any border */
+  border-radius: 20px; /* Slightly rounded corners */
+  padding: 4px 8px; /* Add padding around the text */
+  font-size: 16px; /* Adjust font size for readability */
+  display: inline-block; /* Ensure the button wraps around the text */
+  text-align: center; /* Center the text */
+  cursor: pointer; /* Add pointer cursor on hover */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+.modal-header .close-btn:hover {
+  background-color: #e63939; /* Darker red on hover */
+}
+
+/* Center the modal title */
+.modal-header {
+  position: relative; /* Allow absolute positioning of child elements */
+  display: flex;
+  justify-content: center; /* Center the modal title */
+  align-items: center; /* Vertically align the content */
+}
+
+.modal-title {
+  margin: 0; /* Remove default margin */
+  font-size: 20px; /* Adjust font size if needed */
+  font-weight: bold; /* Make the title bold */
+  text-align: center; /* Ensure text alignment is centered */
+}
+
+/* Box for selected items */
+.selected-items-box {
+  width: 300px; /* Match the width of the swipeable container */
+  height: 300px; /* Match the height of the swipeable container */
+  border: 1px solid #ddd; /* Add a border around the box */
+  border-radius: 8px; /* Rounded corners */
+  padding: 10px; /* Add padding inside the box */
+  background-color: #f9f9f9; /* Light background color */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Align content at the top */
+}
+
+.selected-items-box h3 {
+  margin-bottom: 10px; /* Add spacing below the title */
+  text-align: center; /* Center the title inside the box */
+  font-size: 16px; /* Adjust font size */
+  font-weight: bold; /* Make the title bold */
+}
+
+.selected-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Add spacing between selected items */
+  overflow-y: auto; /* Add scroll if content overflows */
+  width: 100%; /* Ensure it fits the container */
+  height: calc(100% - 40px); /* Adjust height to fit inside the box */
+}
+
+.modal-body .swipeable-container,
+.modal-body .selected-items-box {
+  width: 300px; /* Fixed width for consistency */
+  height: 300px; /* Fixed height for consistency */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
