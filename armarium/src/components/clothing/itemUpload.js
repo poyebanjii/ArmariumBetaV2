@@ -9,7 +9,7 @@ import Joyride from 'react-joyride';
 import { Center } from 'framer/render/presentation/Frame/DeprecatedFrame.js';
 import '../styles/Forms.css';
 
-const ItemUpload = ({type}) => {
+const ItemUpload = ({ type }) => {
   const [items, setItems] = useState([
     { file: null, title: '', tags: '', color: '', type: '', preview: null },
   ]);
@@ -22,21 +22,21 @@ const ItemUpload = ({type}) => {
   const [itemType, setItemType] = useState("top");
   const [bgRemove, setBgRemove] = useState(null);
   const [runTour, setRunTour] = useState(false);
-  const [steps, setSteps] = useState([ 
+  const [steps, setSteps] = useState([
     {
-      target: '#choosefile', 
+      target: '#choosefile',
       content: 'This is the button for choosing what image to upload.',
     },
     {
-      target: '#selecttype', 
+      target: '#selecttype',
       content: 'You can choose what type of clothing it is such as top, bottom, or shoes.',
     },
     {
-      target: '#textinput', 
+      target: '#textinput',
       content: 'These are the inputs of where you can type in title, tags, or color.',
     },
     {
-      target: '#uploadbutton', 
+      target: '#uploadbutton',
       content: 'Here is where you can upload your clothing item to the wadrobe once you are all done.',
     },
   ]);
@@ -82,11 +82,11 @@ const ItemUpload = ({type}) => {
   //     return;
   //   }
   //   const user = auth.currentUser;
-  
+
   //   if (image) {
   //     const storageRef = ref(storage, `images/${image.name}`);
   //     const uploadTask = uploadBytesResumable(storageRef, image);
-  
+
   //     uploadTask.on(
   //       "state_changed",
   //       (snapshot) => {
@@ -174,7 +174,7 @@ const ItemUpload = ({type}) => {
                 color: item.color,
                 createdAt: serverTimestamp(),
               }).then(() => resolve(url));
-            }); 
+            });
           }
         );
       });
@@ -193,7 +193,7 @@ const ItemUpload = ({type}) => {
   const checkNewUser = async (user) => {
     const userDocRef = doc(db, 'Users', user.uid);
     const userSnapshot = await getDoc(userDocRef);
-    
+
     if (userSnapshot.exists() && userSnapshot.data().isNewUser) {
       setRunTour(true); // Run the tutorial
       //await updateDoc(userDocRef, { isNewUser: false }); // Mark tutorial as complete
@@ -219,7 +219,7 @@ const ItemUpload = ({type}) => {
     const apiKey = "izMQbubK4NUk3p24uQn9kBvP"; // Consider moving this to a secure location (e.g., environment variables)
     const apiUrl = "https://api.remove.bg/v1.0/removebg";
     const accountUrl = "https://api.remove.bg/v1.0/account";
-  
+
     // Check account credits
     try {
       const accountRes = await fetch(accountUrl, {
@@ -228,30 +228,30 @@ const ItemUpload = ({type}) => {
           "X-Api-Key": apiKey,
         },
       });
-  
+
       if (!accountRes.ok) {
         throw new Error("Failed to fetch account info.");
       }
-  
+
       const accountData = await accountRes.json();
       const { total_credits, total_credits_used } = accountData.data.attributes;
       const remainingCredits = total_credits - total_credits_used;
-  
+
       // Alert if half of the credits are used
       if (remainingCredits <= total_credits / 2) {
         alert("Warning: You've used more than half of your Remove.bg credits.");
       }
-  
+
       if (remainingCredits <= 0) {
         alert("You've run out of Remove.bg credits. Please add more credits.");
         return null;
       }
-  
+
       // Proceed with background removal
       const formData = new FormData();
       formData.append("image_url", imageUrl);
       formData.append("size", "auto");
-  
+
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -259,23 +259,23 @@ const ItemUpload = ({type}) => {
         },
         body: formData,
       });
-  
+
       if (res.status === 402) {
         alert("You've run out of Remove.bg credits. Please add more credits.");
         return null;
       }
-  
+
       if (!res.ok) {
         throw new Error(`API error: ${res.statusText}`);
       }
-  
+
       const data = await res.blob();
       const bgRemovedImageUrl = URL.createObjectURL(data);
       setBgRemove(bgRemovedImageUrl);
-  
+
       const storageRef = ref(storage, `images/bg-removed-${images.name}`);
       const uploadTask = uploadBytesResumable(storageRef, data);
-  
+
       return new Promise((resolve, reject) => {
         uploadTask.on(
           "state_changed",
@@ -293,70 +293,71 @@ const ItemUpload = ({type}) => {
   };
 
   return (
-        <div className='Form-box'>
-          <div className='input-group'>
+    <div className='Form-box'>
+      <div className='input-group'>
         <h2 style={{ textAlign: 'center' }}>Upload Items</h2>
         {items.map((item, index) => (
-        <div key={index} style={{ marginBottom: '20px', padding: '20px' }}>
-          <input
-            type="file"
-            onChange={(e) => handleFileChange(index, e.target.files[0])}
-            required
-          />
-          {item.preview && (
-            <div>
-              <img
-                src={item.preview}
-                alt="Preview"
-                style={{ width: '100px', height: 'auto', marginTop: '10px' }}
-              />
-            </div>
-          )}
-          <select
-            value={item.type}
-            onChange={(e) => handleInputChange(index, 'type', e.target.value)}
-            required
-            style={{
-              display: 'block', // Makes the select box a block element
-              margin: '0 auto', // Centers it horizontally
-              marginBottom: '10px', // Adds some space below the select box
-            }}
-          >
-            <option value="" disabled>
-              Select Type
-            </option>
-            <option value="top">Top</option>
-            <option value="bottom">Bottom</option>
-            <option value="shoes">Shoes</option>
-            <option value="toplayer">Top Layer</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Title"
-            value={item.title}
-            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Tags (comma separated)"
-            value={item.tags}
-            onChange={(e) => handleInputChange(index, 'tags', e.target.value)}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Color"
-            value={item.color}
-            onChange={(e) => handleInputChange(index, 'color', e.target.value)}
-            required
-          />
-        </div>
-      ))}
-      <button className= 'Form-Submit' onClick={addNewItem} style={{ marginBottom: '20px' }}>
-        + Add Another Item
-      </button>
-      <button className = 'Form-Submit' onClick={handleUpload}>Upload All</button>
+          <div key={index} style={{ marginBottom: '20px', padding: '20px' }}>
+            <input
+              type="file"
+              onChange={(e) => handleFileChange(index, e.target.files[0])}
+              required
+            />
+            {item.preview && (
+              <div>
+                <img
+                  src={item.preview}
+                  alt="Preview"
+                  style={{ width: '100px', height: 'auto', marginTop: '10px' }}
+                />
+              </div>
+            )}
+            <select
+              value={item.type}
+              onChange={(e) => handleInputChange(index, 'type', e.target.value)}
+              required
+              style={{
+                display: 'block', // Makes the select box a block element
+                margin: '0 auto', // Centers it horizontally
+                marginBottom: '10px', // Adds some space below the select box
+              }}
+            >
+              <option value="" disabled>
+                Select Type
+              </option>
+              <option value="top">Top</option>
+              <option value="bottom">Bottom</option>
+              <option value="shoes">Shoes</option>
+              <option value="toplayer">Top Layer</option>
+              <option value="accessory"> Accessory</option>
+            </select>
+            <input
+              type="text"
+              placeholder="Title"
+              value={item.title}
+              onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Tags (comma separated)"
+              value={item.tags}
+              onChange={(e) => handleInputChange(index, 'tags', e.target.value)}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Color"
+              value={item.color}
+              onChange={(e) => handleInputChange(index, 'color', e.target.value)}
+              required
+            />
+          </div>
+        ))}
+        <button className='Form-Submit' onClick={addNewItem} style={{ marginBottom: '20px' }}>
+          + Add Another Item
+        </button>
+        <button className='Form-Submit' onClick={handleUpload}>Upload All</button>
       </div>
       {/* Joyride tutorial */}
       <Joyride
@@ -371,7 +372,7 @@ const ItemUpload = ({type}) => {
           }
         }}
       />
-      </div>
+    </div>
   );
 };
 
