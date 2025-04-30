@@ -16,7 +16,7 @@ const Wardrobe = () => {
     const [bottoms, setBottoms] = useState([]);
     const [shoes, setShoes] = useState([]);
     const [topLayers, setTopLayers] = useState([]);
-    const [accessories, setAccessories] = useState([]);
+    const [accessory, setAccessory] = useState([]);
     const [isTop, setIsTop] = useState(true);
     const [isBottom, setIsBottom] = useState(false);
     const [isShoes, setIsShoes] = useState(false);
@@ -64,7 +64,7 @@ const Wardrobe = () => {
         isBottom ? filteredClothes(bottoms) :
             isShoes ? filteredClothes(shoes) :
                 isTopLayer ? filteredClothes(topLayers) :
-                    isAccessory ? filteredClothes(accessories) :
+                    isAccessory ? filteredClothes(accessory) :
                     [];
 
     const fetchData = async (user) => {
@@ -120,16 +120,16 @@ const Wardrobe = () => {
                 setTopLayers(topLayerData);
             }
 
-            if (accessories.length === 0) {
-                const accessoriesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/accessory/items`));
-                const accessoryData = accessoriesCollection.docs.map(doc => ({
+            if (accessory.length === 0) {
+                const accessoryCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/accessory/items`));
+                const accessoryData = accessoryCollection.docs.map(doc => ({
                     id: doc.id,
                     title: doc.data().title,
                     tags: doc.data().tags,
                     url: doc.data().url
                 }));
                 console.log("Accessory", accessoryData);
-                setAccessories(accessoryData);
+                setAccessory(accessoryData);
             }
 
         } catch (error) {
@@ -177,7 +177,7 @@ const Wardrobe = () => {
                 setTopLayers(topLayers.filter((item) => item.id !== id));
             }
             else if (type === 'accessory') {
-                setAccessories(accessories.filter((item) => item.id !== id));
+                setAccessory(accessory.filter((item) => item.id !== id));
             }
         }
 
@@ -236,8 +236,7 @@ const Wardrobe = () => {
         setIsTopLayer(true);
         setIsAccessory(false);
     };
-
-    const handleShowAccessories = () => {
+    const handleShowAccessory = () => {
         setIsTop(false);
         setIsBottom(false);
         setIsShoes(false);
@@ -432,29 +431,29 @@ const Wardrobe = () => {
             {/* Accessory Row */}
             <div className="wardrobe-row">
                 <div className='Add-Button'>
-                    <h3>Top Layers</h3>
+                    <h3>Accessory</h3>
                     <button className="add-nav-link" onClick={() => handleShowModal('accessory')}>
                         Add
                     </button>
                 </div>
                 <div className="wardrobe-content-row">
-                    {filteredClothes(accessories).map((accessory, index) => (
-                        <div key={accessory.id} className="wardrobe-item">
-                            <img
-                                src={accessory.url}
-                                alt={`Accessory ${index + 1}`}
-                                className="wardrobe-image"
-                                onClick={() => handleDeleteClick({ id: accessory.id, type: 'accessory' })}
-                            />
-                            {isDelete && (
-                                <button
-                                    onClick={() => addToDeleteList({ id: accessory.id, type: 'accessory' })}
-                                    className="delete-button"
-                                >
-                                    {clothesToDelete.some(item => item.id === accessory.id) ? 'Remove' : 'Select'}
-                                </button>
-                            )}
-                        </div>
+                {filteredClothes(accessory).map((accessory, index) => (
+                    <div key={accessory.id} className="wardrobe-item">
+                        <img 
+                        src={accessory.url} 
+                        alt={`Accessory ${index + 1}`} 
+                        className="wardrobe-image"
+                        onClick={() => handleDeleteClick({ id: accessory.id, type: 'accessory' })}
+                        />
+                        {isDelete && (
+                        <button
+                            onClick={() => addToDeleteList({ id: accessory.id, type: 'accessory' })}
+                            className="delete-button"
+                        >
+                            {clothesToDelete.some(item => item.id === accessory.id) ? 'Remove' : 'Select'}
+                        </button>
+                        )}
+                    </div>
                     ))}
                 </div>
             </div>

@@ -143,7 +143,7 @@ function Outfit() {
     }
 
     if (topLayers.length === 0) {
-      const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/topLayer/items`));
+      const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/toplayer/items`));
       const topLayersData = topLayersCollection.docs.map(doc => doc.data().url);
       setTopLayers(topLayersData);
     }
@@ -234,7 +234,7 @@ function Outfit() {
       const topLayerUrls = [];
       for (let i = 0; i < selectedTopLayers.length; i++) {
         const topLayerImage = selectedTopLayers[i];
-        const topLayerRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/topLayers/${Date.now()}_${i}.jpg`);
+        const topLayerRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/toplayers/${Date.now()}_${i}.jpg`);
         await uploadBytes(topLayerRef, await fetch(topLayerImage).then(r => r.blob()));
         const topLayerUrl = await getDownloadURL(topLayerRef);
         topLayerUrls.push(topLayerUrl);
@@ -313,7 +313,7 @@ function Outfit() {
   };
 
   const handleDeleteItem = (url, category) => {
-    if (category === 'topLayer') {
+    if (category === 'toplayer') {
       setSelectedTopLayers(prev => prev.filter(item => item !== url));
     } else if (category === 'accessory') {
       setSelectedAccessories(prev => prev.filter(item => item !== url));
