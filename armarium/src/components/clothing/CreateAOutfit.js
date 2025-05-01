@@ -220,45 +220,62 @@ function Outfit() {
   const saveOutfit = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
-
+  
     if (!user) {
       alert('Please log in to save your outfit.');
       return;
     }
-
+  
     try {
+      // Save top image
       const topImage = tops[topIndex];
+      const topImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/tops/${Date.now()}_${topIndex}.jpg`);
+      await uploadBytes(topImageRef, await fetch(topImage).then((r) => r.blob()));
+      const topImageUrl = await getDownloadURL(topImageRef);
+  
+      // Save bottom image
       const bottomImage = bottoms[bottomIndex];
+      const bottomImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/bottoms/${Date.now()}_${bottomIndex}.jpg`);
+      await uploadBytes(bottomImageRef, await fetch(bottomImage).then((r) => r.blob()));
+      const bottomImageUrl = await getDownloadURL(bottomImageRef);
+  
+      // Save shoes image
       const shoesImage = shoes[shoesIndex];
-
+      const shoesImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/shoes/${Date.now()}_${shoesIndex}.jpg`);
+      await uploadBytes(shoesImageRef, await fetch(shoesImage).then((r) => r.blob()));
+      const shoesImageUrl = await getDownloadURL(shoesImageRef);
+  
+      // Save top layers
       const topLayerUrls = [];
       for (let i = 0; i < selectedTopLayers.length; i++) {
         const topLayerImage = selectedTopLayers[i];
         const topLayerRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/toplayers/${Date.now()}_${i}.jpg`);
-        await uploadBytes(topLayerRef, await fetch(topLayerImage).then(r => r.blob()));
+        await uploadBytes(topLayerRef, await fetch(topLayerImage).then((r) => r.blob()));
         const topLayerUrl = await getDownloadURL(topLayerRef);
         topLayerUrls.push(topLayerUrl);
       }
-
+  
+      // Save accessories
       const accessoryUrls = [];
       for (let i = 0; i < selectedAccessories.length; i++) {
         const accessoryImage = selectedAccessories[i];
         const accessoryRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/accessories/${Date.now()}_${i}.jpg`);
-        await uploadBytes(accessoryRef, await fetch(accessoryImage).then(r => r.blob()));
+        await uploadBytes(accessoryRef, await fetch(accessoryImage).then((r) => r.blob()));
         const accessoryUrl = await getDownloadURL(accessoryRef);
         accessoryUrls.push(accessoryUrl);
       }
-
+  
+      // Save outfit data to Firestore
       await addDoc(collection(db, `Users/${user.uid}/Outfits`), {
-        topImageUrl: topImage,
-        bottomImageUrl: bottomImage,
-        shoesImageUrl: shoesImage,
+        topImageUrl,
+        bottomImageUrl,
+        shoesImageUrl,
         topLayerUrls,
         accessoryUrls,
         outfitName,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
-
+  
       alert('Outfit saved successfully!');
       setShowModal(false);
       setOutfitName('');
