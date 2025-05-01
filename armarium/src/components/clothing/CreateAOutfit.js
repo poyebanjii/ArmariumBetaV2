@@ -285,25 +285,45 @@ function Outfit() {
   };
 
   const toggleLockTop = () => {
-    setIsLocked(prevState => ({ ...prevState, top: !prevState.top }));
+    setIsLocked((prevState) => ({
+      ...prevState,
+      top: !prevState.top,
+      all: false, // Disable global lock when an individual lock is toggled
+    }));
   };
 
   const toggleLockBottom = () => {
-    setIsLocked(prevState => ({ ...prevState, bottom: !prevState.bottom }));
+    setIsLocked((prevState) => ({
+      ...prevState,
+      bottom: !prevState.bottom,
+      all: false, // Disable global lock when an individual lock is toggled
+    }));
   };
 
   const toggleLockShoes = () => {
-    setIsLocked(prevState => ({ ...prevState, shoes: !prevState.shoes }));
+    setIsLocked((prevState) => ({
+      ...prevState,
+      shoes: !prevState.shoes,
+      all: false, // Disable global lock when an individual lock is toggled
+    }));
   };
 
   const toggleOneLock = () => {
-    setIsLocked(prevState => {
+    setIsLocked((prevState) => {
       const newState = { ...prevState, all: !prevState.all };
+  
       if (newState.all) {
+        // If global lock is enabled, lock all individual containers
+        newState.top = true;
+        newState.bottom = true;
+        newState.shoes = true;
+      } else {
+        // If global lock is disabled, unlock all individual containers
         newState.top = false;
         newState.bottom = false;
         newState.shoes = false;
       }
+  
       return newState;
     });
   };
@@ -337,11 +357,11 @@ function Outfit() {
         <div className="header-buttons">
           {/* Lock All Button */}
           <img
-            src={isLocked.all ? "unlock.png" : "lock.png"}
-            alt={isLocked.all ? "Unlock All" : "Lock All"}
-            onClick={toggleOneLock}
-            className="lock-image"
-            style={{ cursor: "pointer" }}
+              src={isLocked.all ? "lock.png" : "unlock.png"}
+              alt={isLocked.all ? "Lock All" : "Unlock All"}
+              onClick={toggleOneLock}
+              className="lock-image"
+              style={{ cursor: "pointer" }}
           />
 
           {/* Add Modal Button */}
@@ -488,96 +508,71 @@ function Outfit() {
             </div>
           )}
           <div className="outfit-builder">
-            {!showLayers ? (
-              <>
-                {/* Top Clothing Container */}
-                <div className="clothing-container">
-                  <div className="lock-icon">
-                    <img
-                      src={isLocked.top ? "unlock.png" : "lock.png"}
-                      alt={isLocked.top ? "Unlock Top" : "Lock Top"}
-                      onClick={toggleLockTop}
-                      className="lock-image"
-                      style={{ cursor: "pointer" }}
-                    />
-                  </div>
-                  <div className="swipeable-container top">
-                    {tops.length > 0 ? (
-                      <SwipeableImage
-                        key={topIndex}
-                        image={tops[topIndex]}
-                        handleSwipe={handleSwipeTop}
-                        isLocked={isLocked.top}
-                        isAllLocked={isLocked.all}
-                        handleSwipeAll={handleSwipeAll}
-                        itemLength={tops.length}
-                      />
-                    ) : (
-                      <p>No tops available.</p>
-                    )}
-                  </div>
+          {/* Top and Bottom Containers with Conditional Overlays */}
+          {!showLayers ? (
+            <>
+              {/* Top Clothing Container */}
+              <div className="clothing-container">
+                <div className="lock-icon">
+                  <img
+                    src={isLocked.top ? "lock.png" : "unlock.png"} // Dynamically set the image based on lock state
+                    alt={isLocked.top ? "Lock Top" : "Unlock Top"}
+                    onClick={toggleLockTop}
+                    className="lock-image"
+                    style={{ cursor: "pointer" }}
+                  />
                 </div>
+                <div className="swipeable-container top">
+                  <SwipeableImage
+                    key={topIndex}
+                    image={tops[topIndex]}
+                    handleSwipe={handleSwipeTop}
+                    isLocked={isLocked.top || isLocked.all} // Ensure swipe is disabled when locked
+                    isAllLocked={isLocked.all}
+                    handleSwipeAll={handleSwipeAll}
+                    itemLength={tops.length}
+                  />
+                </div>
+              </div>
 
-                {/* Bottom Clothing Container */}
-                <div className="clothing-container">
-                  <div className="lock-icon">
-                    <img
-                      src={isLocked.bottom ? "unlock.png" : "lock.png"}
-                      alt={isLocked.bottom ? "Unlock Bottom" : "Lock Bottom"}
-                      onClick={toggleLockBottom}
-                      className="lock-image"
-                      style={{ cursor: "pointer" }}
-                    />
-                  </div>
-                  <div className="swipeable-container bottom">
-                    {bottoms.length > 0 ? (
-                      <SwipeableImage
-                        key={bottomIndex}
-                        image={bottoms[bottomIndex]}
-                        handleSwipe={handleSwipeBottom}
-                        isLocked={isLocked.bottom}
-                        isAllLocked={isLocked.all}
-                        handleSwipeAll={handleSwipeAll}
-                        itemLength={bottoms.length}
-                      />
-                    ) : (
-                      <p>No bottoms available.</p>
-                    )}
-                  </div>
+              {/* Bottom Clothing Container */}
+              <div className="clothing-container">
+                <div className="lock-icon">
+                  <img
+                    src={isLocked.bottom ? "lock.png" : "unlock.png"} // Dynamically set the image based on lock state
+                    alt={isLocked.bottom ? "Lock Bottom" : "Unlock Bottom"}
+                    onClick={toggleLockBottom}
+                    className="lock-image"
+                    style={{ cursor: "pointer" }}
+                  />
                 </div>
-
-                {/* Shoes Clothing Container */}
-                <div className="clothing-container">
-                  <div className="lock-icon">
-                    <img
-                      src={isLocked.shoes ? "unlock.png" : "lock.png"}
-                      alt={isLocked.shoes ? "Unlock Shoes" : "Lock Shoes"}
-                      onClick={toggleLockShoes}
-                      className="lock-image"
-                      style={{ cursor: "pointer" }}
-                    />
-                  </div>
-                  <div className="swipeable-container shoes">
-                    {shoes.length > 0 ? (
-                      <SwipeableImage
-                        key={shoesIndex}
-                        image={shoes[shoesIndex]}
-                        handleSwipe={handleSwipeShoes}
-                        isLocked={isLocked.shoes}
-                        isAllLocked={isLocked.all}
-                        handleSwipeAll={handleSwipeAll}
-                        itemLength={shoes.length}
-                      />
-                    ) : (
-                      <p>No shoes available.</p>
-                    )}
-                  </div>
+                <div className="swipeable-container bottom">
+                  <SwipeableImage
+                    key={bottomIndex}
+                    image={bottoms[bottomIndex]}
+                    handleSwipe={handleSwipeBottom}
+                    isLocked={isLocked.bottom || isLocked.all} // Ensure swipe is disabled when locked
+                    isAllLocked={isLocked.all}
+                    handleSwipeAll={handleSwipeAll}
+                    itemLength={bottoms.length}
+                  />
                 </div>
-              </>
-            ) : (
-              <>
-                {/* Top Layer Overlay */}
-                <div className="clothing-container">
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Top Layer Overlay */}
+              <div className="clothing-container">
+                <div className="swipeable-container top">
+                  <SwipeableImage
+                    key={topIndex}
+                    image={tops[topIndex]}
+                    handleSwipe={handleSwipeTop}
+                    isLocked={isLocked.top || isLocked.all} // Ensure swipe is disabled when locked
+                    isAllLocked={isLocked.all}
+                    handleSwipeAll={handleSwipeAll}
+                    itemLength={tops.length}
+                  />
                   <div className="overlay-container">
                     <h3>Selected Top Layers</h3>
                     <div className="overlay-items">
@@ -596,9 +591,20 @@ function Outfit() {
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Accessory Overlay */}
-                <div className="clothing-container">
+              {/* Accessory Overlay */}
+              <div className="clothing-container">
+                <div className="swipeable-container bottom">
+                  <SwipeableImage
+                    key={bottomIndex}
+                    image={bottoms[bottomIndex]}
+                    handleSwipe={handleSwipeBottom}
+                    isLocked={isLocked.bottom || isLocked.all} // Ensure swipe is disabled when locked
+                    isAllLocked={isLocked.all}
+                    handleSwipeAll={handleSwipeAll}
+                    itemLength={bottoms.length}
+                  />
                   <div className="overlay-container">
                     <h3>Selected Accessories</h3>
                     <div className="overlay-items">
@@ -617,9 +623,33 @@ function Outfit() {
                     </div>
                   </div>
                 </div>
-              </>
-            )}
+              </div>
+            </>
+          )}
+          {/* Shoes Container (Always Visible) */}
+          <div className="clothing-container">
+            <div className="lock-icon">
+              <img
+                src={isLocked.shoes ? "lock.png" : "unlock.png"} // Dynamically set the image based on lock state
+                alt={isLocked.shoes ? "Lock Shoes" : "Unlock Shoes"}
+                onClick={toggleLockShoes}
+                className="lock-image"
+                style={{ cursor: "pointer" }}
+              />
+            </div>
+            <div className="swipeable-container shoes">
+              <SwipeableImage
+                key={shoesIndex}
+                image={shoes[shoesIndex]}
+                handleSwipe={handleSwipeShoes}
+                isLocked={isLocked.shoes || isLocked.all} // Ensure swipe is disabled when locked
+                isAllLocked={isLocked.all}
+                handleSwipeAll={handleSwipeAll}
+                itemLength={shoes.length}
+              />
+            </div>
           </div>
+        </div>
         </div>
       </div>
       <div className={`modal ${showModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">
