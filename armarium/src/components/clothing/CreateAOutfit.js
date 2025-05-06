@@ -25,7 +25,7 @@ const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipe
 
   return (
     <motion.div
-      drag={isLocked || itemLength <= 1 ? false : "x"}
+      drag={!isLocked && itemLength > 1 ? "x" : false} // Enable drag only if not locked and there are multiple items
       dragConstraints={{ left: -1000, right: 1000 }}
       style={{
         width: '100%',
@@ -37,8 +37,7 @@ const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipe
       onDragEnd={(event, info) => {
         if (Math.abs(info.point.x) <= 10) {
           animControls.start({ x: 0, rotate: 0, opacity: 1 });
-        }
-        else {
+        } else {
           const direction = info.offset.x < 0 ? "left" : "right";
           animControls.start({
             x: direction === "left" ? -1000 : 1000,
@@ -55,10 +54,15 @@ const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipe
         }
       }}
     >
-      <img src={image} alt="Clothing item" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+      <img
+        src={image}
+        alt="Clothing item"
+        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        onDragStart={(e) => e.preventDefault()} // Prevent default drag behavior
+      />
     </motion.div>
   );
-}
+};
 
 /**
  * The tinder-style page for users to swipe left or right on clothing items.
