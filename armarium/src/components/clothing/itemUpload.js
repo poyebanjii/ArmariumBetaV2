@@ -6,9 +6,15 @@ import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { collection, addDoc, getDoc, updateDoc, doc, serverTimestamp } from 'firebase/firestore';
 import Navbar from '../Navbar';
 import Joyride from 'react-joyride';
+import { Center } from 'framer/render/presentation/Frame/DeprecatedFrame.js';
+import '../styles/Forms.css';
 
-const ItemUpload = () => {
-  const [image, setImage] = useState(null);
+const ItemUpload = ({type}) => {
+  const [items, setItems] = useState([
+    { file: null, title: '', tags: '', color: '', type: '', preview: null },
+  ]);
+  const [images, setImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [url, setUrl] = useState("");
   const [progress, setProgress] = useState(0);
   const [tags, setTags] = useState("");
@@ -36,61 +42,178 @@ const ItemUpload = () => {
     },
   ]);
 
-  const handleChange = (e) => {
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
+  const handleFileChange = (index, file) => {
+    const updatedItems = [...items];
+    updatedItems[index].file = file;
+    updatedItems[index].preview = URL.createObjectURL(file);
+    setItems(updatedItems);
+
+
+    // Update the images state
+    const updatedImages = [...images];
+    updatedImages[index] = file; // Set the file at the corresponding index
+    setImages(updatedImages);
   };
 
-  const handleUpload = () => {
+  useEffect(() => {
+    setItems((prevItems) =>
+      prevItems.map((item => ({ ...item, type: type || '' })))
+    );
+  }, [type]);
+
+  // const handleChange = (e) => {
+  //   if (e.target.files[0]) {
+  //     setImages(e.target.files[0]);
+  //   }
+  // };
+
+  // const handleChange = (e) => {
+  //   if (e.target.files) {
+  //     setImages(Array.from(e.target.files)); // Convert FileList to an array
+  //   }
+  // };
+
+  const handleInputChange = (index, field, value) => {
+    const updatedItems = [...items];
+    updatedItems[index][field] = value;
+    setItems(updatedItems);
+
+  };
+
+  const addNewItem = () => {
+    setItems([...items, { file: null, title: '', tags: '', color: '', type: '', preview: null }]);
+  };
+
+  // const handleUpload = () => {
+  //   if (!auth.currentUser) {
+  //     console.error('User is not authenticated');
+  //     return;
+  //   }
+  //   const user = auth.currentUser;
+  
+  //   if (image) {
+  //     const storageRef = ref(storage, `images/${image.name}`);
+  //     const uploadTask = uploadBytesResumable(storageRef, image);
+  
+  //     uploadTask.on(
+  //       "state_changed",
+  //       (snapshot) => {
+  //         const progress = Math.round(
+  //           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+  //         );
+  //         setProgress(progress);
+  //       },
+  //       (error) => {
+  //         console.log(error);
+  //       },
+  //       () => {
+  //         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+  //           setUrl(url);
+  //           removeBackground(url).then((bgRemoveUrl) => {
+  //             const itemId = `${itemType}-${new Date().getTime()}`;
+  //             addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${itemType}/items`), {
+  //               url: bgRemoveUrl || url,
+  //               title: title,
+  //               tags: tags.split(',').map(tag => tag.trim()),
+  //               color: color,
+  //               itemId: itemId,
+  //               createdAt: serverTimestamp(),
+  //             }).then(() => {
+  //               logEvent(analytics, 'item_uploaded', {
+  //                 item_type: itemType,
+  //                 title: title,
+  //                 color: color,
+  //                 tags: tags.split(',').map(tag => tag.trim()),
+  //               });
+  //               console.log('Item uploaded and event logged');
+  //             }).catch((error) => {
+  //               console.error('Error logging event:', error);
+  //             });
+  //           });
+  //         });
+  //       }
+  //     );
+  //   }
+  // };
+
+  const handleUpload = async () => {
     if (!auth.currentUser) {
       console.error('User is not authenticated');
       return;
     }
+    setIsLoading(true); // Set loading state to true
+  
     const user = auth.currentUser;
   
-    if (image) {
-      const storageRef = ref(storage, `images/${image.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, image);
+    try {
+      // Iterate through the images in the `images` state
+      for (let i = 0; i < images.length; i++) {
+        const file = images[i];
   
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = Math.round(
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          );
-          setProgress(progress);
-        },
-        (error) => {
-          console.log(error);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            setUrl(url);
-            removeBackground(url).then((bgRemoveUrl) => {
-              const itemId = `${itemType}-${new Date().getTime()}`;
-              addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${itemType}/items`), {
-                url: bgRemoveUrl || url,
-                title: title,
-                tags: tags.split(',').map(tag => tag.trim()),
-                color: color,
-                itemId: itemId,
-                createdAt: serverTimestamp(),
-              }).then(() => {
-                logEvent(analytics, 'item_uploaded', {
-                  item_type: itemType,
-                  title: title,
-                  color: color,
-                  tags: tags.split(',').map(tag => tag.trim()),
-                });
-                console.log('Item uploaded and event logged');
-              }).catch((error) => {
-                console.error('Error logging event:', error);
-              });
-            });
-          });
+        if (!file) {
+          console.error(`Image at index ${i} is missing.`);
+          continue; // Skip this iteration if the file is missing
         }
-      );
+  
+        // Upload the original image to Firebase Storage
+        const storageRef = ref(storage, `images/${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+  
+        await new Promise((resolve, reject) => {
+          uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+              const progressValue = Math.round(
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+              );
+              setProgress((prev) => ({
+                ...prev,
+                [file.name]: progressValue,
+              }));
+            },
+            (error) => {
+              console.error(`Error uploading image ${file.name}:`, error);
+              reject(error);
+            },
+            async () => {
+              try {
+                // Get the download URL of the uploaded image
+                const url = await getDownloadURL(uploadTask.snapshot.ref);
+  
+                // Call removeBackground for this image
+                const bgRemoveUrl = await removeBackground(url, file);
+  
+                // Save the processed image details to Firestore
+                await addDoc(collection(db, `Users/${user.uid}/ItemsCollection/${items[i].type}/items`), {
+                  url: bgRemoveUrl || url, // Use background-removed URL if available, else original
+                  title:items[i].title,
+                  tags: items[i].tags.split(',').map(tag => tag.trim()),
+                  color: items[i].color,
+                  createdAt: serverTimestamp(),
+                });
+  
+                resolve();
+              } catch (error) {
+                console.error(`Error processing image ${file.name}:`, error);
+                reject(error);
+              }
+            }
+          );
+        });
+      }
+  
+      console.log('All images processed successfully');
+
+      window.location.reload(); // Reload the page to reflect changes
+
+      // Optionally, you can log an event to Firebase Analytics here
+      logEvent(analytics, 'item_uploaded', {
+        item_type: items[0].type,
+      });
+      console.log('Item uploaded and event logged');
+    } catch (error) {
+      console.error('Error processing images:', error);
+      alert('Error processing some images. Please try again.');
     }
   };
 
@@ -119,7 +242,7 @@ const ItemUpload = () => {
     }
   }, []);
 
-  const removeBackground = async (imageUrl) => {
+  const removeBackground = async (imageUrl, file) => {
     const apiKey = "izMQbubK4NUk3p24uQn9kBvP"; // Consider moving this to a secure location (e.g., environment variables)
     const apiUrl = "https://api.remove.bg/v1.0/removebg";
     const accountUrl = "https://api.remove.bg/v1.0/account";
@@ -177,7 +300,7 @@ const ItemUpload = () => {
       const bgRemovedImageUrl = URL.createObjectURL(data);
       setBgRemove(bgRemovedImageUrl);
   
-      const storageRef = ref(storage, `images/bg-removed-${image.name}`);
+      const storageRef = ref(storage, `images/bg-removed-${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, data);
   
       return new Promise((resolve, reject) => {
@@ -197,51 +320,78 @@ const ItemUpload = () => {
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="App">
-        <h2>Upload an Item</h2>
-        <progress value={progress} max="100" />
-        <br />
-        <input type="file" id="choosefile" onChange={handleChange} required />
-        <br />
-        <select onChange={(e) => setItemType(e.target.value)} id="selecttype" value={itemType}>
-          <option value="top">Top</option>
-          <option value="bottom">Bottom</option>
-          <option value="shoes">Shoes</option>
-          <option value="toplayer">Top Layer</option>
-        </select>
-        <br />
-        <br />
-        <br />
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          id = "textinput"
-          required
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="Tags (comma separated)"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-          required
-        />
-        <br />
-        <input
-          type="text"
-          placeholder="Color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
-          required
-        />
-        <br />
-        <button onClick={handleUpload} id="uploadbutton">Upload</button>
-        <br />
-        {url && <img src={bgRemove || url} alt="Uploaded" style={{ width: "300px" }} />}
+        <div className='Form-box'>
+          {isLoading && (
+            <div className="upload-overlay">
+              <div className="upload-spinner">
+                <p>Processing your files... Please wait.</p>
+              </div>
+            </div>
+            )}
+          <div className='input-group'>
+        <h2 style={{ textAlign: 'center' }}>Upload Items</h2>
+        {items.map((item, index) => (
+        <div key={index} style={{ marginBottom: '20px', padding: '20px' }}>
+          <input
+            type="file"
+            onChange={(e) => handleFileChange(index, e.target.files[0])}
+            required
+          />
+          {item.preview && (
+            <div>
+              <img
+                src={item.preview}
+                alt="Preview"
+                style={{ width: '100px', height: 'auto', marginTop: '10px' }}
+              />
+            </div>
+          )}
+          <select
+            value={item.type}
+            onChange={(e) => handleInputChange(index, 'type', e.target.value)}
+            required
+            style={{
+              display: 'block', // Makes the select box a block element
+              margin: '0 auto', // Centers it horizontally
+              marginBottom: '10px', // Adds some space below the select box
+            }}
+          >
+            <option value="" disabled>
+              Select Type
+            </option>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+            <option value="shoes">Shoes</option>
+            <option value="toplayer">Top Layer</option>
+            <option value="accessory">Accessory</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Title"
+            value={item.title}
+            onChange={(e) => handleInputChange(index, 'title', e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Tags (comma separated)"
+            value={item.tags}
+            onChange={(e) => handleInputChange(index, 'tags', e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Color"
+            value={item.color}
+            onChange={(e) => handleInputChange(index, 'color', e.target.value)}
+            required
+          />
+        </div>
+      ))}
+      <button className= 'Form-Submit' onClick={addNewItem} style={{ marginBottom: '20px' }}>
+        + Add Another Item
+      </button>
+      <button className = 'Form-Submit' onClick={handleUpload}>Upload All</button>
       </div>
       {/* Joyride tutorial */}
       <Joyride
@@ -256,7 +406,7 @@ const ItemUpload = () => {
           }
         }}
       />
-    </div>
+      </div>
   );
 };
 

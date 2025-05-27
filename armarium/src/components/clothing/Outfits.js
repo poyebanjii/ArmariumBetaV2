@@ -15,7 +15,7 @@ function Outfits() {
   const [outfitToDelete, setOutfitToDelete] = useState([]);
   const [title, setTitle] = useState('');
   const navigate = useNavigate();
-  const DELAY = 750;
+  const DELAY = 150;
 
   const fetchOutfits = async (user) => {
     if (user) {
