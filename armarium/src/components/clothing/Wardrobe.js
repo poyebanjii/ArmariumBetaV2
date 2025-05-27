@@ -4,25 +4,55 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { NavLink, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
-import '../styles/Loading.css';
+import Loader from '../Loader';
+import ItemUpload from './itemUpload';
+import ClothesLibSearch from './ClothesLibSearch';
+import '../styles/Wardrobe.css';
+import '../styles/Forms.css';
+import { Center } from 'framer/render/presentation/Frame/DeprecatedFrame.js';
 
 const Wardrobe = () => {
     const [tops, setTops] = useState([]);
     const [bottoms, setBottoms] = useState([]);
     const [shoes, setShoes] = useState([]);
     const [topLayers, setTopLayers] = useState([]);
+    const [accessory, setAccessory] = useState([]);
     const [isTop, setIsTop] = useState(true);
     const [isBottom, setIsBottom] = useState(false);
     const [isShoes, setIsShoes] = useState(false);
     const [isTopLayer, setIsTopLayer] = useState(false);
+    const [isAccessory, setIsAccessory] = useState(false);
     const [isDelete, setIsDelete] = useState(false);
     const [clothesToDelete, setClothesToDelete] = useState([]);
     const [searchInput, setSearchInput] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLibraryModalOpen, setIsLibraryModalOpen] = useState(false);
+    const [selectedType, setSelectedType] = useState('');
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
     const DELAY = 750;
-    
+
+    const handleShowModal = (type) => {
+        setSelectedType(type);
+        setIsModalOpen(true);
+        document.body.classList.add('modal-open'); // Prevent scrolling
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        document.body.classList.remove('modal-open');
+    };
+
+    const handleOpenLibraryModal = () => {
+        setIsLibraryModalOpen(true);
+    };
+
+    const handleCloseLibraryModal = () => {
+        setIsLibraryModalOpen(false);
+    };
+
     const filteredClothes = (clothes) => {
         return clothes.filter(clothing => {
             const matchesTitle = clothing.title && clothing.title.toLowerCase().includes(searchInput.toLowerCase());
@@ -32,16 +62,17 @@ const Wardrobe = () => {
     };
 
     const displayedClothes = isTop ? filteredClothes(tops) :
-                         isBottom ? filteredClothes(bottoms) :
-                         isShoes ? filteredClothes(shoes) :
-                         isTopLayer ? filteredClothes(topLayers) :
-                         [];
-                         
+        isBottom ? filteredClothes(bottoms) :
+            isShoes ? filteredClothes(shoes) :
+                isTopLayer ? filteredClothes(topLayers) :
+                    isAccessory ? filteredClothes(accessory) :
+                    [];
+
     const fetchData = async (user) => {
         try {
             await new Promise(resolve => setTimeout(resolve, DELAY));
 
-            if (tops.length === 0) { 
+            if (tops.length === 0) {
                 const topsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/top/items`));
                 const topsData = topsCollection.docs.map(doc => ({
                     id: doc.id,
@@ -49,12 +80,12 @@ const Wardrobe = () => {
                     tags: doc.data().tags,
                     url: doc.data().url
                 }));
-                console.log("clothiing doc:", user.uid);
+                console.log("clothing doc:", user.uid);
                 console.log(topsData);
                 setTops(topsData);
             }
 
-            if (bottoms.length === 0) { 
+            if (bottoms.length === 0) {
                 const bottomsCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/bottom/items`));
                 const bottomsData = bottomsCollection.docs.map(doc => ({
                     id: doc.id,
@@ -66,7 +97,7 @@ const Wardrobe = () => {
                 setBottoms(bottomsData);
             }
 
-            if (shoes.length === 0) { 
+            if (shoes.length === 0) {
                 const shoesCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/shoes/items`));
                 const shoesData = shoesCollection.docs.map(doc => ({
                     id: doc.id,
@@ -78,7 +109,7 @@ const Wardrobe = () => {
                 setShoes(shoesData);
             }
 
-            if (topLayers.length === 0) { 
+            if (topLayers.length === 0) {
                 const topLayersCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/toplayer/items`));
                 const topLayerData = topLayersCollection.docs.map(doc => ({
                     id: doc.id,
@@ -88,6 +119,18 @@ const Wardrobe = () => {
                 }));
                 console.log("TOP", topLayerData);
                 setTopLayers(topLayerData);
+            }
+
+            if (accessory.length === 0) {
+                const accessoryCollection = await getDocs(collection(db, `Users/${user.uid}/ItemsCollection/accessory/items`));
+                const accessoryData = accessoryCollection.docs.map(doc => ({
+                    id: doc.id,
+                    title: doc.data().title,
+                    tags: doc.data().tags,
+                    url: doc.data().url
+                }));
+                console.log("Accessory", accessoryData);
+                setAccessory(accessoryData);
             }
 
         } catch (error) {
@@ -102,7 +145,7 @@ const Wardrobe = () => {
             if (user) {
                 fetchData(user).then(() => setLoading(false));
             } else {
-                navigate('/login'); 
+                navigate('/login');
             }
         });
 
@@ -121,8 +164,8 @@ const Wardrobe = () => {
         for (let { id, type } of clothesToDelete) {
             const itemDoc = doc(db, `Users/${user.uid}/ItemsCollection/${type}/items`, id);
             await deleteDoc(itemDoc);
-            
-            if (type === 'top') {                                                                                                                                                                               
+
+            if (type === 'top') {
                 setTops(tops.filter((item) => item.id !== id));
             }
             else if (type === 'bottom') {
@@ -134,11 +177,14 @@ const Wardrobe = () => {
             else if (type === 'toplayer') {
                 setTopLayers(topLayers.filter((item) => item.id !== id));
             }
+            else if (type === 'accessory') {
+                setAccessory(accessory.filter((item) => item.id !== id));
+            }
         }
 
         setClothesToDelete([]);
         setIsDelete(false);
-    }
+    };
 
     const addToDeleteList = (clothing) => {
         setClothesToDelete(prevList => {
@@ -148,7 +194,7 @@ const Wardrobe = () => {
                 return [...prevList, clothing];
             }
         });
-    }
+    };
 
     const handleDeleteClick = (id, type) => {
         console.log('Type: ', type);
@@ -158,34 +204,6 @@ const Wardrobe = () => {
             console.log(type);
             navigate(`/editClothing/${id.id}/${id.type}`);
         }
-    };
-
-    const handleShowTops = () => {
-        setIsTop(true);
-        setIsBottom(false);
-        setIsShoes(false);
-        setIsTopLayer(false);
-    };
-
-    const handleShowBottoms = () => {
-        setIsTop(false);
-        setIsBottom(true);
-        setIsShoes(false);
-        setIsTopLayer(false);
-    };
-
-    const handleShowShoes = () => {
-        setIsTop(false);
-        setIsBottom(false);
-        setIsShoes(true);
-        setIsTopLayer(false);
-    };
-
-    const handleShowTopLayers = () => {
-        setIsTop(false);
-        setIsBottom(false);
-        setIsShoes(false);
-        setIsTopLayer(true);
     };
 
     const toggleDelete = () => {
@@ -198,180 +216,205 @@ const Wardrobe = () => {
     const handleSearchChange = (e) => {
         const inputValue = e.target.value.toLowerCase();
         setSearchInput(inputValue);
-    }
-
-    if (loading) {
-        return <div><Navbar /> <div className="loader"></div></div>;
-    }
-
+    };
+    
     if (error) {
         return <div><Navbar /> Error: {error.message}</div>;
     }
 
     return (
-        <div>
+        <div className="wardrobe-container">
+            <Loader loading={loading} />
             <Navbar />
-            <input 
-                type="text" 
-                placeholder="Search by title or tags..." 
-                value={searchInput} 
-                onChange={handleSearchChange} 
-            />
-            <NavLink onClick={handleShowTops} style={{ marginRight: '10px', cursor: 'pointer' }}>
-                Tops
-            </NavLink>
-            <NavLink onClick={handleShowBottoms} style={{ cursor: 'pointer' }}>
-                Bottoms
-            </NavLink>
-            <NavLink onClick={handleShowShoes} style={{ marginRight: '10px', cursor: 'pointer' }}>
-                Shoes
-            </NavLink>
-            <NavLink onClick={handleShowTopLayers} style={{ marginRight: '10px', cursor: 'pointer' }}>
-                Top Layer
-            </NavLink>
-            <button onClick={toggleDelete}>
-                {isDelete ? 'Cancel' : 'Delete'}
-            </button>
-            {isDelete && (
-                <button onClick={handleDelete} style={{ marginLeft: '10px' }}>
-                    Confirm Delete
+            <div className="wardrobe-header">
+                <input
+                    type="text"
+                    placeholder="Search by title or tags..."
+                    value={searchInput}
+                    onChange={handleSearchChange}
+                    className="wardrobe-search"
+                />
+                <button className="delete-clothing-item" onClick={toggleDelete}>
+                    {isDelete ? 'Cancel' : 'Delete'}
                 </button>
+                {isDelete && (
+                    <button className="delete-clothing-item" onClick={handleDelete}>
+                        Confirm Delete
+                    </button>
+                )}
+            </div>
+
+            {isModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <ItemUpload type={selectedType} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                            <button className="modal-close" onClick={handleCloseModal}>Close</button>
+                            <button className="modal-close" onClick={handleOpenLibraryModal}>Clothing Library</button>
+                        </div>
+                    </div>
+                </div>
             )}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isTop && displayedClothes.map((top, index) => (
-                    <div key={top.id} style={{ position: 'relative' }}>
-                        <img 
-                            src={top.url} 
-                            alt={`Top ${index + 1}`} 
-                            style={{ 
-                                width: '100%', 
-                                height: '200px', 
-                                objectFit: 'cover', // Ensures the image maintains its aspect ratio
-                                borderRadius: '8px', // Adds rounded corners for better aesthetics
-                                border: clothesToDelete.some(item => item.id === top.id) ? '2px solid red' : 'none'
-                            }}
-                            onClick={() => handleDeleteClick({ id: top.id, type: 'top' })}
-                        />
-                        {isDelete && (
-                            <button
-                                onClick={() => addToDeleteList({ id: top.id, type: 'top' })}
-                                style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {clothesToDelete.some(item => item.id === top.id) ? 'Remove' : 'Select'}
-                            </button>
-                        )}
+
+            {isLibraryModalOpen && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <ClothesLibSearch />
+                        <button className="modal-close" onClick={handleCloseLibraryModal}>
+                            Close Library
+                        </button>
                     </div>
-                ))}
+                </div>
+            )}
+
+            {/* Tops Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                    <h3>Tops</h3>
+                    <button className="add-nav-link" id="tops-add-button"onClick={() => handleShowModal('top')}>
+                        Add
+                    </button>
+                </div>
+                <div className="wardrobe-content-row">
+                    {filteredClothes(tops).map((top, index) => (
+                        <div key={top.id} className="wardrobe-item">
+                            <img
+                                src={top.url}
+                                alt={`Top ${index + 1}`}
+                                className="wardrobe-image"
+                                onClick={() => handleDeleteClick({ id: top.id, type: 'top' })}
+                            />
+                            {isDelete && (
+                                <button
+                                    onClick={() => addToDeleteList({ id: top.id, type: 'top' })}
+                                    className="delete-button"
+                                >
+                                    {clothesToDelete.some(item => item.id === top.id) ? 'Remove' : 'Select'}
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isBottom && displayedClothes.map((bottom, index) => (
-                    <div key={bottom.id} style={{ position: 'relative' }}>
-                        <img 
-                            src={bottom.url} 
-                            alt={`Bottom ${index + 1}`} 
-                            style={{ 
-                                width: '100%', 
-                                height: '200px', 
-                                objectFit: 'cover', 
-                                borderRadius: '8px', 
-                                border: clothesToDelete.some(item => item.id === bottom.id) ? '2px solid red' : 'none'
-                            }}
-                            onClick={() => handleDeleteClick({ id: bottom.id, type: 'bottom' })}
-                        />
-                        {isDelete && (
-                            <button
-                                onClick={() => addToDeleteList({ id: bottom.id, type: 'bottom' })}
-                                style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {clothesToDelete.some(item => item.id === bottom.id) ? 'Remove' : 'Select'}
-                            </button>
-                        )}
-                    </div>
-                ))}
+
+            {/* Bottoms Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                    <h3>Bottoms</h3>
+                    <button className="add-nav-link" onClick={() => handleShowModal('bottom')}>
+                        Add
+                    </button>
+                </div>
+                <div className="wardrobe-content-row">
+                    {filteredClothes(bottoms).map((bottom, index) => (
+                        <div key={bottom.id} className="wardrobe-item">
+                            <img
+                                src={bottom.url}
+                                alt={`Bottom ${index + 1}`}
+                                className="wardrobe-image"
+                                onClick={() => handleDeleteClick({ id: bottom.id, type: 'bottom' })}
+                            />
+                            {isDelete && (
+                                <button
+                                    onClick={() => addToDeleteList({ id: bottom.id, type: 'bottom' })}
+                                    className="delete-button"
+                                >
+                                    {clothesToDelete.some(item => item.id === bottom.id) ? 'Remove' : 'Select'}
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isShoes && displayedClothes.map((shoe, index) => (
-                    <div key={shoe.id} style={{ position: 'relative' }}>
-                        <img 
-                            src={shoe.url} 
-                            alt={`Shoe ${index + 1}`} 
-                            style={{ 
-                                width: '100%', 
-                                height: '200px', 
-                                objectFit: 'cover', // Ensures the image maintains its aspect ratio
-                                borderRadius: '8px', // Adds rounded corners for better aesthetics
-                                border: clothesToDelete.some(item => item.id === shoe.id) ? '2px solid red' : 'none'
-                            }}
-                            onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
-                        />
-                        {isDelete && (
-                            <button
-                                onClick={() => addToDeleteList({ id: shoe.id, type: 'shoes' })}
-                                style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {clothesToDelete.some(item => item.id === shoe.id) ? 'Remove' : 'Select'}
-                            </button>
-                        )}
-                    </div>
-                ))}
+
+            {/* Shoes Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                    <h3>Shoes</h3>
+                    <button className="add-nav-link" onClick={() => handleShowModal('shoes')}>
+                        Add
+                    </button>
+                </div>
+                <div className="wardrobe-content-row">
+                    {filteredClothes(shoes).map((shoe, index) => (
+                        <div key={shoe.id} className="wardrobe-item">
+                            <img
+                                src={shoe.url}
+                                alt={`Shoe ${index + 1}`}
+                                className="wardrobe-image"
+                                onClick={() => handleDeleteClick({ id: shoe.id, type: 'shoes' })}
+                            />
+                            {isDelete && (
+                                <button
+                                    onClick={() => addToDeleteList({ id: shoe.id, type: 'shoes' })}
+                                    className="delete-button"
+                                >
+                                    {clothesToDelete.some(item => item.id === shoe.id) ? 'Remove' : 'Select'}
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {isTopLayer && displayedClothes.map((toplayer, index) => (
-                    <div key={toplayer.id} style={{ position: 'relative' }}>
+
+            {/* Top Layers Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                    <h3>Top Layers</h3>
+                    <button className="add-nav-link" onClick={() => handleShowModal('toplayer')}>
+                        Add
+                    </button>
+                </div>
+                <div className="wardrobe-content-row">
+                    {filteredClothes(topLayers).map((toplayer, index) => (
+                        <div key={toplayer.id} className="wardrobe-item">
+                            <img
+                                src={toplayer.url}
+                                alt={`TopLayer ${index + 1}`}
+                                className="wardrobe-image"
+                                onClick={() => handleDeleteClick({ id: toplayer.id, type: 'toplayer' })}
+                            />
+                            {isDelete && (
+                                <button
+                                    onClick={() => addToDeleteList({ id: toplayer.id, type: 'toplayer' })}
+                                    className="delete-button"
+                                >
+                                    {clothesToDelete.some(item => item.id === toplayer.id) ? 'Remove' : 'Select'}
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Accessory Row */}
+            <div className="wardrobe-row">
+                <div className='Add-Button'>
+                    <h3>Accessory</h3>
+                    <button className="add-nav-link" onClick={() => handleShowModal('accessory')}>
+                        Add
+                    </button>
+                </div>
+                <div className="wardrobe-content-row">
+                {filteredClothes(accessory).map((accessory, index) => (
+                    <div key={accessory.id} className="wardrobe-item">
                         <img 
-                            src={toplayer.url} 
-                            alt={`TopLayer ${index + 1}`} 
-                            style={{ 
-                                width: '100%', 
-                                height: '200px', 
-                                objectFit: 'cover', // Ensures the image maintains its aspect ratio
-                                borderRadius: '8px', // Adds rounded corners for better aesthetics
-                                border: clothesToDelete.some(item => item.id === toplayer.id) ? '2px solid red' : 'none'
-                            }}
-                            onClick={() => handleDeleteClick({ id: toplayer.id, type: 'toplayer' })}
+                        src={accessory.url} 
+                        alt={`Accessory ${index + 1}`} 
+                        className="wardrobe-image"
+                        onClick={() => handleDeleteClick({ id: accessory.id, type: 'accessory' })}
                         />
                         {isDelete && (
-                            <button
-                                onClick={() => addToDeleteList({ id: toplayer.id, type: 'toplayer' })}
-                                style={{
-                                    position: 'absolute',
-                                    top: '5px',
-                                    right: '5px',
-                                    backgroundColor: 'red',
-                                    color: 'white',
-                                    border: 'none',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                {clothesToDelete.some(item => item.id === toplayer.id) ? 'Remove' : 'Select'}
-                            </button>
+                        <button
+                            onClick={() => addToDeleteList({ id: accessory.id, type: 'accessory' })}
+                            className="delete-button"
+                        >
+                            {clothesToDelete.some(item => item.id === accessory.id) ? 'Remove' : 'Select'}
+                        </button>
                         )}
                     </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );

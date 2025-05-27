@@ -330,10 +330,6 @@ function Outfit() {
   
           <br />
   
-          <button onClick={toggleLockTop} id='lockbutton' disabled={isLocked.all}>
-            {isLocked.top ? 'Unlock Top' : 'Lock Top'}
-          </button>
-  
           <div className="outfit-card">
             <div className="swipeable-container top">
               <SwipeableImage

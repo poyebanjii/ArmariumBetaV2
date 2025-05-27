@@ -1,23 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { db } from '../backend/firebaseConfig'; 
-import SplashScreen from './SplashScreen';
+import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { ref, listAll, getDownloadURL } from 'firebase/storage';
+import { storage } from '../backend/firebaseConfig';
+import { db } from '../backend/firebaseConfig';
+import { useStyleboardContext } from '../../StyleboardContext';
 import '../styles/App.css';
+import '../styles/Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Simulate loading time
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
+  const { setStyleboards } = useStyleboardContext(); // Access the context
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +23,7 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log('User logged in successfully');
-      alert('Login successful!');
+      setError(''); // Clear any previous error messages
 
       // Check the accountSetup status
       const user = auth.currentUser;
@@ -35,7 +32,6 @@ function Login() {
 
       if (userDoc.exists()) {
         const { accountSetup } = userDoc.data();
-        
         if (accountSetup === false) {
           navigate('/userInfo'); // Navigate to /userInfo if accountSetup is false
         } else {
@@ -47,46 +43,43 @@ function Login() {
       }
     } catch (error) {
       console.error('Error logging in:', error);
-      alert('Error logging in. Please check your email and password.');
+      setError('Invalid email or password. Please try again.'); // Display error message
     }
   };
 
   return (
-    <div className="App">
-      {loading ? (
-        <SplashScreen />
-      ) : (
-        <>
-          <h2>ARMARIUM</h2>
-          <form onSubmit={handleLoginSubmit}>
-            <label>
-              Email:
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </label>
-            <br />
-            <label>
-              Password:
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </label>
-            <br />
-            <button type="submit">Login</button>
-          </form>
-          <br />
+    <div className="login-container">
+      <div className="logo">
+        <div className="logo-text">ARMARIUM</div>
+      </div>
+      <div className="login-box">
+        <form onSubmit={handleLoginSubmit}>
+          <div className="input-group">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {error && <p className="error-message">{error}</p>}
+          </div>
+          <button type="submit" className="login-button">Sign in</button>
+        </form>
+        <div className="links">
           <Link to="/forgot-password">Forgot Password</Link>
-          <br />
           <Link to="/register">Register</Link>
-        </>
-      )}
+        </div>
+      </div>
     </div>
   );
 }

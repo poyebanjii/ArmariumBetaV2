@@ -1,0 +1,24 @@
+/* Circular style buttons */
+.style-button {
+    width: 80px; /* Fixed width for circle */
+    height: 80px; /* Equal height for circle */
+    border-radius: 50%; /* Makes it circular */
+    background-color: lightgray; /* Default background */
+    border: none; /* Remove default border */
+    cursor: pointer; /* Hand on hover */
+    font-size: 1em; /* Adjust text size */
+    display: flex; /* Center text inside button */
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease; /* Smooth color change */
+  }
+  
+  /* Selected state */
+  .style-button.selected {
+    background-color: gray; /* Background when selected */
+  }
+  
+  /* Optional: Hover effect */
+  .style-button:hover {
+    background-color: #d3d3d3; /* Slightly darker gray on hover when not selected */
+  }

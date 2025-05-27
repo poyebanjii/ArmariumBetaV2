@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
-import '../styles/App.css';
+//import '../styles/App.css';
+import '../styles/Forms.css';
+import '../styles/Brands.css';
 
 function Brands() {
   const [selectedBrands, setSelectedBrands] = useState([]);
@@ -57,44 +59,58 @@ function Brands() {
   };
 
   return (
-    <div className="App">
-      <h3>What brands do you like?</h3>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
-        {brandsList.map((brand) => (
-          <button
-            key={brand}
-            onClick={() => handleBrandClick(brand)}
-            style={{
-              backgroundColor: selectedBrands.includes(brand) ? 'gray' : 'lightgray',
-              padding: '10px 20px',
-              border: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            {brand}
-          </button>
-        ))}
+    <div className="Form-container">
+      <div className="logo">
+        <div className="logo-text">ARMARIUM</div>
       </div>
+      <div className ="Form-box">
+        <div className ="input-group">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
+            {brandsList.map((brand) => (
+              <button
+                key={brand}
+                onClick={() => handleBrandClick(brand)}
+                className={'Form-Button'+ (selectedBrands.includes(brand) ? 'selected' : '')}
+              >
+                {brand}
+              </button>
+            ))}
+          </div>
 
       <form onSubmit={handleCustomBrandSubmit} style={{ marginTop: '20px' }}>
-        <label style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ marginRight: '10px' }}>Insert your favorite brands:</span>
-          <input
-            type="text"
-            value={customBrand}
-            onChange={handleCustomBrandChange}
-            placeholder="Enter brand name"
-            style={{ padding: '5px', borderRadius: '5px', border: '1px solid #ccc' }}
-          />
-        </label>
-        <button type="submit" style={{ display: 'block', margin: '10px auto' }}>
-          Add Brand
-        </button>
+        <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+    <label htmlFor="customBrandInput" style={{ fontWeight: 'bold' }}>
+      Insert your favorite brands:
+    </label>
+  </div>
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}>
+    <input
+      id="customBrandInput"
+      type="text"
+      value={customBrand}
+      onChange={handleCustomBrandChange}
+      placeholder="Enter brand name"
+      style={{
+        padding: '10px',
+        borderRadius: '5px',
+        border: '1px solid #ccc',
+        flex: '1', // Allow the input to take up available space
+        maxWidth: '300px', // Optional: Limit the input width
+      }}
+    />
+    <button
+      type="submit"
+      className='Form-Button-Add'
+    >
+      Add Brand
+    </button>
+  </div>
       </form>
-
-      <button onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
+      <button className = 'Form-Submit' onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
         Next
       </button>
+      </div>
+      </div>
     </div>
   );
 }

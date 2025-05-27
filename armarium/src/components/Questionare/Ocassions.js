@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
-import '../styles/App.css';
 import { doc, updateDoc } from 'firebase/firestore';
+import '../styles/Forms.css';
 
 function Ocassions() {
   const [selectedOcassions, setSelectedOcassions] = useState([]);
@@ -57,19 +57,19 @@ function Ocassions() {
   };
 
   return (
-    <div className="App">
+    <div className="Form-container">
+      <div className="logo">
+        <div className="logo-text">ARMARIUM</div>
+      </div>
       <h3>What occasions do you struggle with?</h3>
+      <div className='Form-box'>
+        <div className='input-group'>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
         {ocassionsList.map((ocassion) => (
           <button
             key={ocassion}
             onClick={() => handleOcassionClick(ocassion)}
-            style={{
-              backgroundColor: selectedOcassions.includes(ocassion) ? 'gray' : 'lightgray',
-              padding: '10px 20px',
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className={'Form-Button' + (selectedOcassions.includes(ocassion) ? 'selected' : '')}
           >
             {ocassion}
           </button>
@@ -84,14 +84,16 @@ function Ocassions() {
           placeholder="Insert your favorite occasions"
           style={{ padding: '10px', width: '200px', marginRight: '10px' }}
         />
-        <button onClick={handleCustomOcassionAdd} style={{ padding: '10px 20px', cursor: 'pointer' }}>
+        <button onClick={handleCustomOcassionAdd} className='Form-Button-Add'>
           Add
         </button>
       </div>
 
-      <button onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
+      <button className='Form-Submit'onClick={handleNext} style={{ display: 'block', margin: '20px auto' }}>
         Next
       </button>
+      </div>
+      </div>
     </div>
   );
 }
