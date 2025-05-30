@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; // Ensure your firebaseConfig exports db
@@ -154,7 +154,7 @@ function Register() {
       </form>
       <br />
       <div className="links">
-        <a href="/login">Already have an account?</a>
+        <Link to="/login">Already have an account?</Link>
         <br />
         </div>
         </div>
