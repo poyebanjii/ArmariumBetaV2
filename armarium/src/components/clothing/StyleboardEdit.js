@@ -6,13 +6,12 @@ import Navbar from '../Navbar';
 import OutfitsList from './OutfitsList';
 import '../styles/MyOutfits.css';
 
-function StyleboardPage() {
+function StyleboardEdit() {
   const location = useLocation();
   const navigate = useNavigate();
   const { styleboard } = location.state || {};
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [selectedOutfits, setSelectedOutfits] = React.useState([]);
-  const [title, setTitle] = React.useState(styleboard?.name || '');
 
   const handleDelete = async () => {
     const user = auth.currentUser;
@@ -20,51 +19,45 @@ function StyleboardPage() {
     try {
       const styleboardDocRef = doc(db, `Users/${user.uid}/Styleboards`, styleboard.id);
 
+      // Fetch the current document
       const styleboardDoc = await getDoc(styleboardDocRef);
+
       if (!styleboardDoc.exists()) {
         console.error("Styleboard document does not exist.");
         return;
       }
 
+      // Get the current outfits array
       const currentOutfits = styleboardDoc.data().outfits || [];
 
+      // Create DocumentReference objects for the selected outfits
       const selectedOutfitRefs = selectedOutfits.map((outfit) =>
         doc(db, `Users/${user.uid}/Outfits`, outfit.id)
       );
 
       const updatedOutfits = currentOutfits.filter((outfitRef) => {
-        return !selectedOutfitRefs.some((selectedRef) => outfitRef.path === selectedRef.path);
+        const isMatch = selectedOutfitRefs.some((selectedRef) => {
+          console.log("Comparing outfitRef:", outfitRef.path, "with selectedRef:", selectedRef.path);
+          return outfitRef.path === selectedRef.path;
+        });
+        console.log("Is match:", isMatch);
+        return !isMatch;
       });
 
+      // Update the document with the modified array
       await updateDoc(styleboardDocRef, { outfits: updatedOutfits });
 
       styleboard.outfits = styleboard.outfits.filter(
         (outfit) => !selectedOutfits.some((selectedOutfit) => selectedOutfit.id === outfit.id)
       );
 
-      // Update the ExploreStyleboards copy
-      const exploreDocRef = doc(db, 'ExploreStyleboards', styleboard.id);
-      const exploreDoc = await getDoc(exploreDocRef);
-
-      if (exploreDoc.exists()) {
-        const currentExploreOutfits = exploreDoc.data().outfits || [];
-
-        const updatedExploreOutfits = currentExploreOutfits.filter(
-          (outfit) => !selectedOutfits.some((sel) => sel.id === outfit.id)
-        );
-
-        await updateDoc(exploreDocRef, {
-          outfits: updatedExploreOutfits
-        });
-      }
-
-      // Clean up
+      // Clear the selected outfits and close the modal
       setSelectedOutfits([]);
       setShowDeleteModal(false);
     } catch (error) {
       console.error("Error deleting outfit:", error);
     }
-  };
+  }
 
   if (!styleboard) {
     return <p>No styleboard data found.</p>;
@@ -87,56 +80,10 @@ function StyleboardPage() {
         }}>
           Delete
         </button>
-
+        
       </div>
 
-      <div className="center">
-        <input
-          type="text"
-          className="editable-title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={{
-            fontSize: '2rem',
-            textAlign: 'center',
-            marginBottom: '10px',
-            border: 'none',
-            borderBottom: '2px solid gray',
-            outline: 'none',
-            width: '60%'
-          }}
-        />
-        <button
-          className="outfit-button"
-          onClick={async () => {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            try {
-              const userStyleboardRef = doc(db, `Users/${user.uid}/Styleboards`, styleboard.id);
-              const exploreStyleboardRef = doc(db, 'ExploreStyleboards', styleboard.id);
-
-              // Update personal styleboard
-              await updateDoc(userStyleboardRef, { name: title });
-
-              // Also update shared Explore styleboard if it exists
-              const exploreDoc = await getDoc(exploreStyleboardRef);
-              if (exploreDoc.exists()) {
-                await updateDoc(exploreStyleboardRef, { styleboardName: title });
-              }
-
-              alert('Styleboard title updated!');
-            } catch (err) {
-              console.error('Error updating title:', err);
-              alert('Failed to update title.');
-            }
-          }}
-        >
-          Save Title
-        </button>
-      </div>
-
-
+      <div className="center"><h1>{styleboard.name}</h1></div>
       
       <div className="center">
         <div className="outfit-outer">
@@ -176,4 +123,4 @@ function StyleboardPage() {
   );
 }
 
-export default StyleboardPage;
+export default StyleboardEdit;

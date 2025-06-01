@@ -73,8 +73,17 @@ function Styleboards() {
     try {
       await new Promise((res) => setTimeout(res, DELAY));
       for (const styleboardId of selectedStyleboards) {
-        const ref = doc(db, `Users/${user.uid}/Styleboards`, styleboardId);
-        await deleteDoc(ref);
+        // Delete from user's Styleboards
+        const userStyleboardRef = doc(db, `Users/${user.uid}/Styleboards`, styleboardId);
+        await deleteDoc(userStyleboardRef);
+
+        // Also delete from ExploreStyleboards if it exists
+        const exploreRef = doc(db, 'ExploreStyleboards', styleboardId);
+        const exploreSnap = await getDoc(exploreRef);
+        if (exploreSnap.exists()) {
+          await deleteDoc(exploreRef);
+          console.log(`Removed from Explore: ${styleboardId}`);
+        }
       }
 
       setSelectedStyleboards([]);
