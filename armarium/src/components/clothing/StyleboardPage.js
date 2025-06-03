@@ -1,5 +1,5 @@
 import React from 'react';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, arrayUnion } from 'firebase/firestore';
 import { auth, db } from '../backend/firebaseConfig';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
@@ -13,6 +13,8 @@ function StyleboardPage() {
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [selectedOutfits, setSelectedOutfits] = React.useState([]);
   const [title, setTitle] = React.useState(styleboard?.name || '');
+  const user = auth.currentUser;
+  const userId = user?.uid;
 
   const handleDelete = async () => {
     const user = auth.currentUser;
@@ -74,7 +76,7 @@ function StyleboardPage() {
     <div>
       <Navbar />
       <button onClick={() => navigate(-1)} style={{ marginBottom: '20px' }}>
-        Back to Styleboards
+        Back to Stylesboards
       </button>
 
       <div className="center">
@@ -86,6 +88,13 @@ function StyleboardPage() {
           }
         }}>
           Delete
+        </button>
+
+        <button
+          className="outfit-button"
+          onClick={() => navigate(`/wardrobeOutfits/${userId}`, { state: { mode: 'addToStyleboard', styleboard } })}
+        >
+          Add Outfits to Styleboard
         </button>
 
       </div>

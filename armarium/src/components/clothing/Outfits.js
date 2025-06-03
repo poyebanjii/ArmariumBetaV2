@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, deleteDoc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../Navbar';
 import '../styles/Outfits2.css'; 
 
@@ -16,6 +16,11 @@ function Outfits() {
   const [title, setTitle] = useState('');
   const navigate = useNavigate();
   const DELAY = 150;
+
+  const location = useLocation();
+  const mode = location.state?.mode;
+  const styleboard = location.state?.styleboard;
+  console.log("mode", mode)
 
   const fetchOutfits = async (user) => {
     if (user) {
@@ -48,6 +53,41 @@ const handleSearchChange = (e) => {
   const inputValue = e.target.value.toLowerCase();
   setSearchInput(inputValue);
 }
+
+const handleAddToStyleboard = async () => {
+  const user = auth.currentUser;
+  if (!user || !styleboard) return;
+
+  const outfitRefs = outfitToDelete.map((outfit) => doc(db, `Users/${user.uid}/Outfits`, outfit.id));
+
+  const styleboardRef = doc(db, `Users/${user.uid}/Styleboards`, styleboard.id);
+  await updateDoc(styleboardRef, {
+    outfits: arrayUnion(...outfitRefs),
+  });
+
+  // Update ExploreStyleboards copy too
+  const exploreRef = doc(db, 'ExploreStyleboards', styleboard.id);
+  const exploreSnap = await getDoc(exploreRef);
+  if (exploreSnap.exists()) {
+    const currentExploreData = exploreSnap.data();
+    const newOutfits = [...(currentExploreData.outfits || []), ...outfitToDelete];
+
+    await updateDoc(exploreRef, {
+      outfits: newOutfits,
+    });
+  } else {
+    // If ExploreStyleboards entry doesn't exist yet, create it
+    await setDoc(exploreRef, {
+      ...styleboard,
+      outfits: outfitToDelete,
+      styleboardName: styleboard.name,
+      createdAt: new Date(),
+    });
+  }
+
+  alert("Outfits added to styleboard!");
+  navigate(-1);
+};
 
 const handleDelete = async () => {
   const user = auth.currentUser;
@@ -107,7 +147,7 @@ const toggleDelete = () => {
 return (
   <div>
     <Navbar /> 
-    <h1>My Outfits</h1>
+    <h1>My Outfits </h1>
 
     <input
       type="text"
@@ -122,6 +162,16 @@ return (
     {isDelete && (
       <button onClick={handleDelete} style={{ marginLeft: '10px' }}>
         Confirm Delete
+      </button>
+    )}
+
+    <button onClick={handleAddToStyleboard} style={{ marginLeft: '10px' }}>
+        Confirm Add to Styleboard
+    </button>
+
+    {mode === 'addToStyleboard' && outfitToDelete.length > 0 && (
+      <button onClick={handleAddToStyleboard} style={{ marginLeft: '10px' }}>
+        Confirm Add to Styleboard
       </button>
     )}
 
