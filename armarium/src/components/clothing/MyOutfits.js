@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, doc, deleteDoc, setDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, deleteDoc, setDoc, addDoc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../backend/firebaseConfig";
 import { db } from '../backend/firebaseConfig'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../Navbar';
 import OutfitsList from './OutfitsList';
 import Loader from '../Loader';
@@ -21,6 +21,10 @@ function Outfits() {
   const [styleboardName, setStyleboardName] = useState('');
   const navigate = useNavigate();
   const DELAY = 750;
+  const location = useLocation();
+  const mode = location.state?.mode;
+  const styleboard = location.state?.styleboard;
+  const [existingOutfitIds, setExistingOutfitIds] = useState([]);
 
   const fetchOutfits = async (user) => {
     if (user) {
@@ -86,6 +90,35 @@ const createStyleboard = async () => {
   }
 };
 
+const handleAddToStyleboard = async () => {
+  const user = auth.currentUser;
+  if (!user || !styleboard) return;
+
+  const outfitRefs = selectedOutfits.map((outfit) => doc(db, `Users/${user.uid}/Outfits`, outfit.id));
+  const styleboardRef = doc(db, `Users/${user.uid}/Styleboards`, styleboard.id);
+
+  // Update the user's private styleboard
+  await updateDoc(styleboardRef, {
+    outfits: arrayUnion(...outfitRefs),
+  });
+
+  // Only update ExploreStyleboards if it already exists (i.e., has been shared)
+  const exploreRef = doc(db, 'ExploreStyleboards', styleboard.id);
+  const exploreSnap = await getDoc(exploreRef);
+  if (exploreSnap.exists()) {
+    const currentExploreData = exploreSnap.data();
+    const existingIds = new Set((currentExploreData.outfits || []).map(o => o.id));
+    const newUniqueOutfits = selectedOutfits.filter(o => !existingIds.has(o.id));
+
+    await updateDoc(exploreRef, {
+      outfits: [...(currentExploreData.outfits || []), ...newUniqueOutfits],
+    });
+  }
+
+  alert("Outfits added to styleboard!");
+  navigate(-1);
+};
+
 const handleDelete = async () => {
   const user = auth.currentUser;
   if (!selectedOutfits.length) {
@@ -112,16 +145,29 @@ const handleDelete = async () => {
   }
 };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-        if (user) {
-          fetchOutfits(user).then(() => setLoading(false));
-        } else {
-            navigate('/login'); 
-        }
-    });
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      await fetchOutfits(user);
 
-    return () => unsubscribe();
+      // If we're in addToStyleboard mode, extract outfit IDs already in the styleboard
+      if (mode === 'addToStyleboard' && styleboard?.outfits) {
+        const outfitIds = [];
+        for (const ref of styleboard.outfits) {
+          // Handles both DocumentReference and plain outfit objects
+          const id = ref?.id || ref;
+          if (id) outfitIds.push(id);
+        }
+        setExistingOutfitIds(outfitIds);
+      }
+
+      setLoading(false);
+    } else {
+      navigate('/login');
+    }
+  });
+
+  return () => unsubscribe();
 }, []);
 
 return (
@@ -144,30 +190,44 @@ return (
     </div>
 
     <div className="center">
-      <button className="outfit-button" onClick={() => {
-        if (selectedOutfits.length > 0) {
-          setShowDeleteModal(true);
-        } else {
-          alert("No outfit has been selected.");
-        }
-      }}>
-        Delete
-      </button>
-      <button className="outfit-button" onClick={() => {
-          if (selectedOutfits.length > 0) {
-            setShowStyleboardModal(true);
-          } else {
-            alert("No outfit has been selected.");
-          }
-        }}>
-        Create Styleboard
-      </button>
+      {mode !== 'addToStyleboard' && (
+        <>
+          <button className="outfit-button" onClick={() => {
+            if (selectedOutfits.length > 0) {
+              setShowDeleteModal(true);
+            } else {
+              alert("No outfit has been selected.");
+            }
+          }}>
+            Delete
+          </button>
+          <button className="outfit-button" onClick={() => {
+            if (selectedOutfits.length > 0) {
+              setShowStyleboardModal(true);
+            } else {
+              alert("No outfit has been selected.");
+            }
+          }}>
+            Create Styleboard
+          </button>
+        </>
+      )}
+      {mode === 'addToStyleboard' && (
+        <button className="outfit-button" onClick={handleAddToStyleboard} style={{ marginLeft: '10px' }}>
+          Confirm Add to Styleboard
+        </button>
+    )}
     </div>
     
     <div className="center">
       <div className="outfit-outer">
 
-      <OutfitsList outfits={filteredOutfits()} selectedOutfits={selectedOutfits} setSelectedOutfits={setSelectedOutfits} />
+      <OutfitsList 
+        outfits={filteredOutfits()} 
+        selectedOutfits={selectedOutfits} 
+        setSelectedOutfits={setSelectedOutfits}
+        existingOutfitIds={existingOutfitIds}
+      />
 
       {/* Delete Modal */}
       <div className={`modal ${showDeleteModal ? 'd-block' : 'd-none'}`} tabIndex="-1" role="dialog">

@@ -32,7 +32,6 @@ import RouteTracker from './utils/RouteTracker';
 import ViewSharedOutfit from './clothing/ViewSharedOutfit'
 import Bookmarked from './profile/Bookmarked';
 import BookmarkedPage from './profile/BookmarkedPage';
-import StyleboardEdit from './clothing/StyleboardEdit';
 
 /**
  * The routers for linking to different pages.

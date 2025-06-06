@@ -259,44 +259,75 @@ function EditOutfit() {
         try {
             const user = auth.currentUser;
             if (!user) {
-                console.error("No user logged in");
-                return;
+            console.error("No user logged in");
+            return;
             }
 
             const outfitRef = doc(db, `Users/${user.uid}/Outfits/${outfitId}`);
 
             const updateData = {
-                topImageUrl: chosenTop,
-                bottomImageUrl: chosenBottom,
-                shoesImageUrl: chosenShoes,
-                outfitName: chosenName,
+            topImageUrl: chosenTop,
+            bottomImageUrl: chosenBottom,
+            shoesImageUrl: chosenShoes,
+            outfitName: chosenName,
             };
 
-            
             if (chosenLayers !== undefined) {
-                updateData.topLayerUrls = chosenLayers;
+            updateData.topLayerUrls = chosenLayers;
             }
 
             if (chosenAccessories !== undefined) {
-                updateData.accessoryUrls = chosenAccessories;
+            updateData.accessoryUrls = chosenAccessories;
             }
 
+            // Update personal outfit
             await updateDoc(outfitRef, updateData);
-
             console.log("Outfit updated successfully");
 
+            // ✅ Update ExploreStyleboards that contain this outfit
+            const exploreStyleboardsSnapshot = await getDocs(collection(db, 'ExploreStyleboards'));
+            for (const docSnap of exploreStyleboardsSnapshot.docs) {
+            const exploreData = docSnap.data();
+            const styleboardId = docSnap.id;
+
+            const updatedOutfits = (exploreData.outfits || []).map((outfit) => {
+                if (outfit.id === outfitId) {
+                return {
+                    ...outfit,
+                    topImageUrl: chosenTop,
+                    bottomImageUrl: chosenBottom,
+                    shoesImageUrl: chosenShoes,
+                    outfitName: chosenName,
+                    topLayerUrls: chosenLayers,
+                    accessoryUrls: chosenAccessories,
+                };
+                }
+                return outfit;
+            });
+
+            // If nothing changed, skip
+            const isUpdated = JSON.stringify(exploreData.outfits) !== JSON.stringify(updatedOutfits);
+            if (isUpdated) {
+                await updateDoc(doc(db, 'ExploreStyleboards', styleboardId), {
+                outfits: updatedOutfits
+                });
+                console.log(`Updated outfit in shared ExploreStyleboard: ${styleboardId}`);
+            }
+            }
+
+            // ✅ Sync local state after update
             setBaseName(chosenName);
             setBaseTop(chosenTop);
             setBaseBottom(chosenBottom);
             setBaseShoes(chosenShoes);
             setBaseLayers(chosenLayers);
             setBaseAccessories(chosenAccessories);
-
             setMadeChanges(false);
+
         } catch (error) {
             console.error("Error saving changes:", error);
         }
-    }
+    };
 
     const handleCancelChanges = () => {
         setMadeChanges(false);

@@ -38,10 +38,15 @@ function Styleboards() {
             })
           );
 
+          const exploreRef = doc(db, 'ExploreStyleboards', docSnap.id);
+          const exploreSnap = await getDoc(exploreRef);
+          const isShared = exploreSnap.exists();
+
           return {
             id: docSnap.id,
             ...styleboardData,
             outfits: outfits.filter(Boolean),
+            isShared,
           };
         })
       );
@@ -107,7 +112,18 @@ function Styleboards() {
         styleboardName: styleboard.name, 
         sharedAt: new Date(),
       });
-      alert('Styleboard shared to Explore!');
+      fetchStyleboards(auth.currentUser);
+    } catch (error) {
+      console.error('Error sharing styleboard:', error);
+      alert('Failed to share styleboard.');
+    }
+  };
+
+  const handleUnShareToExplore = async (styleboard) => {
+    try {
+      const exploreRef = doc(db, 'ExploreStyleboards', styleboard.id);
+      await deleteDoc(exploreRef);
+      fetchStyleboards(auth.currentUser);
     } catch (error) {
       console.error('Error sharing styleboard:', error);
       alert('Failed to share styleboard.');
@@ -188,15 +204,27 @@ function Styleboards() {
                     </div>
                     <div className="outfit-footer">
                       <h1 className="outfit-title">{styleboard.name}</h1>
-                      <button
-                        className="share-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleShareToExplore(styleboard);
-                        }}
-                      >
-                        Share to Explore
-                      </button>
+                      {styleboard.isShared ? (
+                        <button
+                          className="share-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleUnShareToExplore(styleboard);
+                          }}
+                        >
+                          Unshare from Explore
+                        </button>
+                      ) : (
+                        <button
+                          className="share-button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleShareToExplore(styleboard);
+                          }}
+                        >
+                          Share to Explore
+                        </button>
+                      )}
                     </div>
                   </li>
                 ))}
