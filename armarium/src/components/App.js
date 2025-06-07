@@ -32,6 +32,7 @@ import RouteTracker from './utils/RouteTracker';
 import ViewSharedOutfit from './clothing/ViewSharedOutfit'
 import Bookmarked from './profile/Bookmarked';
 import BookmarkedPage from './profile/BookmarkedPage';
+import TravelBoard from './clothing/TravelBoard';
 
 /**
  * The routers for linking to different pages.
@@ -66,6 +67,7 @@ function App() {
         <Route path="/editClothing/:clothingId/:type" element={<ProtectedRoute element={<EditClothing />} />} />
         <Route path="/wardrobeOutfits/:userId" element={<ProtectedRoute element={<Outfits />} />} />
         <Route path="/wardrobeStyleboards/:userId" element={<ProtectedRoute element={<Styleboards />} />} />
+        <Route path="/travelBoards/:userId" element={<ProtectedRoute element={<TravelBoard />} />} />
         <Route path="/" element={<Styleboards />} />
         <Route path="/styleboard/:id" element={<StyleboardPage />} />
         <Route path="/explore" element={<ProtectedRoute element={<Explore />} />} />

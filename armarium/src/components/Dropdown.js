@@ -29,8 +29,11 @@ function Dropdown() {
           <Link to={`/wardrobeOutfits/${userId}`}>My Outfits</Link>
           </li>
           <li>
-        <Link to={`/wardrobeStyleboards/${userId}`}>My Styleboards</Link>
-        </li>
+          <Link to={`/wardrobeStyleboards/${userId}`}>My Styleboards</Link>
+          </li>
+          <li>
+          <Link to={`/travelBoards/${userId}`}>My Travel Boards</Link>
+          </li>
       </ul>
       </div>
   );
