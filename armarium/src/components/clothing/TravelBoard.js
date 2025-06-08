@@ -1,103 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
-import { db } from '../backend/firebaseConfig';
+import React, { useState, useEffect } from 'react'; 
 import Navbar from '../Navbar';
-import { DateRange } from 'react-date-range';
-import 'react-date-range/dist/styles.css';
-import 'react-date-range/dist/theme/default.css';
-import { differenceInCalendarDays, eachDayOfInterval, format, addDays } from 'date-fns';
+import CreateTravelBoard from './CreateTravelBoard';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../backend/firebaseConfig';
 
 function TravelBoard() {
-  const auth = getAuth();
-  const [range, setRange] = useState([
-    {
-      startDate: new Date(),
-      endDate: addDays(new Date(), 2),
-      key: 'selection',
-    },
-  ]);
-  const [outfits, setOutfits] = useState([]);
-  const [selectedOutfitsByDate, setSelectedOutfitsByDate] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [travelBoards, setTravelBoards] = useState([]);
   const [user, setUser] = useState(null);
 
-  const selectedStart = range[0].startDate;
-  const selectedEnd = range[0].endDate;
-  const travelDates = eachDayOfInterval({ start: selectedStart, end: selectedEnd })
-    .map((date) => format(date, 'yyyy-MM-dd'));
+  const auth = getAuth();
+
+  const handleShowModal = () => {
+    setIsModalOpen(true);
+    document.body.classList.add('modal-open');
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    document.body.classList.remove('modal-open');
+    fetchTravelBoards(); // refresh after closing modal
+  };
+
+  const fetchTravelBoards = async () => {
+    if (!user) return;
+    try {
+      const snapshot = await getDocs(collection(db, `Users/${user.uid}/TravelBoards`));
+      const boards = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setTravelBoards(boards);
+    } catch (err) {
+      console.error("Error fetching travel boards:", err);
+    }
+  };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const outfitSnapshot = await getDocs(collection(db, `Users/${currentUser.uid}/Outfits`));
-        const outfitList = outfitSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setOutfits(outfitList);
+        fetchTravelBoards();
       }
     });
     return () => unsubscribe();
   }, []);
 
-  const handleOutfitChange = (date, outfitId) => {
-    setSelectedOutfitsByDate((prev) => ({ ...prev, [date]: outfitId }));
-  };
-
-  const handleTravelBoardCreation = async () => {
-    if (!user) return;
-
-    try {
-      const travelBoardData = {
-        userId: user.uid,
-        createdAt: new Date(),
-        startDate: selectedStart,
-        endDate: selectedEnd,
-        outfitsPerDay: selectedOutfitsByDate,
-      };
-      await addDoc(collection(db, `Users/${user.uid}/TravelBoards`), travelBoardData);
-      alert('Travel board created!');
-    } catch (error) {
-      console.error('Failed to create travel board:', error);
-      alert('Error saving travel board.');
-    }
-  };
-
   return (
     <div>
       <Navbar />
 
-      <button
-        className="outfit-button"
-        onClick={handleTravelBoardCreation}
-        style={{ marginLeft: '10px' }}
-      >
-        Create Travel Board
-      </button>
-
-      {travelDates.map((date, index) => (
-        <div key={index} className="day-outfit-select">
-          <h3>{date}</h3>
-          <select
-            value={selectedOutfitsByDate[date] || ''}
-            onChange={(e) => handleOutfitChange(date, e.target.value)}
-          >
-            <option value="">Select Outfit</option>
-            {outfits.map((outfit) => (
-              <option key={outfit.id} value={outfit.id}>
-                {outfit.outfitName || `Outfit ${outfit.id}`}
-              </option>
-            ))}
-          </select>
-        </div>
-      ))}
-
-      <div className="calendar-wrapper">
-        <DateRange
-          editableDateInputs={true}
-          onChange={(item) => setRange([item.selection])}
-          moveRangeOnFirstSelection={false}
-          ranges={range}
-        />
+      <div className="center" style={{ marginTop: '20px' }}>
+        <button
+          className="outfit-button"
+          onClick={handleShowModal}
+        >
+          Create Travel Board
+        </button>
       </div>
+
+      <h2 style={{ textAlign: 'center', marginTop: '30px' }}>Your Travel Boards</h2>
+
+      <div className="travel-board-list center" style={{ marginTop: '20px' }}>
+        {travelBoards.length === 0 ? (
+          <p style={{ textAlign: 'center' }}>No travel boards yet.</p>
+        ) : (
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {travelBoards.map(board => (
+              <li key={board.id} style={{
+                border: '1px solid #ccc',
+                padding: '15px',
+                marginBottom: '10px',
+                borderRadius: '8px',
+                maxWidth: '600px'
+              }}>
+                <h3>{board.title || 'Untitled Board'}</h3>
+                <p><strong>Dates:</strong> {board.startDate} → {board.endDate}</p>
+                <p><strong>Days Planned:</strong> {Object.keys(board.outfitsPerDay || {}).length}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {isModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <CreateTravelBoard />
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+              <button className="modal-close" onClick={handleCloseModal}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
