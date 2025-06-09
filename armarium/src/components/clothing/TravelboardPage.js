@@ -33,9 +33,11 @@ function TravelboardPage() {
           <div className="outfit-center">
             <OutfitsList
               outfits={outfits}
+              disableCheckboxes={true}
+              groupByDate={travelBoard.outfitsPerDay}
               selectedOutfits={selectedOutfits}
               setSelectedOutfits={setSelectedOutfits}
-              existingOutfitIds={[]} // You can modify this if needed
+              existingOutfitIds={[]} 
             />
           </div>
         </div>

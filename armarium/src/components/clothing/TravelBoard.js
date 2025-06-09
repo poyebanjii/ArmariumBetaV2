@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../Navbar';
 import CreateTravelBoard from './CreateTravelBoard';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../Loader';
@@ -13,8 +13,11 @@ function TravelBoard() {
   const [travelBoards, setTravelBoards] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [isDelete, setIsDelete] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedTravelboards, setSelectedTravelboards] = useState([]);
   const auth = getAuth();
+  const DELAY = 750;
 
   const handleShowModal = () => {
     setIsModalOpen(true);
@@ -29,6 +32,40 @@ function TravelBoard() {
 
   const handleTravelClick = (travelBoard) => {
     navigate(`/travelBoardPage/${travelBoard.id}`, { state: { travelBoard } });
+  };
+
+  const handleCheckboxClick = (event, boardId) => {
+    event.stopPropagation();
+    setSelectedTravelboards((prev) =>
+      prev.includes(boardId)
+        ? prev.filter((id) => id !== boardId)
+        : [...prev, boardId]
+    );
+  };
+
+  const handleDelete = async () => {
+    const user = auth.currentUser;
+    if (!selectedTravelboards.length) {
+      alert("No travel board has been selected.");
+      return;
+    }
+
+    try {
+        await new Promise((resolve) => setTimeout(resolve, DELAY));
+    
+        for (const travelBoard of selectedTravelboards) {
+          const travelBoardDocRef = doc(db, `Users/${user.uid}/TravelBoards`, travelBoard);
+          await deleteDoc(travelBoardDocRef);
+          console.log("Travel Board deleted successfully:", travelBoard);
+        }
+    
+        setSelectedTravelboards([]);
+        await fetchTravelBoards(); 
+        setShowDeleteModal(false);
+      } catch (error) {
+        console.error("Error deleting travel board:", error);
+        alert("Failed to delete travel board. Please try again.");
+      }
   };
 
   const fetchTravelBoards = async () => {
@@ -66,12 +103,17 @@ function TravelBoard() {
       <Loader loading={loading} />
       <Navbar />
 
-      <div className="center" style={{ marginTop: '20px' }}>
+      <div className="center" style={{ marginTop: '20px', gap: '10px', display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <button className="outfit-button" onClick={handleShowModal}>
+          Create Travel Board
+        </button>
         <button
           className="outfit-button"
-          onClick={handleShowModal}
+          style={{ backgroundColor: selectedTravelboards.length ? '#e63939' : '#ccc' }}
+          onClick={handleDelete}
+          disabled={selectedTravelboards.length === 0}
         >
-          Create Travel Board
+          Delete Selected
         </button>
       </div>
 
@@ -81,26 +123,42 @@ function TravelBoard() {
         {travelBoards.length === 0 ? (
           <p style={{ textAlign: 'center' }}>No travel boards yet.</p>
         ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {travelBoards.map(board => (
-            <li
-              key={board.id}
-              onClick={() => handleTravelClick(board)} // ✅ Correct placement
-              style={{
-                border: '1px solid #ccc',
-                padding: '15px',
-                marginBottom: '10px',
-                borderRadius: '8px',
-                maxWidth: '600px',
-                cursor: 'pointer' // Optional: makes it look clickable
-              }}
-            >
-              <h3>{board.title || 'Untitled Board'}</h3>
-              <p><strong>Dates:</strong> {board.startDate} → {board.endDate}</p>
-              <p><strong>Days Planned:</strong> {Object.keys(board.outfitsPerDay || {}).length}</p>
-            </li>
-          ))}
-        </ul>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {travelBoards.map(board => (
+              <li
+                key={board.id}
+                onClick={() => handleTravelClick(board)}
+                style={{
+                  border: '1px solid #ccc',
+                  padding: '15px',
+                  marginBottom: '10px',
+                  borderRadius: '8px',
+                  maxWidth: '600px',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  backgroundColor: selectedTravelboards.includes(board.id) ? '#f0f8ff' : 'white'
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedTravelboards.includes(board.id)}
+                  onClick={(e) => handleCheckboxClick(e, board.id)}
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    transform: 'scale(1.2)',
+                    cursor: 'pointer'
+                  }}
+                />
+                <div style={{ marginLeft: '30px' }}>
+                  <h3>{board.title || 'Untitled Board'}</h3>
+                  <p><strong>Dates:</strong> {board.startDate} → {board.endDate}</p>
+                  <p><strong>Days Planned:</strong> {Object.keys(board.outfitsPerDay || {}).length}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
 

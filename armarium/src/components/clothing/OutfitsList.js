@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/MyOutfits.css';
 
-function OutfitsList({ outfits, selectedOutfits, setSelectedOutfits, existingOutfitIds = [] }) {
+function OutfitsList({ outfits, selectedOutfits, setSelectedOutfits, existingOutfitIds = [], disableCheckboxes = false, groupByDate = null }) {
   const navigate = useNavigate();
 
   const handleCheckboxClick = (event, outfit, isDisabled) => {
@@ -20,6 +20,54 @@ function OutfitsList({ outfits, selectedOutfits, setSelectedOutfits, existingOut
 
   if (!outfits || outfits.length === 0) {
     return <p>No outfits found.</p>;
+  }
+
+    // 📌 Special TravelBoard layout
+  if (groupByDate) {
+    const sortedDates = Object.keys(groupByDate).sort((a, b) => new Date(a) - new Date(b));
+
+    return (
+      <div
+        className="outfit-outer"
+        style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}
+      >
+        {sortedDates.map((date) => {
+          const outfit = groupByDate[date];
+          if (!outfit) return null;
+
+          return (
+            <div
+              key={date}
+              className="outfit-column"
+              style={{
+                border: '1px solid #ccc',
+                borderRadius: '10px',
+                padding: '10px',
+                textAlign: 'center',
+                width: '160px',
+                backgroundColor: '#fff',
+              }}
+            >
+              <h4>{date}</h4>
+              <div className="image-container">
+                {outfit.topImageUrl && (
+                  <img src={outfit.topImageUrl} alt="Top" className="outfit-image center" />
+                )}
+                {outfit.bottomImageUrl && (
+                  <img src={outfit.bottomImageUrl} alt="Bottom" className="outfit-image center" />
+                )}
+                {outfit.shoesImageUrl && (
+                  <img src={outfit.shoesImageUrl} alt="Shoes" className="outfit-image center" />
+                )}
+              </div>
+              <p style={{ marginTop: '10px', fontWeight: 'bold' }}>
+                {outfit.outfitName || 'Untitled Outfit'}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    );
   }
 
   return (
@@ -45,13 +93,15 @@ function OutfitsList({ outfits, selectedOutfits, setSelectedOutfits, existingOut
               cursor: alreadyInStyleboard ? 'not-allowed' : 'pointer',
             }}
           >
-            <input
-              type="checkbox"
-              className="select-box"
-              checked={selected}
-              disabled={alreadyInStyleboard}
-              onClick={(event) => handleCheckboxClick(event, outfit, alreadyInStyleboard)}
-            />
+            {!disableCheckboxes && (
+              <input
+                type="checkbox"
+                className="select-box"
+                checked={selected}
+                disabled={alreadyInStyleboard}
+                onClick={(event) => handleCheckboxClick(event, outfit, alreadyInStyleboard)}
+              />
+            )}
 
             <div className="image-container">
               <img src={outfit.topImageUrl} alt="Top" className="outfit-image center" />
