@@ -3,16 +3,19 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../Navbar';
+import Loader from '../Loader';
 import '../styles/ExploreFormat.css'; 
 
 function Explore() {
   const [styleboards, setStyleboards] = useState([]);
   const [searchInput, setSearchInput] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchExploreStyleboards = async () => {
       try {
+        setLoading(true);
         const querySnapshot = await getDocs(collection(db, 'ExploreStyleboards'));
         const styleboardsList = querySnapshot.docs.map(doc => ({
           id: doc.id,
@@ -20,8 +23,10 @@ function Explore() {
         }));
         setStyleboards(styleboardsList);
         console.log('Styleboard', styleboards);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching explore styleboards:', error);
+        setLoading(false);
       }
     };
 
@@ -38,6 +43,7 @@ function Explore() {
 
   return (
     <div>
+      <Loader loading={loading} />
       <Navbar />
       <div className="explore-container">
         <h1>Explore InspoBoards</h1>

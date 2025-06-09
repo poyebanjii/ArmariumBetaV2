@@ -4,11 +4,15 @@ import CreateTravelBoard from './CreateTravelBoard';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig';
+import { useNavigate } from 'react-router-dom';
+import Loader from '../Loader';
 
 function TravelBoard() {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [travelBoards, setTravelBoards] = useState([]);
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
 
@@ -23,14 +27,21 @@ function TravelBoard() {
     fetchTravelBoards(); // refresh after closing modal
   };
 
+  const handleTravelClick = (travelBoard) => {
+    navigate(`/travelBoardPage/${travelBoard.id}`, { state: { travelBoard } });
+  };
+
   const fetchTravelBoards = async () => {
     if (!user) return;
     try {
+      setLoading(true);
       const snapshot = await getDocs(collection(db, `Users/${user.uid}/TravelBoards`));
       const boards = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setTravelBoards(boards);
+      setLoading(false);
     } catch (err) {
       console.error("Error fetching travel boards:", err);
+      setLoading(false);
     }
   };
 
@@ -44,8 +55,15 @@ function TravelBoard() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (user) {
+      fetchTravelBoards();
+    }
+  }, [user]);
+
   return (
     <div>
+      <Loader loading={loading} />
       <Navbar />
 
       <div className="center" style={{ marginTop: '20px' }}>
@@ -63,21 +81,26 @@ function TravelBoard() {
         {travelBoards.length === 0 ? (
           <p style={{ textAlign: 'center' }}>No travel boards yet.</p>
         ) : (
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {travelBoards.map(board => (
-              <li key={board.id} style={{
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          {travelBoards.map(board => (
+            <li
+              key={board.id}
+              onClick={() => handleTravelClick(board)} // ✅ Correct placement
+              style={{
                 border: '1px solid #ccc',
                 padding: '15px',
                 marginBottom: '10px',
                 borderRadius: '8px',
-                maxWidth: '600px'
-              }}>
-                <h3>{board.title || 'Untitled Board'}</h3>
-                <p><strong>Dates:</strong> {board.startDate} → {board.endDate}</p>
-                <p><strong>Days Planned:</strong> {Object.keys(board.outfitsPerDay || {}).length}</p>
-              </li>
-            ))}
-          </ul>
+                maxWidth: '600px',
+                cursor: 'pointer' // Optional: makes it look clickable
+              }}
+            >
+              <h3>{board.title || 'Untitled Board'}</h3>
+              <p><strong>Dates:</strong> {board.startDate} → {board.endDate}</p>
+              <p><strong>Days Planned:</strong> {Object.keys(board.outfitsPerDay || {}).length}</p>
+            </li>
+          ))}
+        </ul>
         )}
       </div>
 
