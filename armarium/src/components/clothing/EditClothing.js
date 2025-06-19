@@ -4,6 +4,7 @@ import { logEvent } from 'firebase/analytics';
 import { getDoc, doc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import Navbar from '../Navbar';
+import '../styles/EditClothing.css';
 
 const EditClothing = () => {
     const { clothingId } = useParams();
@@ -206,50 +207,80 @@ const EditClothing = () => {
     };
 
     return (
-        <div>
+        <div className="edit-clothing-container">
             <Navbar />
-            <h1>Edit Clothing</h1>
-            <div>
-                {image && <img src={image} alt="Clothing" style={{ width: '150px', height: 'auto' }} />}
-                {tags.length > 0 && (
-                    <div>
-                        <h3>Current Tags:</h3>
-                        <ul>
-                            {tags.map((tag, index) => (
-                                <li key={index}>{tag}</li>
-                            ))}
-                        </ul>
+            <div className="edit-clothing-content">
+                <h1 className="edit-clothing-title">Edit Clothing</h1>
+                
+                <div className="clothing-preview">
+                    {image && <img src={image} alt="Clothing" className="clothing-image" />}
+                    
+                    {tags.length > 0 && (
+                        <div className="current-tags-section">
+                            <h3>Current Tags</h3>
+                            <div className="tags-container">
+                                {tags.map((tag, index) => (
+                                    <span key={index} className="tag">{tag}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="edit-sections">
+                    {/* Update Tags Section */}
+                    <div className="edit-section">
+                        <h3>Update Tags</h3>
+                        <div className="input-group">
+                            <input 
+                                type="text" 
+                                className="form-input"
+                                placeholder="Enter new tags separated by commas" 
+                                value={newTags} 
+                                onChange={handleTagChange}
+                            />
+                            <button className="update-button" onClick={handleUpdateTags}>
+                                Update Tags
+                            </button>
+                        </div>
                     </div>
-                )}
-                <div>
-                    <h3>Update Tags</h3>
-                    <input 
-                        type="text" 
-                        placeholder="Enter new tags separated by commas" 
-                        value={newTags} 
-                        onChange={handleTagChange}
-                    />
-                    <button onClick={handleUpdateTags}>Update Tags</button>
-                </div>
-                <div>
-                    <h3>Update Title</h3>
-                    <input 
-                        type="text" 
-                        placeholder="Enter a new title" 
-                        value={newTitle} 
-                        onChange={handleTitleChange}
-                    />
-                    <button onClick={handleUpdateTitle}>Update Title</button>
-                </div>
-                <div>
-                    <h3>Change Clothing Type</h3>
-                    <select value={newType} onChange={handleTypeChange}>
-                        <option value="top">Top</option>
-                        <option value="bottom">Bottom</option>
-                        <option value="shoes">Shoes</option>
-                        <option value="toplayer">Top Layer</option>
-                    </select>
-                    <button onClick={handleUpdateType}>Update Type</button>
+
+                    {/* Update Title Section */}
+                    <div className="edit-section">
+                        <h3>Update Title</h3>
+                        <div className="input-group">
+                            <input 
+                                type="text" 
+                                className="form-input"
+                                placeholder="Enter a new title" 
+                                value={newTitle} 
+                                onChange={handleTitleChange}
+                            />
+                            <button className="update-button" onClick={handleUpdateTitle}>
+                                Update Title
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Change Type Section */}
+                    <div className="edit-section">
+                        <h3>Change Clothing Type</h3>
+                        <div className="input-group">
+                            <select 
+                                value={newType} 
+                                onChange={handleTypeChange}
+                                className="form-select"
+                            >
+                                <option value="top">Top</option>
+                                <option value="bottom">Bottom</option>
+                                <option value="shoes">Shoes</option>
+                                <option value="toplayer">Top Layer</option>
+                            </select>
+                            <button className="update-button" onClick={handleUpdateType}>
+                                Update Type
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

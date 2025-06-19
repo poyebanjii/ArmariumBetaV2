@@ -47,6 +47,11 @@ function OutfitsList({ outfits, selectedOutfits, setSelectedOutfits, existingOut
                 width: '160px',
                 backgroundColor: '#fff',
               }}
+              onClick={() => {
+              navigate(`/editOutfit/${outfit.id}`, {
+                state: { outfitName: outfit.outfitName, outfitId: outfit.id },
+              });
+          }}
             >
               <h4>{date}</h4>
               <div className="image-container">

@@ -150,111 +150,111 @@ function Styleboards() {
   );
 
   return (
-    <div>
+  <div className="app-container">
+    <Navbar />
+    <div className="content-container">
       <Loader loading={loading} />
-      <Navbar />
+      
       <div className={loading ? 'blurred' : ''}>
-        <h1>My Styleboards</h1>
-
-        <input
-          type="text"
-          placeholder="Search styleboard by title"
-          value={searchInput}
-          onChange={handleSearchChange}
-        />
-
-        <div className="center">
-          <button
-            className="outfit-button"
-            onClick={() =>
-              selectedStyleboards.length > 0
-                ? setShowDeleteModal(true)
-                : alert("No styleboard selected.")
-            }
-          >
-            Delete
-          </button>
-        </div>
-
-        <div className="center">
-          <div className="outfit-outer">
-            {filteredStyleboards.length > 0 ? (
-              <ul className="outfits-list">
-                {filteredStyleboards.map((styleboard) => (
-                  <li
-                    key={styleboard.id}
-                    className="outfit-item"
-                    onClick={() => handleStyleboardClick(styleboard)}
-                  >
-                    <input
-                      type="checkbox"
-                      className="select-box"
-                      onClick={(e) => handleCheckboxClick(e, styleboard.id)}
-                      checked={selectedStyleboards.includes(styleboard.id)}
-                    />
-                    <div className="image-container">
-                      {['topImageUrl', 'bottomImageUrl', 'shoesImageUrl'].map((key) => (
-                        <img
-                          key={key}
-                          src={styleboard.outfits[0]?.[key]}
-                          alt={key}
-                          className="outfit-image center"
-                        />
-                      ))}
-                    </div>
-                    <div className="outfit-footer">
-                      <h1 className="outfit-title">{styleboard.name}</h1>
-                      {styleboard.isShared ? (
-                        <button
-                          className="share-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUnShareToExplore(styleboard);
-                          }}
-                        >
-                          Unshare from Explore
-                        </button>
-                      ) : (
-                        <button
-                          className="share-button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleShareToExplore(styleboard);
-                          }}
-                        >
-                          Share to Explore
-                        </button>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No styleboards found.</p>
-            )}
-          </div>
-        </div>
-
-        {/* Delete Modal */}
-        <div className={`modal ${showDeleteModal ? 'd-block' : 'd-none'}`} tabIndex="-1">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Delete Styleboards</h5>
-                <button className="btn-close" onClick={() => setShowDeleteModal(false)}>×</button>
-              </div>
-              <div className="modal-body">
-                <p>Are you sure you want to delete the selected styleboards?</p>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-primary" onClick={handleDelete}>Delete</button>
-                <button className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+        <div className="styleboards-header-container">
+          <div className="styleboards-header">
+            <h1>My Styleboards</h1>
+                            <button
+                  onClick={() =>
+                    selectedStyleboards.length > 0
+                      ? setShowDeleteModal(true)
+                      : alert("No styleboard selected.")
+                  }
+                >
+                  Delete Selected
+                </button>
+            <div className="header-controls">
+              <div className="search-container">
+                <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="Search styleboard by title"
+                  value={searchInput}
+                  onChange={handleSearchChange}
+                />
               </div>
             </div>
           </div>
         </div>
+
+        {filteredStyleboards.length > 0 ? (
+          <div className="styleboards-grid">
+            {filteredStyleboards.map((styleboard) => (
+              <div
+                key={styleboard.id}
+                className="styleboard-card"
+                onClick={() => handleStyleboardClick(styleboard)}
+              >
+                <input
+                  type="checkbox"
+                  className="card-checkbox"
+                  onClick={(e) => handleCheckboxClick(e, styleboard.id)}
+                  checked={selectedStyleboards.includes(styleboard.id)}
+                />
+                
+                <div className="images-grid">
+                  {styleboard.outfits.slice(0, 4).map((outfit, index) => (
+                    <img
+                      key={index}
+                      src={outfit.topImageUrl || outfit.bottomImageUrl || outfit.shoesImageUrl}
+                      alt={`Outfit ${index + 1}`}
+                      className="grid-image"
+                    />
+                  ))}
+                </div>
+                
+                <div className="card-footer">
+                  <h3 className="card-title">{styleboard.name}</h3>
+                  <button
+                    className={`share-button ${styleboard.isShared ? 'shared' : 'unshared'}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      styleboard.isShared 
+                        ? handleUnShareToExplore(styleboard)
+                        : handleShareToExplore(styleboard);
+                    }}
+                  >
+                    {styleboard.isShared ? 'Unshare from Explore' : 'Share to Explore'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <p>No styleboards found. Create your first styleboard to get started!</p>
+          </div>
+        )}
+
+        {/* Delete Modal */}
+        {showDeleteModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3 className="modal-title">Delete Styleboards</h3>
+              <p>Are you sure you want to delete {selectedStyleboards.length} selected styleboard(s)? This action cannot be undone.</p>
+              <div className="modal-actions">
+                <button className="modal-button modal-cancel" onClick={() => setShowDeleteModal(false)}>
+                  Cancel
+                </button>
+                <button className="modal-button modal-confirm" onClick={handleDelete}>
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
+    </div>
+
   );
 }
 

@@ -9,6 +9,7 @@ import Navbar from '../Navbar';
 import OutfitsList from './OutfitsList';
 import Loader from '../Loader';
 import '../styles/MyOutfits.css';
+import Joyride from 'react-joyride';
 
 function Outfits() {
   const [outfits, setOutfits] = useState([]);
@@ -25,6 +26,8 @@ function Outfits() {
   const mode = location.state?.mode;
   const styleboard = location.state?.styleboard;
   const [existingOutfitIds, setExistingOutfitIds] = useState([]);
+    const [runTour, setRunTour] = useState(false);
+    const [steps, setSteps] = useState([]);
 
   const fetchOutfits = async (user) => {
     if (user) {
@@ -144,6 +147,44 @@ const handleDelete = async () => {
 
   }
 };
+
+  const finishTour = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDocRef = doc(db, 'Users', user.uid);
+      await updateDoc(userDocRef, { isNewUser: false });
+    }
+    setRunTour(false);
+  };
+
+
+    useEffect(() => {
+      if (location.state?.joyrideStep === 'myoutfits-start') {
+          setSteps([
+          {
+              target: '.outfit-outer',
+              content: 'This the outfits page where you can view your outfits.',
+          },
+          {
+              target: '.search-input',
+              content: 'Use this search to filter your wardrobe.',
+          },
+          {
+              target: '.btn btn-primary',
+              content: 'You can delete outfits by selecting them and then pressing this button.',
+          },
+          {
+              target: '.outfit-button',
+              content: 'You can create styleboards by selecting them and then pressing this button.',
+          },
+          {
+              target: '.navbar',
+              content: 'Let’s continue to your styleboards!',
+          }
+          ]);
+          setRunTour(true);
+      }
+  }, [location]);
 
 useEffect(() => {
   const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -288,6 +329,20 @@ return (
         </div>
       </div>
     </div>
+    <Joyride
+        steps={steps}
+        run={runTour}
+        continuous={true}
+        showProgress={true}
+        showSkipButton={true}
+        callback={(data) => {
+          if (data.status === 'finished' || data.status === 'skipped') {
+            navigate('/wardrobe', { state: { joyrideStep: 'wardrobe-start' } });
+          } else if (data.status === 'skipped') {
+            finishTour();
+          }
+        }}
+      />
   </div>
 );
 }

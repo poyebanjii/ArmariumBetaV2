@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../Navbar';
 import OutfitsList from './OutfitsList';
 import '../styles/MyOutfits.css';
+import Loader from '../Loader';
 
 function StyleboardPage() {
   const navigate = useNavigate();
@@ -95,7 +96,7 @@ function StyleboardPage() {
   };
 
   if (loading) return <p>Loading...</p>;
-  if (!styleboard) return <p>No styleboard data found.</p>;
+  if (!styleboard) return <Loader loading={loading} />;
 
   const userId = auth.currentUser?.uid;
 

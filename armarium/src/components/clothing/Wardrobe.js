@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../backend/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { collection, getDocs, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { NavLink, useNavigate, useLocation  } from 'react-router-dom';
+import { getAuth } from 'firebase/auth'
+
 import Navbar from '../Navbar';
 import Loader from '../Loader';
 import ItemUpload from './itemUpload';
 import ClothesLibSearch from './ClothesLibSearch';
 import '../styles/Wardrobe.css';
 import '../styles/Forms.css';
+import Joyride from 'react-joyride';
 import { Center } from 'framer/render/presentation/Frame/DeprecatedFrame.js';
 
 const Wardrobe = () => {
+    const [userId, setUserId] = useState(null);
     const [tops, setTops] = useState([]);
     const [bottoms, setBottoms] = useState([]);
     const [shoes, setShoes] = useState([]);
@@ -34,6 +38,11 @@ const Wardrobe = () => {
     const [isUploading, setIsUploading] = useState(false);
     const DELAY = 750;
 
+    const location = useLocation();
+    const [runTour, setRunTour] = useState(false);
+    const [steps, setSteps] = useState([]);
+
+
     const handleShowModal = (type) => {
         setSelectedType(type);
         setIsModalOpen(true);
@@ -53,6 +62,25 @@ const Wardrobe = () => {
         setIsLibraryModalOpen(false);
     };
 
+    const checkNewUser = async (user) => {
+    const userDocRef = doc(db, 'Users', user.uid);
+    const userSnapshot = await getDoc(userDocRef);
+
+    if (userSnapshot.exists() && userSnapshot.data().isNewUser) {
+        setRunTour(true);
+        await updateDoc(userDocRef, { isNewUser: false });
+    }
+    };
+
+    const finishTour = async () => {
+        const user = auth.currentUser;
+        if (user) {
+            const userDocRef = doc(db, 'Users', user.uid);
+            await updateDoc(userDocRef, { isNewUser: false });
+        }
+        setRunTour(false);
+    };
+
     const filteredClothes = (clothes) => {
         return clothes.filter(clothing => {
             const matchesTitle = clothing.title && clothing.title.toLowerCase().includes(searchInput.toLowerCase());
@@ -60,6 +88,40 @@ const Wardrobe = () => {
             return matchesTitle || matchesTags;
         });
     };
+
+    useEffect(() => {
+        const auth = getAuth();
+        const user = auth.currentUser;
+        
+        if (user) {
+        setUserId(user.uid); // Set the user ID
+        }
+        console.log("user:", userId)
+    }, []);
+
+    useEffect(() => {
+        if (location.state?.joyrideStep === 'wardrobe-start') {
+            setSteps([
+            {
+                target: '#tops-add-button',
+                content: 'This is add button allows to add clothing.',
+            },
+            {
+                target: '.wardrobe-search',
+                content: 'Use this search to filter your wardrobe.',
+            },
+            {
+                target: '.delete-clothing-item',
+                content: 'You can delete clothes from here.',
+            },
+            {
+                target: '.navbar',
+                content: 'Let’s continue to your outfits!',
+            }
+            ]);
+            setRunTour(true);
+        }
+    }, [location]);
 
     const displayedClothes = isTop ? filteredClothes(tops) :
         isBottom ? filteredClothes(bottoms) :
@@ -416,6 +478,21 @@ const Wardrobe = () => {
                     ))}
                 </div>
             </div>
+
+        <Joyride
+            steps={steps}
+            run={runTour}
+            continuous={true}
+            showProgress={true}
+            showSkipButton={true}
+            callback={(data) => {
+            if (data.status === 'finished' || data.status === 'skipped') {
+                finishTour();
+            } else if (data.action === 'next' && data.index === 3) {
+                navigate(`/wardrobeOutfits/${userId}`, { state: { joyrideStep: 'myoutfits-start' } });
+            }
+            }}
+        />
         </div>
     );
 };

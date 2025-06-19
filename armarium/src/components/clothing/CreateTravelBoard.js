@@ -6,6 +6,7 @@ import Navbar from '../Navbar';
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
+import '../styles/CreateTravelBoard.css';
 import { differenceInCalendarDays, eachDayOfInterval, format, addDays } from 'date-fns';
 
 function CreateTravelBoard() {
@@ -92,35 +93,39 @@ function CreateTravelBoard() {
 
 
   return (
-    <div>
-      <div className="Form-box" style={{ padding: '20px' }}>
-        <h2>Create a Travel Board</h2>
+    <div className="create-travel-board-container">
+      <h2 className="create-travel-board-header">Create a Travel Board</h2>
 
-        <label style={{ display: 'block', marginBottom: '10px' }}>
-          Title:
-          <input
-            type="text"
-            value={title}
-            placeholder="e.g. Spring Break Trip"
-            onChange={(e) => setTitle(e.target.value)}
-            style={{
-              marginLeft: '10px',
-              padding: '6px',
-              fontSize: '16px',
-              width: '250px',
-            }}
-            required
-          />
-        </label>
+      <div className="form-group">
+        <label className="form-label">Title</label>
+        <input
+          type="text"
+          value={title}
+          placeholder="e.g. Spring Break Trip"
+          onChange={(e) => setTitle(e.target.value)}
+          className="form-input"
+          required
+        />
+      </div>
 
+      <div className="date-range-container">
+        <DateRange
+          editableDateInputs={true}
+          onChange={(item) => setRange([item.selection])}
+          moveRangeOnFirstSelection={false}
+          ranges={range}
+        />
+      </div>
 
+      <div className="form-group">
+        <h3 className="outfits-title">Select Outfits for Each Day</h3>
         {travelDates.map((date, index) => (
-          <div key={index} className="day-outfit-select" style={{ marginBottom: '10px' }}>
-            <h4>{date}</h4>
+          <div key={index} className="outfit-selector">
+            <span className="outfit-selector-date">{format(new Date(date), 'EEEE, MMMM do')}</span>
             <select
               value={selectedOutfitsByDate[date] || ''}
               onChange={(e) => handleOutfitChange(date, e.target.value)}
-              style={{ padding: '6px', fontSize: '14px' }}
+              className="outfit-selector-select"
             >
               <option value="">Select Outfit</option>
               {outfits.map((outfit) => (
@@ -131,24 +136,14 @@ function CreateTravelBoard() {
             </select>
           </div>
         ))}
-
-        <div className="calendar-wrapper" style={{ marginTop: '20px' }}>
-          <DateRange
-            editableDateInputs={true}
-            onChange={(item) => setRange([item.selection])}
-            moveRangeOnFirstSelection={false}
-            ranges={range}
-          />
-        </div>
-
-        <button
-          className="outfit-button"
-          onClick={handleTravelBoardCreation}
-          style={{ marginTop: '20px', padding: '10px 20px', fontSize: '16px' }}
-        >
-          Create Travel Board
-        </button>
       </div>
+
+      <button
+        onClick={handleTravelBoardCreation}
+        className="create-travel-board-button"
+      >
+        Create Travel Board
+      </button>
     </div>
   );
 }

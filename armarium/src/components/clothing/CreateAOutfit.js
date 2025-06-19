@@ -709,7 +709,7 @@ function Outfit() {
         showSkipButton={true}
         callback={(data) => {
           if (data.status === 'finished' || data.status === 'skipped') {
-            navigate('/itemUpload');
+            navigate('/wardrobe', { state: { joyrideStep: 'wardrobe-start' } });
           } else if (data.status === 'skipped') {
             finishTour();
           }
