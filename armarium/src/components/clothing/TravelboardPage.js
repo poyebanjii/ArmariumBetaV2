@@ -168,7 +168,7 @@ function TravelboardPage() {
               background: '#fff'
             }}
             >
-              <h4 style={{ textAlign: 'center', marginBottom: '10px' }}>{date}</h4>
+              <h4 style={{ texRtAlign: 'center', marginBottom: '10px' }}>{date}</h4>
 
               {editMode ? (
                 <select
@@ -188,7 +188,7 @@ function TravelboardPage() {
                       style={{ cursor: 'pointer' }}
                       onClick={() => {
                         navigate(`/editOutfit/${outfit.id}`, {
-                          state: { outfitName: outfit.outfitName, outfitId: outfit.id },
+                          state: { outfitName: outfit.outfitName, outfitId: outfit.id, travelBoardId: travelBoard.id, },
                         });
                       }}
                     >

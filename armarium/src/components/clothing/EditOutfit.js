@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { db, auth } from '../backend/firebaseConfig';
-import { collection, getDocs, query, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, query, deleteDoc, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import Navbar from '../Navbar';
@@ -259,9 +259,53 @@ function EditOutfit() {
     try {
         const user = auth.currentUser;
         if (!user) {
-        console.error("No user logged in");
+            console.error("No user logged in");
+            return;
+        }
+
+        const { travelBoardId, date } = location.state || {};
+
+           
+        // If editing from travelboard, create a new outfit
+        if (travelBoardId && date) {
+        // Create new outfit in user's collection
+        const newOutfitRef = doc(collection(db, `Users/${user.uid}/Outfits`));
+        const newOutfitData = {
+            topImageUrl: chosenTop,
+            bottomImageUrl: chosenBottom,
+            shoesImageUrl: chosenShoes,
+            outfitName: chosenName,
+            topLayerUrls: chosenLayers,
+            accessoryUrls: chosenAccessories,
+            createdAt: new Date().toISOString()
+        };
+        await setDoc(newOutfitRef, newOutfitData);
+
+        // Update travelboard to reference new outfit
+        const travelBoardRef = doc(db, `Users/${user.uid}/TravelBoards/${travelBoardId}`);
+        const travelBoardSnap = await getDoc(travelBoardRef);
+        const currentOutfits = travelBoardSnap.data().outfitsPerDay || {};
+        
+        await updateDoc(travelBoardRef, {
+            outfitsPerDay: {
+            ...currentOutfits,
+            [date]: {
+                id: newOutfitRef.id,
+                outfitName: newOutfitData.outfitName,
+                topImageUrl: newOutfitData.topImageUrl,
+                bottomImageUrl: newOutfitData.bottomImageUrl,
+                shoesImageUrl: newOutfitData.shoesImageUrl,
+                topLayerUrls: newOutfitData.topLayerUrls,
+                accessoryUrls: newOutfitData.accessoryUrls
+            }
+            }
+        });
+
+        console.log("New outfit created and travelboard updated");
+        navigate(-1); // Go back to travelboard
         return;
         }
+
 
         const outfitRef = doc(db, `Users/${user.uid}/Outfits/${outfitId}`);
 
