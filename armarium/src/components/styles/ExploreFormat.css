@@ -1,70 +1,72 @@
-.styleboards-list {
-  list-style: none;
-  padding: 0;
+.explore-header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 30px;
+  margin-bottom: 20px;
 }
 
-.styleboard-item {
-  width: 350px;
+/* Pinterest-style grid */
+.pinterest-grid {
+  columns: 4 250px; /* min-width of cards, number will auto-adjust */
+  column-gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.styleboard-grid {
+/* Each pin card */
+.pin-card {
+  background: white;
+  display: inline-block;
+  width: 100%;
+  margin: 0 0 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.pin-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.pin-image-container {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  justify-items: center;
+  gap: 5px;
+  padding: 5px;
 }
 
-.styleboard-image {
-  width: 150px;
+.pin-image-container img {
+  width: 100%;
   height: 150px;
   object-fit: cover;
+  border-radius: 8px;
 }
 
-.outfit-image {
-  width: 100px;
-  height: 100px;
-  margin: 10px;
-  cursor: pointer;
-  border: 2px solid transparent;
-  border-radius: 5px;
+.pin-card h3 {
+  padding: 12px 15px;
+  margin: 0;
+  font-size: 16px;
+  color: #333;
 }
 
-.outfit-image.selected {
-  border: 2px solid #007bff;
-  box-shadow: 0 0 5px #007bff;
+/* Responsive */
+@media (max-width: 1024px) {
+  .pinterest-grid {
+    columns: 2 200px;
+  }
+  .pin-image-container img {
+    height: 120px;
+  }
 }
 
-.loader {
-  border: 16px solid #f3f3f3; 
-  border-top: 16px solid #3498db; 
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loader-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
-
-.blurred {
-  filter: blur(5px);
-  pointer-events: none; /* prevent interaction with other content */
+@media (max-width: 600px) {
+  .pinterest-grid {
+    columns: 1 100%;
+  }
 }

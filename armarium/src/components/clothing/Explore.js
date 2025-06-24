@@ -45,68 +45,62 @@ function Explore() {
     <div>
       <Loader loading={loading} />
       <Navbar />
+      
       <div className="explore-container">
-        <h1>Explore InspoBoards</h1>
+        <div className="explore-header">
+          <h1>Explore InspoBoards</h1>
+          <div className="search-container">
+            <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search styleboard by title"
+              value={searchInput}
+              onChange={handleSearchChange}
+              className="search-input"
+            />
+          </div>
+        </div>
 
-        <input
-          type="text"
-          placeholder="Search styleboard by title"
-          value={searchInput}
-          onChange={handleSearchChange}
-          className="search-input"
-        />
+      <div className="pinterest-grid">
+        {styleboards.length > 0 ? (
+          styleboards
+            .filter((styleboard) =>
+              (styleboard.styleboardName || '').toLowerCase().includes(searchInput)
+            )
+            .map((styleboard) => {
+              const firstOutfit = styleboard.outfits?.[0];
 
-        <ul className="styleboards-list">
-          {styleboards.length > 0 ? (
-            styleboards
-              .filter((styleboard) =>
-                (styleboard.styleboardName || '').toLowerCase().includes(searchInput)
-              )
-              .map((styleboard) => {
-                const firstOutfit = styleboard.outfits?.[0];
-
-                return (
-                  <li
-                    key={styleboard.id}
-                    className="styleboard-item"
-                    onClick={() => handleStyleboardClick(styleboard)}
-                  >
-                    <h2>{styleboard.styleboardName || 'Unnamed Styleboard'}</h2>
-
-                    {firstOutfit && (
-                      <div className="first-outfit-preview">
-                        <div className="image-container">
-                          {firstOutfit.topImageUrl && (
-                            <img
-                              src={firstOutfit.topImageUrl}
-                              alt="Top"
-                              className="outfit-image"
-                            />
-                          )}
-                          {firstOutfit.bottomImageUrl && (
-                            <img
-                              src={firstOutfit.bottomImageUrl}
-                              alt="Bottom"
-                              className="outfit-image"
-                            />
-                          )}
-                          {firstOutfit.shoesImageUrl && (
-                            <img
-                              src={firstOutfit.shoesImageUrl}
-                              alt="Shoes"
-                              className="outfit-image"
-                            />
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </li>
-                );
-              })
-          ) : (
+              return (
+                <div
+                  key={styleboard.id}
+                  className="pin-card"
+                  onClick={() => handleStyleboardClick(styleboard)}
+                >
+                  {firstOutfit && (
+                    <div className="pin-image-container">
+                      {firstOutfit.topImageUrl && (
+                        <img src={firstOutfit.topImageUrl} alt="Top" loading="lazy" />
+                      )}
+                      {firstOutfit.bottomImageUrl && (
+                        <img src={firstOutfit.bottomImageUrl} alt="Bottom" loading="lazy" />
+                      )}
+                      {firstOutfit.shoesImageUrl && (
+                        <img src={firstOutfit.shoesImageUrl} alt="Shoes" loading="lazy" />
+                      )}
+                    </div>
+                  )}
+                  <h3>{styleboard.styleboardName || 'Unnamed Styleboard'}</h3>
+                </div>
+              );
+            })
+        ) : (
+          <div className="no-results">
             <p>No styleboards found.</p>
-          )}
-        </ul>
+          </div>
+        )}
+      </div>
       </div>
     </div>
   );

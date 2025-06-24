@@ -76,10 +76,14 @@ function ExplorePage() {
   return (
     <div>
       <Navbar />
-      <button onClick={() => navigate(-1)} style={{ marginBottom: '20px' }}>
-        Back to Explore Inspoboards Page
-      </button>
-      <h1>{styleboard.styleboardName}</h1>
+
+      <div className="explore-detail-header">
+        <button onClick={() => navigate(-1)} className="back-button">
+          ← Back to Explore
+        </button>
+        <h1>{styleboard.styleboardName}</h1>
+      </div>
+      
       <div className="bookmark-container">
         <img
           src={isBookmarked ? "bookmark.png" : "unbookmark.png"} 
