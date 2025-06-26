@@ -34,6 +34,7 @@ import Bookmarked from './profile/Bookmarked';
 import BookmarkedPage from './profile/BookmarkedPage';
 import TravelBoard from './clothing/TravelBoard';
 import TravelboardPage from './clothing/TravelboardPage';
+import Planner from './clothing/Planner';
 
 /**
  * The routers for linking to different pages.
@@ -70,6 +71,7 @@ function App() {
         <Route path="/wardrobeStyleboards/:userId" element={<ProtectedRoute element={<Styleboards />} />} />
         <Route path="/travelBoards/:userId" element={<ProtectedRoute element={<TravelBoard />} />} />
         <Route path="/travelBoardPage/:id" element={<ProtectedRoute element={<TravelboardPage />} />} />
+        <Route path="/planner/:userId" element={<ProtectedRoute element={<Planner />} />} />
         <Route path="/" element={<Styleboards />} />
         <Route path="/styleboard/:id" element={<StyleboardPage />} />
         <Route path="/explore" element={<ProtectedRoute element={<Explore />} />} />
