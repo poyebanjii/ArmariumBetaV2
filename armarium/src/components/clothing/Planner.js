@@ -89,76 +89,129 @@ function Planner() {
       <Navbar />
       <Loader loading={loading} />
 
-      <div className="center" style={{ marginTop: '20px' }}>
-        <h2>Daily Outfit Planner</h2>
-        <p>Select a date on the calendar, then assign an outfit.</p>
-      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 20px' }}>
+        {/* Calendar Side */}
+        <div style={{
+          width: '350px',
+          marginRight: '40px',
+          background: '#fff',
+          borderRadius: '12px',
+          padding: '20px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        }}>
+          <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>Outfit Planner</h2>
+          <p style={{ textAlign: 'center', fontSize: '0.95rem', color: '#555' }}>
+            Select a day to assign an outfit
+          </p>
 
-      <div className="center calendar-wrapper" style={{ marginTop: '20px' }}>
-        <DateRange
-        onChange={handleSelect}
-        moveRangeOnFirstSelection={false}
-        ranges={[{ startDate: selectedDate, endDate: selectedDate, key: 'selection' }]}
-        dayContentRenderer={(date) => {
-            const formatted = format(date, 'yyyy-MM-dd');
-            const isPlanned = !!selectedOutfitsByDate[formatted];
+          <DateRange
+            onChange={handleSelect}
+            moveRangeOnFirstSelection={false}
+            ranges={[{ startDate: selectedDate, endDate: selectedDate, key: 'selection' }]}
+            dayContentRenderer={(date) => {
+              const formatted = format(date, 'yyyy-MM-dd');
+              const isPlanned = !!selectedOutfitsByDate[formatted];
+              return (
+                <div style={{ position: 'relative' }}>
+                  <span>{date.getDate()}</span>
+                  {isPlanned && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        bottom: 2,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '6px',
+                        height: '6px',
+                        backgroundColor: '#007bff',
+                        borderRadius: '50%',
+                      }}
+                    />
+                  )}
+                </div>
+              );
+            }}
+          />
+        </div>
 
-            return (
-            <div style={{ position: 'relative' }}>
-                <span>{date.getDate()}</span>
-                {isPlanned && (
-                <span
-                    style={{
-                    position: 'absolute',
-                    bottom: 2,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: '6px',
-                    height: '6px',
-                    backgroundColor: '#007bff',
-                    borderRadius: '50%',
-                    }}
-                />
-                )}
-            </div>
-            );
-        }}
-        />
-      </div>
+        {/* Outfit Selection Side */}
+        <div style={{
+          flex: 1,
+          maxWidth: '500px',
+          background: '#fff',
+          borderRadius: '12px',
+          padding: '20px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        }}>
+          <h3 style={{ marginBottom: '15px' }}>
+            Assign Outfit for: <span style={{ color: '#007bff' }}>{format(selectedDate, 'yyyy-MM-dd')}</span>
+          </h3>
 
-      <div className="center" style={{ marginTop: '30px' }}>
-        <h3>Assign Outfit for: {format(selectedDate, 'yyyy-MM-dd')}</h3>
-        <select onChange={(e) => handleAssignOutfit(e.target.value)} value={selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')] || ''}>
-          <option value="">-- Select Outfit --</option>
-          {outfits.map((outfit) => (
-            <option key={outfit.id} value={outfit.id}>
-              {outfit.outfitName || `Outfit ${outfit.id}`}
-            </option>
-          ))}
-        </select>
-
-        {selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')] && (
-            <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'center' }}>
-                {['topImageUrl', 'bottomImageUrl', 'shoesImageUrl'].map((key) => {
+          <select
+            onChange={(e) => handleAssignOutfit(e.target.value)}
+            value={selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')] || ''}
+            style={{
+              width: '100%',
+              padding: '10px',
+              fontSize: '1rem',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              marginBottom: '20px',
+            }}
+          >
+            <option value="">-- Select Outfit --</option>
+            {outfits.map((outfit) => (
+              <option key={outfit.id} value={outfit.id}>
+                {outfit.outfitName || `Outfit ${outfit.id}`}
+              </option>
+            ))}
+          </select>
+          
+          {selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')] && (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '20px',
+                marginTop: '20px',
+              }}
+            >
+              {['topImageUrl', 'bottomImageUrl', 'shoesImageUrl'].map((key) => {
                 const outfit = outfits.find(o => o.id === selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')]);
                 return outfit?.[key] ? (
-                    <img
+                  <img
                     key={key}
                     src={outfit[key]}
                     alt={key}
-                    style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #ccc' }}
-                    />
+                    style={{
+                      width: '150px',
+                      height: '150px',
+                      objectFit: 'cover',
+                      borderRadius: '10px',
+                      border: '1px solid #ccc',
+                      boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+                      transition: 'transform 0.2s',
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  />
                 ) : null;
-                })}
+              })}
             </div>
-        )}
+          )}
 
-        <div style={{ marginTop: '20px' }}>
-          <button className="outfit-button" onClick={handleSave}>
-            Save Planner
-          </button>
+          <div style={{ textAlign: 'right' }}>
+            <button
+              onClick={handleSave}
+              className="outfit-button"
+            >
+              Save Planner
+            </button>
+          </div>
         </div>
       </div>
+
     </div>
   );
 }

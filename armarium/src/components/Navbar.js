@@ -595,7 +595,7 @@ function Navbar() {
                 <p>You don't have any outfits to share.</p>
                 <button onClick={() => {
                   setShowOutfitModal(false);
-                  navigate('/create-outfit');
+                  navigate('/outfits');
                 }}>Create a new outfit</button>
               </div>
             ) : (
