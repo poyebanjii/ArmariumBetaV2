@@ -91,6 +91,7 @@ function Outfit() {
   const user = auth.currentUser;
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const [showLockDropdown, setShowLockDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [outfitName, setOutfitName] = useState('');
   const [runTour, setRunTour] = useState(false);
@@ -371,7 +372,6 @@ function Outfit() {
       <Loader loading={loading} />
       <div className="App" id="homepage">
         <h1 className="outfits-title">
-          Outfits
           <img
             src="save.png"
             alt="Save Outfit"
@@ -382,13 +382,44 @@ function Outfit() {
         </h1>
         <div className="header-buttons">
           {/* Lock All Button */}
-          <img
-              src={isLocked.all ? "lock.png" : "unlock.png"}
-              alt={isLocked.all ? "Lock All" : "Unlock All"}
-              onClick={toggleOneLock}
-              className="lock-image"
-              style={{ cursor: "pointer" }}
-          />
+          <div className="lock-sidebar">
+            <img
+              src="unlock.png"
+              alt="Lock Options"
+              onClick={() => setShowLockDropdown(prev => !prev)}
+              className="lock-sidebar-icon"
+              style={{ cursor: "pointer", width: "30px", marginRight: "10px" }}
+            />
+
+            {showLockDropdown && (
+              <div className="lock-dropdown">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isLocked.top}
+                    onChange={toggleLockTop}
+                  />
+                    👕 Lock Tops
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isLocked.bottom}
+                    onChange={toggleLockBottom}
+                  />
+                   👖  Lock Bottoms
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isLocked.shoes}
+                    onChange={toggleLockShoes}
+                  />
+                  👟 Lock Shoes
+                </label>
+              </div>
+            )}
+          </div>
           {/* Add Modal Button */}
           <button
             onClick={() => setShowAddModal(true)}
@@ -532,21 +563,13 @@ function Outfit() {
               </div>
             </div>
           )}
+
           <div className="outfit-builder">
           {/* Top and Bottom Containers with Conditional Overlays */}
           {!showLayers ? (
             <>
               {/* Top Clothing Container */}
               <div className="clothing-container">
-                <div className="lock-icon">
-                  <img
-                    src={isLocked.top ? "lock.png" : "unlock.png"} 
-                    alt={isLocked.top ? "Lock Top" : "Unlock Top"}
-                    onClick={toggleLockTop}
-                    className="lock-image"
-                    style={{ cursor: "pointer" }}
-                  />
-                </div>
                 <div className="swipeable-container top">
                   <SwipeableImage
                     key={topIndex}
@@ -563,15 +586,6 @@ function Outfit() {
 
               {/* Bottom Clothing Container */}
               <div className="clothing-container">
-                <div className="lock-icon">
-                  <img
-                    src={isLocked.bottom ? "lock.png" : "unlock.png"} 
-                    alt={isLocked.bottom ? "Lock Bottom" : "Unlock Bottom"}
-                    onClick={toggleLockBottom}
-                    className="lock-image"
-                    style={{ cursor: "pointer" }}
-                  />
-                </div>
                 <div className="swipeable-container bottom">
                   <SwipeableImage
                     key={bottomIndex}
@@ -654,15 +668,6 @@ function Outfit() {
           )}
           {/* Shoes Container (Always Visible) */}
           <div className="clothing-container">
-            <div className="lock-icon">
-              <img
-                src={isLocked.shoes ? "lock.png" : "unlock.png"}
-                alt={isLocked.shoes ? "Lock Shoes" : "Unlock Shoes"}
-                onClick={toggleLockShoes}
-                className="lock-image"
-                style={{ cursor: "pointer" }}
-              />
-            </div>
             <div className="swipeable-container shoes">
               <SwipeableImage
                 key={shoesIndex}

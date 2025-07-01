@@ -17,6 +17,7 @@ import {
 } from './utils/conversations';
 import ProfileDropdown from './ProfileDropdown';
 import CommunityDropdown from './CommunityDropdown';
+import TravelDropdown from './TravelDropdown';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ function Navbar() {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const [isDropdownProfileVisible, setDropdownProfileVisible] = useState(false);
   const [isDropdownComVisible, setDropdownComVisible] = useState(false);
+  const [isDropdownTripVisible, setDropdownTripVisible] = useState(false);
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [unreadMessages, setUnreadMessages] = useState(0); // State to hold unread messages count
@@ -373,6 +375,15 @@ function Navbar() {
             Wardrobe
             {isDropdownVisible && <Dropdown />}
           </li>
+          <li
+              className="nav-link dropdown"
+              id="community-link"
+              onMouseEnter={() => setDropdownTripVisible(true)}
+              onMouseLeave={() => setDropdownTripVisible(false)}
+            >
+              Trip
+              {isDropdownTripVisible && <TravelDropdown />}
+            </li>
             <li
               className="nav-link dropdown"
               id="community-link"

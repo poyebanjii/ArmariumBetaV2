@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { getAuth } from 'firebase/auth'
 import './styles/Navbar.css';
 
-function ProfileDropdown() {
+function TravelDropdown() {
   const [userId, setUserId] = useState(null);
     //const navigate = useNavigate();
 
@@ -23,17 +23,14 @@ function ProfileDropdown() {
       <div className="dropdown-menu">
         <ul>
           <li>
-          <Link to={`/profile`}>Profile</Link>
+          <Link to={`/travelBoards/${userId}`}>Trip</Link>
           </li>
           <li>
-          <Link to={`/profileSettings`}>Settings</Link>
-          </li>
-          <li>
-          <Link to={`https://docs.google.com/forms/d/1vh_fvJm27AYNRzrLfdTZajZctn0Fr6Tdb4QUMaBo8NA/edit`}>Feedback</Link>
+          <Link to={`/planner/${userId}`}>Planner</Link>
           </li>
       </ul>
       </div>
   );
   };
   
-  export default ProfileDropdown;
+  export default TravelDropdown;

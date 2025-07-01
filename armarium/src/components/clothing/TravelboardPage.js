@@ -87,8 +87,7 @@ function TravelboardPage() {
 
     try {
       const userTravelRef = doc(db, `Users/${user.uid}/TravelBoards`, travelBoard.id);
-      await updateDoc(userTravelRef, { name: title });
-
+      await updateDoc(userTravelRef, { title: title });
 
       alert('Travelboard title updated!');
     } catch (err) {

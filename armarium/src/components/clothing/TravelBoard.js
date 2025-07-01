@@ -16,6 +16,7 @@ function TravelBoard() {
   const [isDelete, setIsDelete] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTravelboards, setSelectedTravelboards] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
   const auth = getAuth();
   const DELAY = 750;
 
@@ -68,6 +69,15 @@ function TravelBoard() {
       }
   };
 
+  const handleSearchChange = (e) => {
+      const inputValue = e.target.value.toLowerCase();
+      setSearchInput(inputValue);
+  };
+
+  const filteredTravelBoards = travelBoards.filter(travelBoard => {
+    return travelBoard.title && travelBoard.title.toLowerCase().includes(searchInput.toLowerCase());
+  });
+
   const fetchTravelBoards = async () => {
     if (!user) return;
     try {
@@ -119,12 +129,27 @@ function TravelBoard() {
 
       <h2 style={{ textAlign: 'center', marginTop: '30px' }}>Your Travel Boards</h2>
 
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+      <input
+        type="text"
+        placeholder="Search travel boards..."
+        value={searchInput}
+        onChange={handleSearchChange}
+        style={{
+          padding: '10px',
+          width: '300px',
+          borderRadius: '5px',
+          border: '1px solid #ccc'
+        }}
+      />
+    </div>
+
       <div className="travel-board-list center" style={{ marginTop: '20px' }}>
         {travelBoards.length === 0 ? (
           <p style={{ textAlign: 'center' }}>No travel boards yet.</p>
         ) : (
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            {travelBoards.map(board => (
+            {filteredTravelBoards.map(board => (
               <li
                 key={board.id}
                 onClick={() => handleTravelClick(board)}
