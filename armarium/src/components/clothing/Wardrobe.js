@@ -73,11 +73,6 @@ const Wardrobe = () => {
     };
 
     const finishTour = async () => {
-        const user = auth.currentUser;
-        if (user) {
-            const userDocRef = doc(db, 'Users', user.uid);
-            await updateDoc(userDocRef, { isNewUser: false });
-        }
         localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
         setRunTour(false);
     };

@@ -197,7 +197,7 @@ export default function UserProfile() {
             {friends.length ? (
               friends.map((f) => (
                 <li key={f.id}>
-                  {f.username} ({f.email})
+                  {f.username}
                 </li>
               ))
             ) : (

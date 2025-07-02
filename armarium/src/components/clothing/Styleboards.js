@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { collection, getDocs, query, where, doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, deleteDoc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; 
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { ref, listAll, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "../backend/firebaseConfig";
+import { useLocation } from 'react-router-dom';
 import Navbar from '../Navbar';
 import Loader from '../Loader';
 import '../styles/StyleboardsFormat.css';
 import '../styles/MyOutfits.css';
+import Joyride from 'react-joyride';
 
 function Styleboards() {
   const [styleboards, setStyleboards] = useState([]);
@@ -19,6 +21,19 @@ function Styleboards() {
   const [selectedStyleboards, setSelectedStyleboards] = useState([]);
   const navigate = useNavigate();
   const DELAY = 750;
+  const location = useLocation();
+  const [runTour, setRunTour] = useState(false);
+  const [steps, setSteps] = useState([]);
+
+  const finishTour = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      const userDocRef = doc(db, 'Users', user.uid);
+      await updateDoc(userDocRef, { isNewUser: false });
+    }
+    localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
+    setRunTour(false);
+  };
 
   const fetchStyleboards = async (user) => {
     if (!user) return;
@@ -149,6 +164,34 @@ function Styleboards() {
     sb.name?.toLowerCase().includes(searchInput)
   );
 
+  useEffect(() => {
+    if (location.state?.startTutorial) {
+      setSteps([
+        {
+          target: '.content-container',
+          content: 'This here is where you can find your styleboards, a way to organize your outfits.',
+          placement: 'center',
+          disableBeacon: true,
+        },
+        {
+          target: '.search-input',
+          content: 'Quickly find specific styleboards by searching for their names.',
+        },
+        {
+          target: '.delete-btn',
+          content: 'You can select styleboards for them to be deleted with this button.',
+        },
+        {
+          target: '.content-container',
+          content: 'You can also share styleboards to the explore inspo board for others to see. You can also view your styleboards with the outfits and can edit them.',
+          placement: 'center',
+          disableBeacon: true,
+        },
+      ]);
+      setRunTour(true);
+    }
+  }, [location]);
+
   return (
   <div className="app-container">
     <Navbar />
@@ -159,12 +202,13 @@ function Styleboards() {
         <div className="styleboards-header-container">
           <div className="styleboards-header">
             <h1>My Styleboards</h1>
-                            <button
+                <button
                   onClick={() =>
                     selectedStyleboards.length > 0
                       ? setShowDeleteModal(true)
                       : alert("No styleboard selected.")
                   }
+                  className='delete-btn'
                 >
                   Delete Selected
                 </button>
@@ -253,6 +297,18 @@ function Styleboards() {
         )}
       </div>
     </div>
+    <Joyride
+        steps={steps}
+        run={runTour}
+        continuous={true}
+        showProgress={true}
+        showSkipButton={true}
+        callback={(data) => {
+          if (data.status === 'finished' || data.status === 'skipped') {
+            finishTour();
+          }
+        }}
+      />
     </div>
 
   );

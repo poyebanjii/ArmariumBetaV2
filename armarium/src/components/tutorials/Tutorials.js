@@ -43,7 +43,12 @@ function Tutorials() {
     {
       title: 'Explore InspoBoards',
       description: 'Find what other users are wearing to gain inspiration.',
-      route: `/planner/${user.uid}`,
+      route: `/explore`,
+    },
+    {
+      title: 'Social',
+      description: 'Add friends and have access to message them.',
+      route: `/friendRequests`,
     }
   ];
 

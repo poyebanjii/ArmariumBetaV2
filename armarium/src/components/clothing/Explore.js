@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../Navbar';
 import Loader from '../Loader';
 import '../styles/ExploreFormat.css'; 
+import Joyride from 'react-joyride';
 
 function Explore() {
   const [styleboards, setStyleboards] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [runTour, setRunTour] = useState(false);
+  const [steps, setSteps] = useState([]);
+  const location = useLocation();
+
+  const finishTour = async () => {
+    localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
+    setRunTour(false);
+  };
 
   useEffect(() => {
     const fetchExploreStyleboards = async () => {
@@ -32,6 +41,30 @@ function Explore() {
 
     fetchExploreStyleboards();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.startTutorial) {
+      setSteps([
+        {
+          target: '.explore-container',
+          content: 'If you want to find what others are wearing, ths inspo boards has you covered. You can find other styleboards here to check out.',
+          placement: 'center',
+          disableBeacon: true,
+        },
+        {
+          target: '.search-input',
+          content: 'Quickly find specific styleboards by searching for their names.',
+        },
+        {
+          target: '.explore-container',
+          content: 'You can also view styleboards by clicking on them and if you like them, you can add to your bookmarks.',
+          placement: 'center',
+          disableBeacon: true,
+        }
+      ]);
+      setRunTour(true);
+    }
+  }, [location]);
 
   const handleSearchChange = (e) => {
     setSearchInput(e.target.value.toLowerCase());
@@ -101,6 +134,18 @@ function Explore() {
           </div>
         )}
       </div>
+      <Joyride
+        steps={steps}
+        run={runTour}
+        continuous={true}
+        showProgress={true}
+        showSkipButton={true}
+        callback={(data) => {
+          if (data.status === 'finished' || data.status === 'skipped') {
+            finishTour();
+          }
+        }}
+      />
       </div>
     </div>
   );

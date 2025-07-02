@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../Navbar';
 import CreateTravelBoard from './CreateTravelBoard';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Loader from '../Loader';
+import Joyride from 'react-joyride';
 
 function TravelBoard() {
   const navigate = useNavigate();
@@ -19,6 +20,14 @@ function TravelBoard() {
   const [searchInput, setSearchInput] = useState("");
   const auth = getAuth();
   const DELAY = 750;
+  const [runTour, setRunTour] = useState(false);
+  const [steps, setSteps] = useState([]);
+  const location = useLocation();
+  
+  const finishTour = async () => {
+    localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
+    setRunTour(false);
+  };
 
   const handleShowModal = () => {
     setIsModalOpen(true);
@@ -108,6 +117,33 @@ function TravelBoard() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (location.state?.startTutorial) {
+      setSteps([
+        {
+          target: '.center',
+          content: 'Here you can create travel boards. If you need to plan for a trip and figure out what you have to wear this is where you can do it',
+          placement: 'center',
+          disableBeacon: true,
+        },
+        {
+          target: '.search-input',
+          content: 'Quickly find specific outfits by searching for their names.',
+        },
+        {
+          target: '.outfit-button:nth-of-type(1)',
+          content: 'This is where all your outfits are displayed. Click on any outfit to view details.',
+        },
+        {
+          target: '.outfit-button:nth-of-type(2)', 
+          content: 'Select travel boards by clicking them, then use this button to delete them.',
+        },
+
+      ]);
+      setRunTour(true);
+    }
+  }, [location]);
+
   return (
     <div>
       <Loader loading={loading} />
@@ -141,6 +177,7 @@ function TravelBoard() {
           borderRadius: '5px',
           border: '1px solid #ccc'
         }}
+        className='search-input'
       />
     </div>
 
@@ -197,6 +234,19 @@ function TravelBoard() {
           </div>
         </div>
       )}
+
+      <Joyride
+        steps={steps}
+        run={runTour}
+        continuous={true}
+        showProgress={true}
+        showSkipButton={true}
+        callback={(data) => {
+          if (data.status === 'finished' || data.status === 'skipped') {
+            finishTour();
+          }
+        }}
+      />
     </div>
   );
 }

@@ -8,7 +8,7 @@ import { collection, getDoc, getDocs, addDoc, getFirestore, doc, updateDoc } fro
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { auth, db, storage } from '../backend/firebaseConfig';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation  } from 'react-router-dom';
 import Joyride from 'react-joyride';
 
 /**
@@ -95,40 +95,41 @@ function Outfit() {
   const [showModal, setShowModal] = useState(false);
   const [outfitName, setOutfitName] = useState('');
   const [runTour, setRunTour] = useState(false);
-  const [steps, setSteps] = useState([
-    {
-      target: '.navbar',
-      content: 'This is the navigation bar where you can access the pages.',
-    },
-    {
-      target: '#home-link',
-      content: 'This is the Home page where you can swipe through clothing items and save outfits.',
-    },
-    {
-      target: '#homepage',
-      content: 'This is the main area where you can browse and create outfits by swiping left or right on the clothing items.',
-    },
-    {
-      target: '#.swipeable-container.top',
-      content: 'Swipe left or right to browse through the clothing item. Each clothing item has one.'
-    },
-    {
-      target: '#lockbutton',
-      content: 'Each clothing item has a lock button, locking it means it will not change/swipe.',
-    },
-    {
-      target: '#lockall',
-      content: 'This button enables all clothing items to change when swiping.',
-    },
-    {
-      target: '#save',
-      content: 'Once you’ve chosen your outfit, click here to save it.',
-    },
-    {
-      target: '#upload-link',
-      content: 'Lets go to the upload page to learn how to upload a clothing item.',
-    },
-  ]);
+  const [steps, setSteps] = useState([]);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.startTutorial) {
+      setSteps([
+      {
+        target: '.main-content',
+        content: 'This is where you can create outfits. You can swipe through clothing items and save outfits.',
+        placement: 'center',
+        disableBeacon: true,
+      },
+      {
+        target: '#homepage',
+        content: 'This is the main area where you can browse and create outfits by swiping left or right on the clothing items.',
+      },
+      {
+        target: '.lock-sidebar-icon',
+        content: 'Lock items you like to keep them while browsing other categories.',
+        placement: 'bottom',
+      },
+      {
+        target: '.flip-image',
+        content: 'Toggle between base layers and accessories with this button.',
+        placement: 'top',
+      },
+      {
+        target: '.save-image',
+        content: 'Love your outfit? Save it with a name to your collection!',
+        placement: 'bottom',
+      }
+      ]);
+      setRunTour(true);
+    }
+  }, [location]);
 
   const fetchData = async (user) => {
     setLoading(true);
@@ -205,11 +206,7 @@ function Outfit() {
   };
 
   const finishTour = async () => {
-    const user = auth.currentUser;
-    if (user) {
-      const userDocRef = doc(db, 'Users', user.uid);
-      await updateDoc(userDocRef, { isNewUser: false });
-    }
+    finishTour();
     setRunTour(false);
   };
 
@@ -714,8 +711,6 @@ function Outfit() {
         showSkipButton={true}
         callback={(data) => {
           if (data.status === 'finished' || data.status === 'skipped') {
-            navigate('/wardrobe', { state: { joyrideStep: 'wardrobe-start' } });
-          } else if (data.status === 'skipped') {
             finishTour();
           }
         }}

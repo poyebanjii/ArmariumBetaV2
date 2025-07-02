@@ -6,6 +6,8 @@ import { getAuth } from 'firebase/auth';
 import '../styles/FriendRequests.css';
 import { sendFriendRequest } from '../utils/friends'; // Import the sendFriendRequest function
 import Loader from '../Loader';
+import { useNavigate, useLocation } from 'react-router-dom';
+import Joyride from 'react-joyride';
 
 function FriendRequests() {
     const auth = getAuth();
@@ -23,6 +25,11 @@ function FriendRequests() {
     const [message, setMessage] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
+
+    const location = useLocation();
+
+    const [runTour, setRunTour] = useState(false);
+    const [steps, setSteps] = useState([]);
 
     useEffect(() => {
         const fetchFriends = async () => {
@@ -228,6 +235,38 @@ useEffect(() => {
         }
     };
 
+    useEffect(() => {
+        if (location.state?.startTutorial) {
+        setSteps([
+            {
+            target: '.friend-requests-container',
+            content: 'If you want to add friends, this page is where you can do that.',
+            placement: 'center',
+            disableBeacon: true,
+            },
+            {
+            target: '.user-search',
+            content: 'Find the person you want to send a request here by typing their username.',
+            },
+            {
+            target: '.friend-req',
+            content: 'This here is where you have any requests from users.',
+            },
+            {
+            target: '.friends-list', 
+            content: 'Here are the list of your friends.',
+            }
+        ]);
+        setRunTour(true);
+        }
+  }, [location]);
+
+  
+    const finishTour = async () => {
+        localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
+        setRunTour(false);
+    };
+
     // const handleAccept = async (requesterId) => {
     //     console.log('Accepting friend request from:', requesterId); // Debugging
     
@@ -366,7 +405,7 @@ useEffect(() => {
                     {message && <p>{message}</p>}
                 </div>
                 {/* Friend Requests UI */}
-                <h2>Friend Requests</h2>
+                <h2 className='friend-req'>Friend Requests</h2>
                 {friendRequestDetails.length === 0 ? (
                     <p>No friend requests at the moment.</p>
                 ) : (
@@ -393,6 +432,18 @@ useEffect(() => {
                         </ul>
                     )}
                 </div>
+        <Joyride
+                steps={steps}
+                run={runTour}
+                continuous={true}
+                showProgress={true}
+                showSkipButton={true}
+                callback={(data) => {
+                if (data.status === 'finished' || data.status === 'skipped') {
+                    finishTour();
+                }
+                }}
+            />
             </div>
         </>
     );
