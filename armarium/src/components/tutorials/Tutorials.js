@@ -10,15 +10,20 @@ function Tutorials() {
   const user = auth.currentUser;
 
   const tutorialPages = [
+      {
+      title: 'Create Outfit',
+      description: 'Walk through creating an outfit using your wardrobe.',
+      route: '/outfits',
+    },
     {
-      title: 'Wardrobe',
+      title: 'Clothes',
       description: 'Learn how to add, edit, and delete your clothing items.',
       route: '/wardrobe',
     },
     {
-      title: 'Create Outfit',
-      description: 'Walk through creating an outfit using your wardrobe.',
-      route: '/outfits',
+      title: 'Outfits',
+      description: 'Learn how to edit and delete your outfits.',
+      route: `/wardrobeOutfits/${user.uid}`,
     },
     {
       title: 'Styleboards',

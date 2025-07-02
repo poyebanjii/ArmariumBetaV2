@@ -105,7 +105,7 @@ const Wardrobe = () => {
             setSteps([
             {
                 target: '.wardrobe-header',
-                content: 'Welcome to your Wardrobe! Here’s how to manage your clothing items.',
+                content: 'Welcome to your clothes! Here’s how to manage your clothing items.',
                 placement: 'center',
                 disableBeacon: true, 
             },

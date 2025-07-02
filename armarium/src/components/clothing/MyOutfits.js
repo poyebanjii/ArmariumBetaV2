@@ -154,36 +154,39 @@ const handleDelete = async () => {
       const userDocRef = doc(db, 'Users', user.uid);
       await updateDoc(userDocRef, { isNewUser: false });
     }
+    localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
     setRunTour(false);
   };
 
 
-    useEffect(() => {
-      if (location.state?.joyrideStep === 'myoutfits-start') {
-          setSteps([
-          {
-              target: '.outfit-outer',
-              content: 'This the outfits page where you can view your outfits.',
-          },
-          {
-              target: '.search-input',
-              content: 'Use this search to filter your wardrobe.',
-          },
-          {
-              target: '.btn btn-primary',
-              content: 'You can delete outfits by selecting them and then pressing this button.',
-          },
-          {
-              target: '.outfit-button',
-              content: 'You can create styleboards by selecting them and then pressing this button.',
-          },
-          {
-              target: '.navbar',
-              content: 'Let’s continue to your styleboards!',
-          }
-          ]);
-          setRunTour(true);
-      }
+  useEffect(() => {
+    if (location.state?.startTutorial) {
+      setSteps([
+        {
+          target: '.outfit-page-title',
+          content: 'Welcome to your Outfits! Here you can view, organize, and manage all your saved outfits.',
+          placement: 'center',
+          disableBeacon: true,
+        },
+        {
+          target: '.search-input',
+          content: 'Quickly find specific outfits by searching for their names.',
+        },
+        {
+          target: '.outfit-outer',
+          content: 'This is where all your outfits are displayed. Click on any outfit to view details.',
+        },
+        {
+          target: '.outfit-button:nth-of-type(1)', // First button (Delete)
+          content: 'Select outfits by clicking them, then use this button to delete them.',
+        },
+        {
+          target: '.outfit-button:nth-of-type(2)', // Second button (Create Styleboard)
+          content: 'Group selected outfits into styleboards for easy organization and planning.',
+        }
+      ]);
+      setRunTour(true);
+    }
   }, [location]);
 
 useEffect(() => {
@@ -337,8 +340,6 @@ return (
         showSkipButton={true}
         callback={(data) => {
           if (data.status === 'finished' || data.status === 'skipped') {
-            navigate('/wardrobe', { state: { joyrideStep: 'wardrobe-start' } });
-          } else if (data.status === 'skipped') {
             finishTour();
           }
         }}
