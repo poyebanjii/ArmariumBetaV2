@@ -5,13 +5,13 @@ import { getDoc, doc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import Navbar from '../Navbar';
 import '../styles/EditClothing.css';
+import TagInput from './TagInput';
 
 const EditClothing = () => {
     const { clothingId } = useParams();
     const { type } = useParams();
     const [image, setImage] = useState('');
     const [tags, setTags] = useState([]);
-    const [newTags, setNewTags] = useState(''); 
     const [title, setTitle] = useState('');
     const [newTitle, setNewTitle] = useState(''); 
     const [newType, setNewType] = useState(type);
@@ -28,7 +28,6 @@ const EditClothing = () => {
                     console.log(clothingData.data());
                     setImage(data.url);
                     setTags(data.tags);
-                    setNewTags(data.tags.join(', '));
                     setTitle(data.title);
                     setNewTitle(data.title);
                 }
@@ -45,7 +44,6 @@ const EditClothing = () => {
                     console.log(clothingData.data());
                     setImage(data.url);
                     setTags(data.tags);
-                    setNewTags(data.tags.join(', '));
                     setTitle(data.title);
                     setNewTitle(data.title);
                 }
@@ -62,7 +60,6 @@ const EditClothing = () => {
                     console.log(clothingData.data());
                     setImage(data.url);
                     setTags(data.tags);
-                    setNewTags(data.tags.join(', '));
                     setTitle(data.title);
                     setNewTitle(data.title);
                 }
@@ -79,7 +76,6 @@ const EditClothing = () => {
                     console.log(clothingData.data());
                     setImage(data.url);
                     setTags(data.tags);
-                    setNewTags(data.tags.join(', '));
                     setTitle(data.title);
                     setNewTitle(data.title);
                 }
@@ -90,10 +86,6 @@ const EditClothing = () => {
         };
         fetchData();
     }, [clothingId])
-
-    const handleTagChange = (e) => {
-        setNewTags(e.target.value); 
-    };
 
     // Perhaps they can be merged
     const handleUpdateTags = async () => {
@@ -116,12 +108,11 @@ const EditClothing = () => {
             return;
         }
         console.log("clothiing doc:", clothingDoc)
-        const tagsArray = newTags.split(',').map(tag => tag.trim());
-        const uniqueTags = Array.from(new Set(tagsArray));
+        const uniqueTags = Array.from(new Set(tags.map(tag => tag.trim()).filter(tag => tag !== '')));
         await updateDoc(clothingDoc, { tags: uniqueTags });
+        setTags(uniqueTags); // sync cleaned tags
 
         setTags(uniqueTags);
-        setNewTags(uniqueTags.join(', '));
 
         console.log('Logging event: tags_updated', { clothing_id: clothingId, type, new_tags: uniqueTags });
         logEvent(analytics, 'tags_updated', {
@@ -232,12 +223,9 @@ const EditClothing = () => {
                     <div className="edit-section">
                         <h3>Update Tags</h3>
                         <div className="input-group">
-                            <input 
-                                type="text" 
-                                className="form-input"
-                                placeholder="Enter new tags separated by commas" 
-                                value={newTags} 
-                                onChange={handleTagChange}
+                            <TagInput
+                            tags={tags}
+                            setTags={setTags}
                             />
                             <button className="update-button" onClick={handleUpdateTags}>
                                 Update Tags

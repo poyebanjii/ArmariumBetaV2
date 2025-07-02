@@ -5,6 +5,7 @@ import Navbar from '../Navbar';
 import { getAuth } from 'firebase/auth';
 import '../styles/FriendRequests.css';
 import { sendFriendRequest } from '../utils/friends'; // Import the sendFriendRequest function
+import Loader from '../Loader';
 
 function FriendRequests() {
     const auth = getAuth();
@@ -330,12 +331,10 @@ useEffect(() => {
         setDebounceTimeout(timeout);
     }, [searchUsername]);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
 
     return (
         <>
+            <Loader loading={loading} />
             <Navbar />
             <div className="friend-requests-container">
                 {/* Friend Search UI */}

@@ -78,6 +78,7 @@ const Wardrobe = () => {
             const userDocRef = doc(db, 'Users', user.uid);
             await updateDoc(userDocRef, { isNewUser: false });
         }
+        localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
         setRunTour(false);
     };
 
@@ -100,26 +101,38 @@ const Wardrobe = () => {
     }, []);
 
     useEffect(() => {
-        if (location.state?.joyrideStep === 'wardrobe-start') {
+        if (location.state?.startTutorial) {
             setSteps([
             {
-                target: '#tops-add-button',
-                content: 'This is add button allows to add clothing.',
+                target: '.wardrobe-header',
+                content: 'Welcome to your Wardrobe! Here’s how to manage your clothing items.',
+                placement: 'center',
+                disableBeacon: true, 
             },
             {
-                target: '.wardrobe-search',
-                content: 'Use this search to filter your wardrobe.',
+                target: '#tops-add-button',
+                content: 'Click the "+" button to add a new clothing item to this category.',
+            },
+            {
+                target: '.search-input',
+                content: 'Search for items by name or tags (e.g., "summer", "formal").',
             },
             {
                 target: '.delete-clothing-item',
-                content: 'You can delete clothes from here.',
+                content: 'Toggle "Delete" mode to select and remove items.',
             },
             {
-                target: '.navbar',
-                content: 'Let’s continue to your outfits!',
-            }
+                target: '.wardrobe-row:nth-child(2) .add-nav-link', // Target Bottoms "+" button
+                content: 'Each category (Tops, Bottoms, etc.) has its own add button.',
+            },
+            {
+                target: '.wardrobe-header',
+                content: 'Here you can edit your clothing or delete it in the "Delete" mode.',
+                placement: 'center',
+            },
             ]);
             setRunTour(true);
+            navigate(location.pathname, { replace: true, state: {} });
         }
     }, [location]);
 
@@ -289,21 +302,31 @@ const Wardrobe = () => {
             <Loader loading={loading} />
             <Navbar />
             <div className="wardrobe-header">
+            <div className="header-center-group">
+                <div className="search-container">
+                <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
                 <input
                     type="text"
                     placeholder="Search by title or tags..."
                     value={searchInput}
                     onChange={handleSearchChange}
-                    className="wardrobe-search"
+                    className="search-input"
                 />
+                </div>
+
+                <div className="header-actions">
                 <button className="delete-clothing-item" onClick={toggleDelete}>
                     {isDelete ? 'Cancel' : 'Delete'}
                 </button>
                 {isDelete && (
                     <button className="delete-clothing-item" onClick={handleDelete}>
-                        Confirm Delete
+                    Confirm Delete
                     </button>
                 )}
+                </div>
+            </div>
             </div>
 
             {isModalOpen && (
@@ -334,7 +357,7 @@ const Wardrobe = () => {
                 <div className='Add-Button'>
                     <h3>Tops</h3>
                     <button className="add-nav-link" id="tops-add-button"onClick={() => handleShowModal('top')}>
-                        Add
+                        +
                     </button>
                 </div>
                 <div className="wardrobe-content-row">
@@ -364,7 +387,7 @@ const Wardrobe = () => {
                 <div className='Add-Button'>
                     <h3>Bottoms</h3>
                     <button className="add-nav-link" onClick={() => handleShowModal('bottom')}>
-                        Add
+                        +
                     </button>
                 </div>
                 <div className="wardrobe-content-row">
@@ -394,7 +417,7 @@ const Wardrobe = () => {
                 <div className='Add-Button'>
                     <h3>Shoes</h3>
                     <button className="add-nav-link" onClick={() => handleShowModal('shoes')}>
-                        Add
+                        +
                     </button>
                 </div>
                 <div className="wardrobe-content-row">
@@ -424,7 +447,7 @@ const Wardrobe = () => {
                 <div className='Add-Button'>
                     <h3>Top Layers</h3>
                     <button className="add-nav-link" onClick={() => handleShowModal('toplayer')}>
-                        Add
+                        +
                     </button>
                 </div>
                 <div className="wardrobe-content-row">
@@ -454,7 +477,7 @@ const Wardrobe = () => {
                 <div className='Add-Button'>
                     <h3>Accessory</h3>
                     <button className="add-nav-link" onClick={() => handleShowModal('accessory')}>
-                        Add
+                        +
                     </button>
                 </div>
                 <div className="wardrobe-content-row">
@@ -488,8 +511,6 @@ const Wardrobe = () => {
             callback={(data) => {
             if (data.status === 'finished' || data.status === 'skipped') {
                 finishTour();
-            } else if (data.action === 'next' && data.index === 3) {
-                navigate(`/wardrobeOutfits/${userId}`, { state: { joyrideStep: 'myoutfits-start' } });
             }
             }}
         />

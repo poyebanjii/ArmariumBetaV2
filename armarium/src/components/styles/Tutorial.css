@@ -1,0 +1,55 @@
+/* Container setup */
+.tutorials-container {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Header */
+.tutorials-container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #a52a2a;
+  font-weight: bold;
+}
+
+/* Grid layout */
+.tutorials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 0 10px;
+}
+
+/* Individual card */
+.tutorial-card {
+  background-color: #fff;
+  border: 2px solid #f2dede;
+  border-radius: 12px;
+  padding: 30px 20px;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.tutorial-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  background-color: #fff0f0;
+}
+
+/* Icon styling (if you add icons later) */
+.tutorial-card svg {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #a52a2a;
+}
+
+/* Card title */
+.tutorial-card h2 {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0;
+}

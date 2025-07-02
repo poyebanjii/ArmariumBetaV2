@@ -29,6 +29,9 @@ function ProfileDropdown() {
           <Link to={`/profileSettings`}>Settings</Link>
           </li>
           <li>
+          <Link to={`/tutorials`}>Tutorials</Link>
+          </li>
+          <li>
           <Link to={`https://docs.google.com/forms/d/1vh_fvJm27AYNRzrLfdTZajZctn0Fr6Tdb4QUMaBo8NA/edit`}>Feedback</Link>
           </li>
       </ul>

@@ -6,6 +6,12 @@
     padding: 20px;
     border-bottom: #ccc 1px solid; /* Optional: Adds a line under each row */
   }
+
+.wardrobe-header {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
   
   /* Style for each item */
   .wardrobe-item {
@@ -165,6 +171,78 @@ body.modal-open {
 .delete-clothing-item:hover {
   background-color: #c98f8f; /* Darker background on hover */
 }
+
+.header-center-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  max-width: 800px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Search container */
+.search-container {
+  position: relative;
+  flex-shrink: 1;
+  flex-grow: 1;
+  max-width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 20px 12px 45px;
+  border: 1px solid #e0c9c1;
+  border-radius: 30px;
+  font-size: 16px;
+  box-sizing: border-box;
+  z-index: 1;
+  position: relative;
+}
+
+.search-wrapper {
+  flex: 1;
+  min-width: 250px;
+  max-width: 600px;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #a52a2a;
+  box-shadow: 0 2px 12px rgba(165, 42, 42, 0.1);
+}
+
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.header-center-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  max-width: 900px;
+  width: 100%;
+}
+
 
   /* Media query for smaller screens */
   @media (max-width: 844px) {

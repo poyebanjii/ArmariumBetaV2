@@ -23,7 +23,7 @@ function TravelDropdown() {
       <div className="dropdown-menu">
         <ul>
           <li>
-          <Link to={`/travelBoards/${userId}`}>Trip</Link>
+          <Link to={`/travelBoards/${userId}`}>Travel</Link>
           </li>
           <li>
           <Link to={`/planner/${userId}`}>Planner</Link>
