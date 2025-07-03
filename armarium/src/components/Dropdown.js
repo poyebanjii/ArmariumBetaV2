@@ -23,13 +23,13 @@ function Dropdown() {
       <div className="dropdown-menu">
         <ul>
           <li>
-          <Link to={`/wardrobe`}>My Clothes</Link>
+          <Link to={`/wardrobe`}>Clothes</Link>
           </li>
           <li>
-          <Link to={`/wardrobeOutfits/${userId}`}>My Outfits</Link>
+          <Link to={`/wardrobeOutfits/${userId}`}>Outfits</Link>
           </li>
           <li>
-          <Link to={`/wardrobeStyleboards/${userId}`}>My Styleboards</Link>
+          <Link to={`/wardrobeStyleboards/${userId}`}>Styleboards</Link>
           </li>
       </ul>
       </div>

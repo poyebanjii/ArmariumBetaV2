@@ -178,7 +178,7 @@ function Styleboards() {
           content: 'Quickly find specific styleboards by searching for their names.',
         },
         {
-          target: '.delete-btn',
+          target: '.outfit-button',
           content: 'You can select styleboards for them to be deleted with this button.',
         },
         {
@@ -201,14 +201,13 @@ function Styleboards() {
       <div className={loading ? 'blurred' : ''}>
         <div className="styleboards-header-container">
           <div className="styleboards-header">
-            <h1>My Styleboards</h1>
                 <button
                   onClick={() =>
                     selectedStyleboards.length > 0
                       ? setShowDeleteModal(true)
                       : alert("No styleboard selected.")
                   }
-                  className='delete-btn'
+                  className='outfit-button'
                 >
                   Delete Selected
                 </button>

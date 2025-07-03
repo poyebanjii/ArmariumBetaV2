@@ -267,43 +267,6 @@ useEffect(() => {
         setRunTour(false);
     };
 
-    // const handleAccept = async (requesterId) => {
-    //     console.log('Accepting friend request from:', requesterId); // Debugging
-    
-    //     const currentUserRef = doc(db, 'Users', currentUserId);
-    //     const currentUserFriendDoc = doc(db, 'Users', currentUserId, 'friends', requesterId);
-    //     const requesterFriendDoc = doc(db, 'Users', requesterId, 'friends', currentUserId);
-    
-    //     try {
-    //         // Add each user to the other's friends list
-    //         await setDoc(currentUserFriendDoc, {
-    //             timestamp: new Date(),
-    //         });
-    //         console.log('Added to current user\'s friends list'); // Debugging
-    
-    //         await setDoc(requesterFriendDoc, {
-    //             timestamp: new Date(),
-    //         });
-    //         console.log('Added to requester\'s friends list'); // Debugging
-    
-    //         // Remove friend request from array
-    //         await updateDoc(currentUserRef, {
-    //             friendRequests: arrayRemove(requesterId),
-    //         });
-    //         console.log('Removed friend request from current user\'s friendRequests array'); // Debugging
-    
-    //         // Update the state to remove the accepted friend request
-    //         setFriendRequests((prev) => {
-    //             const updatedRequests = prev.filter((id) => id !== requesterId);
-    //             updateFriendRequestDetails(updatedRequests); // Update friendRequestDetails
-    //             return updatedRequests;
-    //         });
-    //         console.log('Updated state to remove accepted friend request'); // Debugging
-    //     } catch (error) {
-    //         console.error('Error accepting friend request:', error);
-    //     }
-    // };
-
     const handleReject = async (requesterId) => {
         const currentUserRef = doc(db, 'Users', currentUserId);
     
@@ -373,78 +336,95 @@ useEffect(() => {
 
     return (
         <>
-            <Loader loading={loading} />
-            <Navbar />
-            <div className="friend-requests-container">
-                {/* Friend Search UI */}
-                <div className="user-search" style={{ position: 'relative' }}>
-                    <h2>Find a Friend</h2>
-                    <input
-                        type="text"
-                        className="search-friends"
-                        placeholder="Enter username"
-                        value={searchUsername}
-                        onChange={(e) => setSearchUsername(e.target.value)}
-                    />
-                    {suggestions.length > 0 && (
-                        <ul className="suggestions-dropdown">
-                        {suggestions.map((username) => (
-                            <li
-                            key={username}
-                            onClick={() => {
-                                setSearchUsername(username);
-                                setSuggestions([]);
-                            }}
-                            >
-                            {username}
-                            </li>
-                        ))}
-                        </ul>
-                    )}
-                    <button className="send-friend-button" onClick={handleSendRequest}>Send Friend Request</button>
-                    {message && <p>{message}</p>}
-                </div>
-                {/* Friend Requests UI */}
-                <h2 className='friend-req'>Friend Requests</h2>
-                {friendRequestDetails.length === 0 ? (
-                    <p>No friend requests at the moment.</p>
-                ) : (
-                    friendRequestDetails.map((requester) => (
-                        <div key={requester.id} className="friend-request">
-                            <p>{requester.username}</p>
-                            <button onClick={() => handleAccept(requester.id)}>Accept</button>
-                            <button onClick={() => handleReject(requester.id)}>Reject</button>
-                        </div>
-                    ))
-                )}
-                {/* Friends List UI - new section */}
-                <h2>My Friends</h2>
-                <div className="friends-list">
-                    {friends.length === 0 ? (
-                        <p>You don't have any friends yet.</p>
-                    ) : (
-                        <ul>
-                            {friends.map(friend => (
-                                <li key={friend.id} className="friend-item">
-                                    <p>{friend.username}</p>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-        <Joyride
-                steps={steps}
-                run={runTour}
-                continuous={true}
-                showProgress={true}
-                showSkipButton={true}
-                callback={(data) => {
-                if (data.status === 'finished' || data.status === 'skipped') {
-                    finishTour();
-                }
-                }}
+        <Loader loading={loading} />
+        <Navbar />
+
+        <div className="friend-page-container">
+
+            {/* Friend Search Section */}
+            <section className="user-search" style={{ position: 'relative' }}>
+            <h2>Find a Friend</h2>
+            <input
+                id="searchUsername"
+                type="text"
+                className="search-friends"
+                placeholder="Enter username"
+                value={searchUsername}
+                onChange={(e) => setSearchUsername(e.target.value)}
             />
-            </div>
+            {suggestions.length > 0 && (
+                <ul className="suggestions-dropdown">
+                {suggestions.map((username) => (
+                    <li
+                    key={username}
+                    onClick={() => {
+                        setSearchUsername(username);
+                        setSuggestions([]);
+                    }}
+                    >
+                    {username}
+                    </li>
+                ))}
+                </ul>
+            )}
+            <button
+                className="send-friend-button"
+                onClick={handleSendRequest}
+                disabled={!searchUsername}
+            >
+                Send Friend Request
+            </button>
+            {message && <p className="status-message">{message}</p>}
+            </section>
+
+            {/* Friend Requests */}
+            <section className="friend-requests">
+            <h2>Friend Requests</h2>
+            {friendRequestDetails.length === 0 ? (
+                <p>No friend requests at the moment.</p>
+            ) : (
+                friendRequestDetails.map((requester) => (
+                <div key={requester.id} className="friend-request">
+                    <p>{requester.username}</p>
+                    <div className="request-actions">
+                    <button onClick={() => handleAccept(requester.id)}>Accept</button>
+                    <button onClick={() => handleReject(requester.id)}>Reject</button>
+                    </div>
+                </div>
+                ))
+            )}
+            </section>
+
+            {/* Friend List */}
+            <section className="friends-list">
+            <h2>My Friends</h2>
+            {friends.length === 0 ? (
+                <p>You don't have any friends yet.</p>
+            ) : (
+                <ul>
+                {friends.map(friend => (
+                    <li key={friend.id} className="friend-item">
+                    <p>{friend.username}</p>
+                    </li>
+                ))}
+                </ul>
+            )}
+            </section>
+
+            {/* Joyride */}
+            <Joyride
+            steps={steps}
+            run={runTour}
+            continuous={true}
+            showProgress={true}
+            showSkipButton={true}
+            callback={(data) => {
+                if (data.status === 'finished' || data.status === 'skipped') {
+                finishTour();
+                }
+            }}
+            />
+        </div>
         </>
     );
 }
