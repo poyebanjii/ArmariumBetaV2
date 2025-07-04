@@ -16,6 +16,57 @@ function OutfitsList({ outfits, selectedOutfits, setSelectedOutfits, existingOut
     }
   };
 
+  const handleDownloadCombinedOutfit = async (outfit) => {
+    const imageUrls = [outfit.topImageUrl, outfit.bottomImageUrl, outfit.shoesImageUrl].filter(Boolean);
+
+    try {
+      // Load images
+      const images = await Promise.all(
+        imageUrls.map(
+          (url) =>
+            new Promise((resolve, reject) => {
+              const img = new Image();
+              img.crossOrigin = 'anonymous';
+              img.onload = () => resolve(img);
+              img.onerror = reject;
+              img.src = url;
+            })
+        )
+      );
+
+      const ITEM_WIDTH = 400;
+      const ITEM_HEIGHT = 400;
+
+      const canvasWidth = ITEM_WIDTH;
+      const canvasHeight = ITEM_HEIGHT * images.length;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+
+      const ctx = canvas.getContext('2d');
+
+      let yOffset = 0;
+      images.forEach((img) => {
+        ctx.drawImage(img, 0, yOffset, ITEM_WIDTH, ITEM_HEIGHT);
+        yOffset += ITEM_HEIGHT;
+      });
+
+      // Convert canvas to image
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${outfit.outfitName || 'outfit'}.png`;
+        link.click();
+        URL.revokeObjectURL(url);
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error combining outfit images:', error);
+      alert('Failed to download outfit image.');
+    }
+  };
+
   const isSelected = (id) => selectedOutfits.some((item) => item.id === id);
 
   if (!outfits || outfits.length === 0) {
@@ -107,15 +158,29 @@ function OutfitsList({ outfits, selectedOutfits, setSelectedOutfits, existingOut
                 onClick={(event) => handleCheckboxClick(event, outfit, alreadyInStyleboard)}
               />
             )}
+            
 
             <div className="image-container">
               <img src={outfit.topImageUrl} alt="Top" className="outfit-image center" />
               <img src={outfit.bottomImageUrl} alt="Bottom" className="outfit-image center" />
               <img src={outfit.shoesImageUrl} alt="Shoes" className="outfit-image center" />
+                
             </div>
 
             <h1 className="outfit-title">
               {outfit.outfitName}
+
+              {/* Download Button */}
+              <button
+                className="download-outfit-button"
+                onClick={(e) => {
+                  e.stopPropagation(); // prevent triggering the onClick that navigates
+                  handleDownloadCombinedOutfit(outfit);
+                }}
+              >
+                Download
+              </button>
+              
               {alreadyInStyleboard && (
                 <span style={{ color: '#888', fontSize: '0.75rem', marginLeft: '5px' }}>
                   (Already in styleboard)

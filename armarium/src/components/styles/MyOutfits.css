@@ -90,6 +90,22 @@
   margin-top: 20px;
 }
 
+.download-outfit-button {
+  margin-top: 10px;
+  background-color: #a52a2a;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.download-outfit-button:hover {
+  background-color: #922d2d;
+}
+
 .outfit-title {
   font-size: 16px;
   font-weight: bold;
