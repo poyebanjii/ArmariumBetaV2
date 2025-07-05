@@ -122,6 +122,11 @@ function Outfit() {
         placement: 'top',
       },
       {
+        target: '.one-lock-btn',
+        content: 'This here toggles a one lock where you can swipe one clothing item and the others get swiped as well.',
+        placement: 'top',
+      },
+      {
         target: '.save-image',
         content: 'Love your outfit? Save it with a name to your collection!',
         placement: 'bottom',
@@ -196,7 +201,6 @@ function Outfit() {
   };
 
   const finishTour = async () => {
-    finishTour();
     setRunTour(false);
   };
 
@@ -350,7 +354,7 @@ function Outfit() {
       <Navbar />
       <Loader loading={loading} />
       <div className="App" id="homepage">
-              <button onClick={toggleOneLock}>
+      <button onClick={toggleOneLock} className='one-lock-btn'>
         {isLocked.all ? 'Unlock All' : 'Lock All'}
       </button>
 
