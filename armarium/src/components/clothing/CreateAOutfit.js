@@ -26,7 +26,7 @@ const SwipeableImage = ({ image, handleSwipe, isLocked, isAllLocked, handleSwipe
 
   return (
     <motion.div
-      drag={!isLocked && itemLength > 1 ? "x" : false} 
+      drag={!isAllLocked && isLocked ? false : itemLength > 1 ? "x" : false} 
       dragConstraints={{ left: -1000, right: 1000 }}
       id="swipeable-container"
       style={{
@@ -195,16 +195,6 @@ function Outfit() {
     }
   };
 
-  const checkNewUser = async (user) => {
-    const userDocRef = doc(db, 'Users', user.uid);
-    const userSnapshot = await getDoc(userDocRef);
-
-    if (userSnapshot.exists() && userSnapshot.data().isNewUser) {
-      setRunTour(true);
-      await updateDoc(userDocRef, { isNewUser: false });
-    }
-  };
-
   const finishTour = async () => {
     finishTour();
     setRunTour(false);
@@ -214,7 +204,6 @@ function Outfit() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         fetchData(user).then(() => setLoading(false));
-        fetchData(user).then(() => checkNewUser(user));
       } else {
         navigate('/login');
       }
@@ -294,16 +283,14 @@ function Outfit() {
   };
 
   const handleSwipeAll = (direction) => {
-    if (isLocked.all) {
-      if (direction === "left") {
-        setTopIndex((prevIndex) => (prevIndex + 1) % tops.length);
-        setBottomIndex((prevIndex) => (prevIndex + 1) % bottoms.length);
-        setShoesIndex((prevIndex) => (prevIndex + 1) % shoes.length);
-      } else if (direction === "right") {
-        setTopIndex((prevIndex) => (prevIndex - 1 + tops.length) % tops.length);
-        setBottomIndex((prevIndex) => (prevIndex - 1 + bottoms.length) % bottoms.length);
-        setShoesIndex((prevIndex) => (prevIndex + 1) % shoes.length);
-      }
+    if (direction === "left") {
+      setTopIndex((prevIndex) => (prevIndex + 1) % tops.length);
+      setBottomIndex((prevIndex) => (prevIndex + 1) % bottoms.length);
+      setShoesIndex((prevIndex) => (prevIndex + 1) % shoes.length);
+    } else if (direction === "right") {
+      setTopIndex((prevIndex) => (prevIndex - 1 + tops.length) % tops.length);
+      setBottomIndex((prevIndex) => (prevIndex - 1 + bottoms.length) % bottoms.length);
+      setShoesIndex((prevIndex) => (prevIndex - 1 + shoes.length) % shoes.length);
     }
   };
 
@@ -332,21 +319,16 @@ function Outfit() {
   };
 
   const toggleOneLock = () => {
-    setIsLocked((prevState) => {
+    setIsLocked(prevState => {
       const newState = { ...prevState, all: !prevState.all };
-  
+      
+      // If toggling to 'all locked', make sure individual locks are disabled
       if (newState.all) {
-        // If global lock is enabled, lock all individual containers
-        newState.top = true;
-        newState.bottom = true;
-        newState.shoes = true;
-      } else {
-        // If global lock is disabled, unlock all individual containers
         newState.top = false;
         newState.bottom = false;
         newState.shoes = false;
       }
-  
+      
       return newState;
     });
   };
@@ -368,6 +350,10 @@ function Outfit() {
       <Navbar />
       <Loader loading={loading} />
       <div className="App" id="homepage">
+              <button onClick={toggleOneLock}>
+        {isLocked.all ? 'Unlock All' : 'Lock All'}
+      </button>
+
         <h1 className="outfits-title">
           <img
             src="save.png"
