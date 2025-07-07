@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged  } from 'firebase/auth';
 import {
   getFirestore,
   doc,
@@ -24,8 +24,40 @@ export default function UserProfile() {
   const [messages, setMessages] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [editedMeasurements, setEditedMeasurements] = useState({ height: '', weight: '' });
+  const [styleTags, setStyleTags] = useState([]);
+  const clothingTypes = ['top', 'bottom', 'shoes', 'accessory', 'outerwear'];
 
   const navigate = useNavigate();
+
+  const fetchAllTags = async (user) => {
+    const allTags = [];
+
+    for (const type of clothingTypes) {
+      const itemsPath = `Users/${user.uid}/ItemsCollection/${type}/items`;
+      const snapshot = await getDocs(collection(db, itemsPath));
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if (Array.isArray(data.tags)) {
+          allTags.push(...data.tags);
+        }
+      });
+    }
+
+    // Count tag frequency
+    const tagCounts = allTags.reduce((acc, tag) => {
+      acc[tag] = (acc[tag] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Get top N style tags
+    const sortedTags = Object.entries(tagCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([tag]) => tag);
+
+    return sortedTags;
+};
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -68,10 +100,21 @@ export default function UserProfile() {
       );
       const messagesSnap = await getDocs(messagesQuery);
       setMessages(messagesSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+
     };
 
     fetchProfileData();
   }, [navigate]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        const popularTags = await fetchAllTags(currentUser);
+        setStyleTags(popularTags);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -140,15 +183,19 @@ export default function UserProfile() {
         </div>
 
         <h2 className="weekly-title">
-          Your <span className="weekly-highlight">weekly</span> styles
+          Your <span className="weekly-highlight">current</span> styles
         </h2>
 
         <div className="style-bubbles">
-          {['Artsy', 'Classic', 'Vintage', 'Edgy', 'Comfortable'].map((style, idx) => (
-            <div key={idx} className={`bubble bubble-${idx}`}>
-              {style}
-            </div>
-          ))}
+          {styleTags.length > 0 ? (
+            styleTags.map((tag, idx) => (
+              <div key={idx} className={`bubble bubble-${idx % 5}`}>
+                {tag}
+              </div>
+            ))
+          ) : (
+            <p>No styles detected yet.</p>
+          )}
         </div>
 
         <div className="measurements-box">
