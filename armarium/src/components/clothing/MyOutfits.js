@@ -158,7 +158,7 @@ const handleDelete = async () => {
     if (location.state?.startTutorial) {
       setSteps([
         {
-          target: '.outfit-page-title',
+          target: '.outfit-outer',
           content: 'Welcome to your Outfits! Here you can view, organize, and manage all your saved outfits.',
           placement: 'center',
           disableBeacon: true,

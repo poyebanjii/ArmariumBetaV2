@@ -16,36 +16,40 @@
 }
 
 .outfit-outer {
-  width: 35%;
-  display: flex;
-  justify-content: center;
-  border: 2px solid #a52a2a;
-  border-radius: 10px;
+  width: 100%;
+  padding: 20px;
 }
 
 .outfits-list {
-  padding: 0;
   display: grid;
-  gap: 2%;
-  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   list-style: none;
-  padding: 4%;
+  padding: 0;
+  margin: 0;
 }
 
 .outfit-item {
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
   background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  cursor: pointer;
+  min-height: 320px; 
+}
+
+.outfit-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .outfit-footer {
   position: relative;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
   color: white;
   padding: 10px;
   z-index: 1;
@@ -91,15 +95,15 @@
 }
 
 .download-outfit-button {
-  margin-top: 10px;
   background-color: #a52a2a;
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 0.9rem;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  margin-top: 8px;
 }
 
 .download-outfit-button:hover {
@@ -109,19 +113,14 @@
 .outfit-title {
   font-size: 16px;
   font-weight: bold;
-  background: linear-gradient(to top, #a52a2a, rgba(0, 0, 0, 0));
-  color: white;
-  display: flex;
-  align-items: flex-end;
-  height: 10%;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 10px;
-  border-radius: 0px 0px 5px 5px;
-  margin: 0;
+  color: #333;
+  margin: 8px 0;
+  text-align: center;
+  width: 100%;
+  padding: 0 8px;
+  word-break: break-word;
 }
+
 
 .circle {
   width: 100px; /* Or any desired size */
@@ -223,6 +222,16 @@
   /* .outfit-page-title {
     font-size: 2em;
   } */
+
+  .outfit-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .download-outfit-button {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
 
   .outfit-outer {
     width: 100%;

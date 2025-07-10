@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
 import Navbar from '../Navbar';
 import '../styles/EditOutfit.css';
+import Loader from '../Loader';
 
 function EditOutfit() {
     const location = useLocation();
@@ -46,13 +47,15 @@ function EditOutfit() {
     const [baseLayers, setBaseLayers] = useState([]);
     const [baseAccessories, setBaseAccessories] = useState([]);
 
+    const [loading, setLoading] = useState(true);
+
     const navigate = useNavigate();
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                fetchOutfit(user);
-                fetchData(user);
+                fetchOutfit(user).then(() => setLoading(false));
+                fetchData(user).then(() => setLoading(false));
             } else {
                 navigate('/login');
             }
@@ -418,6 +421,7 @@ function EditOutfit() {
     return (
         <div>
             <Navbar />
+            <Loader loading={loading} />
             <div className="center">
                 <input 
                     type="text" 

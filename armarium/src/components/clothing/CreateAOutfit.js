@@ -98,6 +98,17 @@ function Outfit() {
   const [steps, setSteps] = useState([]);
   const location = useLocation();
 
+  const TABS = {
+    TOPS: 'Tops',
+    BOTTOMS: 'Bottoms',
+    SHOES: 'Shoes',
+    LAYERS: 'Layers',
+    ACCESSORIES: 'Accessories',
+  };
+
+  const [tabContent, setTabContent] = useState(TABS.TOPS);
+
+
   useEffect(() => {
     if (location.state?.startTutorial) {
       setSteps([
@@ -110,6 +121,7 @@ function Outfit() {
       {
         target: '#homepage',
         content: 'This is the main area where you can browse and create outfits by swiping left or right on the clothing items.',
+        placement: 'left',
       },
       {
         target: '.lock-sidebar-icon',
@@ -124,6 +136,11 @@ function Outfit() {
       {
         target: '.one-lock-btn',
         content: 'This here toggles a one lock where you can swipe one clothing item and the others get swiped as well.',
+        placement: 'top',
+      },
+      {
+        target: '.bottom-tab',
+        content: 'If you prefer to click on the clothing item, you can select which one to use from here. You can switch between clothing tabs.',
         placement: 'top',
       },
       {
@@ -353,6 +370,109 @@ function Outfit() {
     <div>
       <Navbar />
       <Loader loading={loading} />
+      
+      <div className="bottom-tab">
+        <div className="tab-buttons">
+          {Object.entries(TABS).map(([key, label]) => (
+            <button
+              key={key}
+              onClick={() => setTabContent(label)}
+              className="tab-button"
+              style={{
+                backgroundColor: tabContent === label ? '#a52a2a' : 'white',
+                color: tabContent === label ? 'white' : '#a52a2a',
+              }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="tab-content">
+        <div className="wardrobe-row">
+          {tabContent === TABS.TOPS && (
+            <div className="wardrobe-content-row">
+              {tops.map((top, index) => (
+                <div
+                  key={index}
+                  className="wardrobe-item"
+                  onClick={() => setTopIndex(index)}
+                >
+                  <img src={top} alt={`Top ${index + 1}`} className="wardrobe-image" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tabContent === TABS.BOTTOMS && (
+            <div className="wardrobe-content-row">
+              {bottoms.map((bottom, index) => (
+                <div
+                  key={index}
+                  className="wardrobe-item"
+                  onClick={() => setBottomIndex(index)}
+                >
+                  <img src={bottom} alt={`Bottom ${index + 1}`} className="wardrobe-image" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tabContent === TABS.SHOES && (
+            <div className="wardrobe-content-row">
+              {shoes.map((shoe, index) => (
+                <div
+                  key={index}
+                  className="wardrobe-item"
+                  onClick={() => setShoesIndex(index)}
+                >
+                  <img src={shoe} alt={`Shoe ${index + 1}`} className="wardrobe-image" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tabContent === TABS.LAYERS && (
+            <div className="wardrobe-content-row">
+              {topLayers.map((layer, index) => (
+                <div
+                  key={index}
+                  className="wardrobe-item"
+                  onClick={() => {
+                    const selected = topLayers[index];
+                    if (!selectedTopLayers.includes(selected)) {
+                      setSelectedTopLayers(prev => [...prev, selected]);
+                    }
+                  }}
+                >
+                  <img src={layer} alt={`Layer ${index + 1}`} className="wardrobe-image" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {tabContent === TABS.ACCESSORIES && (
+            <div className="wardrobe-content-row">
+              {accessories.map((acc, index) => (
+                <div
+                  key={index}
+                  className="wardrobe-item"
+                  onClick={() => {
+                    const selected = accessories[index];
+                    if (!selectedAccessories.includes(selected)) {
+                      setSelectedAccessories(prev => [...prev, selected]);
+                    }
+                  }}
+                >
+                  <img src={acc} alt={`Accessory ${index + 1}`} className="wardrobe-image" />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      </div>
+
       <div className="App" id="homepage">
       <button onClick={toggleOneLock} className='one-lock-btn'>
         {isLocked.all ? 'Unlock All' : 'Lock All'}

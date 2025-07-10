@@ -133,61 +133,56 @@ function OutfitsList({ outfits, selectedOutfits, setSelectedOutfits, existingOut
         const selected = isSelected(outfit.id);
 
         return (
-          <li
-            key={outfit.id}
-            className={`outfit-item ${alreadyInStyleboard ? 'disabled' : ''}`}
-            onClick={() => {
-              if (!alreadyInStyleboard) {
-                navigate(`/editOutfit/${outfit.id}`, {
-                  state: { outfitName: outfit.outfitName, outfitId: outfit.id },
-                });
-              }
-            }}
-            style={{
-              border: selected ? '2px solid blue' : '2px solid whitesmoke',
-              opacity: alreadyInStyleboard ? 0.5 : 1,
-              cursor: alreadyInStyleboard ? 'not-allowed' : 'pointer',
-            }}
-          >
-            {!disableCheckboxes && (
-              <input
-                type="checkbox"
-                className="select-box"
-                checked={selected}
-                disabled={alreadyInStyleboard}
-                onClick={(event) => handleCheckboxClick(event, outfit, alreadyInStyleboard)}
-              />
+        <li
+          key={outfit.id}
+          className={`outfit-item ${alreadyInStyleboard ? 'disabled' : ''}`}
+          onClick={() => {
+            if (!alreadyInStyleboard) {
+              navigate(`/editOutfit/${outfit.id}`, {
+                state: { outfitName: outfit.outfitName, outfitId: outfit.id },
+              });
+            }
+          }}
+          style={{
+            border: selected ? '2px solid blue' : '2px solid whitesmoke',
+          }}
+        >
+          {!disableCheckboxes && (
+            <input
+              type="checkbox"
+              className="select-box"
+              checked={selected}
+              disabled={alreadyInStyleboard}
+              onClick={(event) => handleCheckboxClick(event, outfit, alreadyInStyleboard)}
+            />
+          )}
+
+          <div className="image-container">
+            <img src={outfit.topImageUrl} alt="Top" className="outfit-image" />
+            <img src={outfit.bottomImageUrl} alt="Bottom" className="outfit-image" />
+            <img src={outfit.shoesImageUrl} alt="Shoes" className="outfit-image" />
+          </div>
+
+          <h2 className="outfit-title">{outfit.outfitName}</h2>
+
+          <div className="outfit-footer">
+            {alreadyInStyleboard && (
+              <span className="already-in-styleboard">
+                (Already in styleboard)
+              </span>
             )}
-            
-
-            <div className="image-container">
-              <img src={outfit.topImageUrl} alt="Top" className="outfit-image center" />
-              <img src={outfit.bottomImageUrl} alt="Bottom" className="outfit-image center" />
-              <img src={outfit.shoesImageUrl} alt="Shoes" className="outfit-image center" />
-                
-            </div>
-
-            <h1 className="outfit-title">
-              {outfit.outfitName}
-
-              {/* Download Button */}
-              <button
-                className="download-outfit-button"
-                onClick={(e) => {
-                  e.stopPropagation(); // prevent triggering the onClick that navigates
-                  handleDownloadCombinedOutfit(outfit);
-                }}
-              >
-                Download
-              </button>
-              
-              {alreadyInStyleboard && (
-                <span style={{ color: '#888', fontSize: '0.75rem', marginLeft: '5px' }}>
-                  (Already in styleboard)
-                </span>
-              )}
-            </h1>
-          </li>
+            <button
+              className="download-outfit-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDownloadCombinedOutfit(outfit);
+              }}
+              disabled={alreadyInStyleboard}
+            >
+              Download
+            </button>
+          </div>
+        </li>
         );
       })}
     </ul>

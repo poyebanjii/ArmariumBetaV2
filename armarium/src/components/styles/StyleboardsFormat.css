@@ -5,6 +5,35 @@
   padding: 20px;
 }
 
+.styleboards-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.outfit-button {
+  padding: 10px 20px;
+  background-color: #a52a2a;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 800px;
+  width: 100%;
+}
+
 /* Header Section */
 .styleboards-header {
   display: flex;
@@ -13,6 +42,24 @@
   text-align: center;
   gap: 20px;
   margin-bottom: 30px;
+}
+
+/* Update card styles */
+.styleboard-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+  border: 1px solid #f0f0f0;
+}
+
+.card-footer {
+  padding: 15px;
+  background: #fafafa;
+  border-top: 1px solid #f0f0f0;
 }
 
 .styleboards-header h1 {
@@ -24,9 +71,9 @@
 
 /* Search container */
 .search-container {
-  position: relative;
-  width: 100%;
+  flex-grow: 1;
   max-width: 500px;
+  margin: 0 auto;
 }
 
 .search-icon {
@@ -124,15 +171,20 @@
 .images-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  padding: 8px;
+  gap: 0; /* Remove gap for cleaner look */
+  height: 240px; /* Fixed height */
+  overflow: hidden;
 }
 
 .grid-image {
   width: 100%;
-  height: 120px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 6px;
+  transition: transform 0.3s ease;
+}
+
+.styleboard-card:hover .grid-image {
+  transform: scale(1.03);
 }
 
 /* Card Footer */
@@ -153,17 +205,19 @@
 
 .share-button {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   border: none;
   border-radius: 6px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
+  font-size: 14px;
 }
 
 .share-button.shared {
-  background-color: #e0c9c1;
-  color: #a52a2a;
+  background-color: #f0f0f0;
+  color: #666;
+  border: 1px solid #ddd;
 }
 
 .share-button.unshared {
@@ -173,13 +227,33 @@
 
 .share-button:hover {
   opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 /* Empty State */
 .empty-state {
   text-align: center;
-  padding: 50px 0;
+  padding: 60px 20px;
   color: #666;
+  background: #fafafa;
+  border-radius: 12px;
+  margin: 20px 0;
+  border: 1px dashed #ddd;
+}
+
+.empty-state p {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.empty-state button {
+  padding: 10px 20px;
+  background-color: #a52a2a;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 /* Modal */

@@ -201,16 +201,6 @@ function Styleboards() {
       <div className={loading ? 'blurred' : ''}>
         <div className="styleboards-header-container">
           <div className="styleboards-header">
-                <button
-                  onClick={() =>
-                    selectedStyleboards.length > 0
-                      ? setShowDeleteModal(true)
-                      : alert("No styleboard selected.")
-                  }
-                  className='outfit-button'
-                >
-                  Delete Selected
-                </button>
             <div className="header-controls">
               <div className="search-container">
                 <svg className="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -224,6 +214,17 @@ function Styleboards() {
                   onChange={handleSearchChange}
                 />
               </div>
+              
+              <button
+                onClick={() =>
+                  selectedStyleboards.length > 0
+                    ? setShowDeleteModal(true)
+                    : alert("No styleboard selected.")
+                }
+                className="outfit-button"
+              >
+                Delete Selected
+              </button>
             </div>
           </div>
         </div>
