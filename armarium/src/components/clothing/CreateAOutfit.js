@@ -10,6 +10,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { auth, db, storage } from '../backend/firebaseConfig';
 import { useNavigate, useLocation  } from 'react-router-dom';
 import Joyride from 'react-joyride';
+import ItemUpload from './itemUpload';
 
 /**
  * The swipeable component for tops, bottoms, top layers, and accessories
@@ -97,6 +98,9 @@ function Outfit() {
   const [runTour, setRunTour] = useState(false);
   const [steps, setSteps] = useState([]);
   const location = useLocation();
+
+  const [selectedType, setSelectedType] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const TABS = {
     TOPS: 'Tops',
@@ -366,6 +370,17 @@ function Outfit() {
     }
   };
 
+  const handleShowModal = (type) => {
+      setSelectedType(type);
+      setIsModalOpen(true);
+      document.body.classList.add('modal-open'); // Prevent scrolling
+  };
+
+  const handleCloseModal = () => {
+      setIsModalOpen(false);
+      document.body.classList.remove('modal-open');
+  };
+
   return (
     <div>
       <Navbar />
@@ -391,6 +406,9 @@ function Outfit() {
         <div className="wardrobe-row">
           {tabContent === TABS.TOPS && (
             <div className="wardrobe-content-row">
+              <button className="add-nav-link" id="tops-add-button"onClick={() => handleShowModal('top')}>
+                  +
+              </button>
               {tops.map((top, index) => (
                 <div
                   key={index}
@@ -405,6 +423,9 @@ function Outfit() {
 
           {tabContent === TABS.BOTTOMS && (
             <div className="wardrobe-content-row">
+              <button className="add-nav-link" id="tops-add-button"onClick={() => handleShowModal('bottom')}>
+                  +
+              </button>
               {bottoms.map((bottom, index) => (
                 <div
                   key={index}
@@ -419,6 +440,9 @@ function Outfit() {
 
           {tabContent === TABS.SHOES && (
             <div className="wardrobe-content-row">
+              <button className="add-nav-link" id="tops-add-button"onClick={() => handleShowModal('shoes')}>
+                  +
+              </button>
               {shoes.map((shoe, index) => (
                 <div
                   key={index}
@@ -433,6 +457,9 @@ function Outfit() {
 
           {tabContent === TABS.LAYERS && (
             <div className="wardrobe-content-row">
+              <button className="add-nav-link" id="tops-add-button"onClick={() => handleShowModal('toplayer')}>
+                  +
+              </button>
               {topLayers.map((layer, index) => (
                 <div
                   key={index}
@@ -452,6 +479,9 @@ function Outfit() {
 
           {tabContent === TABS.ACCESSORIES && (
             <div className="wardrobe-content-row">
+              <button className="add-nav-link" id="tops-add-button"onClick={() => handleShowModal('accessory')}>
+                  +
+              </button>
               {accessories.map((acc, index) => (
                 <div
                   key={index}
@@ -825,6 +855,17 @@ function Outfit() {
           }
         }}
       />
+
+      {isModalOpen && (
+          <div className="modal-overlay">
+              <div className="modal-content">
+                  <ItemUpload type={selectedType} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                      <button className="modal-close" onClick={handleCloseModal}>Close</button>
+                  </div>
+              </div>
+          </div>
+      )}
     </div>
   );
 }
