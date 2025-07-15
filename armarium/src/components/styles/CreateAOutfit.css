@@ -105,6 +105,25 @@ html, body {
   margin: 0;
 }
 
+.button-rounded {
+  all: unset;
+  background-color: #ff4d4d;
+  color: white;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.button-rounded:hover {
+  background-color: #e63939;
+  transform: scale(1.1);
+}
+
 .content-wrapper {
   display: flex;
   flex-direction: column;
@@ -129,23 +148,19 @@ html, body {
 }
 
 .modal-content {
-  background-color: white;
-  border-radius: 8px;
-  padding: 15px;
-  width: 90%;
-  height: fit-content;
-  min-width: 0;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
 
 .modal-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 10px;
-  position: relative;
+  border-bottom: 1px solid #eee;
+  padding: 16px 24px;
+}
+
+.modal-footer {
+  border-top: 1px solid #eee;
+  padding: 16px 24px;
 }
 
 .modal-title {
@@ -462,6 +477,26 @@ html, body {
   border-color: #5a6268;
 }
 
+.add-clothes-link {
+  width: 150px; /* Match image width */
+  height: 150px; /* Match image height */
+  background-color: #d8a7a7;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+.add-clothes-link-hover  {
+  background-color: #c98f8f;
+  transform: scale(1.05);
+}
+
 .App .delete-btn{
   all: unset;
   background-color: #ff4d4d;
@@ -499,8 +534,10 @@ html, body {
 }
 
 .save-image {
-  cursor: pointer;
-  transition: transform 0.2s ease; 
+  width: 28px;
+  height: 28px;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
 }
 
 .save-image:hover {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DateRange } from 'react-date-range';
+import { Calendar } from 'react-date-range';
 import { isSameDay } from 'date-fns';
 import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css';
@@ -144,30 +144,24 @@ function Planner() {
             Select a day to assign an outfit
           </p>
 
-          <DateRange
-            onChange={handleSelect}
-            moveRangeOnFirstSelection={false}
-            ranges={[{ startDate: selectedDate, endDate: selectedDate, key: 'selection' }]}
-            dayContentRenderer={(date) => {
+          <Calendar
+            date={selectedDate}
+            onChange={(date) => setSelectedDate(date)}
+              dayContentRenderer={(date) => {
               const formatted = format(date, 'yyyy-MM-dd');
               const isPlanned = !!selectedOutfitsByDate[formatted];
               return (
-                <div style={{ position: 'relative' }}>
+                <div style={{
+                  position: 'relative',
+                  backgroundColor: isPlanned ? '#e6f0ff' : 'transparent',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
                   <span>{date.getDate()}</span>
-                  {isPlanned && (
-                    <span
-                      style={{
-                        position: 'absolute',
-                        bottom: 2,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: '6px',
-                        height: '6px',
-                        backgroundColor: '#007bff',
-                        borderRadius: '50%',
-                      }}
-                    />
-                  )}
                 </div>
               );
             }}
@@ -176,13 +170,13 @@ function Planner() {
 
         {/* Outfit Selection Side */}
         <div style={{
-          flex: 1,
-          maxWidth: '500px',
+          width: '350px', // Match the calendar
           background: '#fff',
           borderRadius: '12px',
           padding: '20px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        }}>
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        }}
+        className="assign-container">
           <h3 style={{ marginBottom: '15px' }}>
             Assign Outfit for: <span style={{ color: '#007bff' }}>{format(selectedDate, 'yyyy-MM-dd')}</span>
           </h3>
