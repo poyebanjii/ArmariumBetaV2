@@ -91,6 +91,7 @@ function Outfit() {
   const DELAY = 650;
   const user = auth.currentUser;
   const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [showLockDropdown, setShowLockDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -101,6 +102,7 @@ function Outfit() {
 
   const [selectedType, setSelectedType] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
 
   const TABS = {
     TOPS: 'Tops',
@@ -247,6 +249,7 @@ function Outfit() {
     }
   
     try {
+      setIsLoading(true); 
       // Save top image
       const topImage = tops[topIndex];
       const topImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/tops/${Date.now()}_${topIndex}.jpg`);
@@ -296,7 +299,7 @@ function Outfit() {
         timestamp: new Date(),
       });
   
-      alert('Outfit saved successfully!');
+      setIsLoading(false); 
       setShowModal(false);
       setOutfitName('');
       setSelectedTopLayers([]);
@@ -385,6 +388,14 @@ function Outfit() {
     <div>
       <Navbar />
       <Loader loading={loading} />
+
+      {isLoading && (
+            <div className="upload-overlay">
+              <div className="upload-spinner">
+                <p>Saving outfit... Please wait.</p>
+              </div>
+            </div>
+      )}
       
       <div className="bottom-tab">
         <div className="tab-buttons">
@@ -504,10 +515,6 @@ function Outfit() {
       </div>
 
       <div className="App" id="homepage">
-      <button onClick={toggleOneLock} className='one-lock-btn'>
-        {isLocked.all ? 'Unlock All' : 'Lock All'}
-      </button>
-
         <h1 className="outfits-title">
           <img
             src="save.png"
@@ -530,6 +537,9 @@ function Outfit() {
 
             {showLockDropdown && (
               <div className="lock-dropdown">
+                <button onClick={toggleOneLock} className='one-lock-btn'>
+                  {isLocked.all ? 'Unlock All' : 'Lock All'}
+                </button>
                 <label>
                   <input
                     type="checkbox"

@@ -132,10 +132,49 @@ const handleDelete = async () => {
   try {
     await new Promise((resolve) => setTimeout(resolve, DELAY));
 
+
     for (const outfit of selectedOutfits) {
       const outfitDocRef = doc(db, `Users/${user.uid}/Outfits`, outfit.id);
       await deleteDoc(outfitDocRef);
-      console.log("Outfit deleted successfully:", outfit.id);
+
+      // Remove from TravelBoards
+      const travelBoardsSnap = await getDocs(collection(db, `Users/${user.uid}/TravelBoards`));
+      for (const docSnap of travelBoardsSnap.docs) {
+        const travelData = docSnap.data();
+        const outfitsPerDay = travelData.outfitsPerDay || {};
+
+        const updatedOutfitsPerDay = {};
+
+        let changed = false;
+
+        // Loop through all dates
+        for (const [date, outfitData] of Object.entries(outfitsPerDay)) {
+          if (outfitData.id === outfit.id) {
+            changed = true; // We found a match to delete
+          } else {
+            updatedOutfitsPerDay[date] = outfitData; // Keep untouched
+          }
+        }
+
+        if (changed) {
+          await updateDoc(docSnap.ref, { outfitsPerDay: updatedOutfitsPerDay });
+          console.log(`Removed outfit ${outfit.id} from TravelBoard: ${docSnap.id}`);
+        }
+      }
+
+      // Remove from DailyPlanner
+      const dailyPlannerRef = doc(db, `Users/${user.uid}/DailyPlanner/OutfitsByDate`);
+      const dailySnap = await getDoc(dailyPlannerRef);
+      if (dailySnap.exists()) {
+        const data = dailySnap.data();
+        const newOutfits = {};
+        for (const [date, outfitId] of Object.entries(data.outfits)) {
+          if (outfitId !== outfit.id) {
+            newOutfits[date] = outfitId;
+          }
+        }
+        await updateDoc(dailyPlannerRef, { outfits: newOutfits });
+      }
     }
 
     setSelectedOutfits([]);

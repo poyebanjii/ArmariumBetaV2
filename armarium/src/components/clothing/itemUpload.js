@@ -17,7 +17,7 @@ const ItemUpload = ({type}) => {
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [url, setUrl] = useState("");
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState({});
   const [tags, setTags] = useState("");
   const [title, setTitle] = useState("");
   const [color, setColor] = useState("");
@@ -281,6 +281,32 @@ const ItemUpload = ({type}) => {
                 alt="Preview"
                 style={{ width: '100px', height: 'auto', marginTop: '10px' }}
               />
+
+              {isLoading && progress[item.file?.name] !== undefined && (
+                <div style={{ width: '100%', marginTop: '10px' }}>
+                  <div
+                    style={{
+                      backgroundColor: '#ddd',
+                      height: '10px',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${progress[item.file?.name] || 0}%`,
+                        backgroundColor: '#ff4d4d',
+                        height: '100%',
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
+                  </div>
+                  <p style={{ fontSize: '12px', marginTop: '4px', textAlign: 'center' }}>
+                    <p>Processing your files... Please wait.</p>
+                    Uploading: {progress[item.file?.name] || 0}%
+                  </p>
+                </div>
+              )}
             </div>
           )}
           <select
@@ -327,6 +353,7 @@ const ItemUpload = ({type}) => {
       </button>
       <button className = 'Form-Submit' onClick={handleUpload}>Upload All</button>
       </div>
+      
       {/* Joyride tutorial */}
       <Joyride
         steps={steps}
