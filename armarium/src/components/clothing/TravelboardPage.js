@@ -7,6 +7,7 @@ import { db } from '../backend/firebaseConfig';
 import { doc, updateDoc, getDocs, collection, getDoc } from 'firebase/firestore';
 import Navbar from '../Navbar';
 import '../styles/MyOutfits.css';
+import '../styles/TravelBoardPage.css';
 
 function TravelboardPage() {
   const location = useLocation();
@@ -99,12 +100,14 @@ function TravelboardPage() {
   return (
     <div>
       <Navbar />
-      <button onClick={() => navigate(-1)} style={{ margin: '15px' }}>
-        Back to Travel Boards
-      </button>
+      <div className="explore-detail-header">
+        <button onClick={() => navigate(-1)} className="back-button">
+          ← Back to Explore
+        </button>
+      </div>
 
-      <div className="center">
-        <div className="center">
+      {/* Centered Title + Trip Dates */}
+      <div className="center" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
         <input
           type="text"
           className="editable-title"
@@ -113,33 +116,29 @@ function TravelboardPage() {
           style={{
             fontSize: '2rem',
             textAlign: 'center',
-            marginBottom: '10px',
             border: 'none',
             borderBottom: '2px solid gray',
             outline: 'none',
-            width: '60%'
+            width: '60%',
+            maxWidth: '400px',
           }}
         />
-        <button className="outfit-button" onClick={handleTitleSave}>Save Title</button>
-      </div>
-        <p>
-          <strong>Trip Dates:</strong> {format(range[0].startDate, 'yyyy-MM-dd')} →{' '}
-          {format(range[0].endDate, 'yyyy-MM-dd')}
+
+        <p style={{ textAlign: 'center', margin: 0 }}>
+          <strong>Trip Dates:</strong> {format(range[0].startDate, 'yyyy-MM-dd')} → {format(range[0].endDate, 'yyyy-MM-dd')}
         </p>
 
-        <button className="outfit-button" onClick={() => setEditMode(!editMode)}>
-          {editMode ? 'Cancel Edit' : 'Edit Trip'}
-        </button>
-
-        {editMode && (
-          <button
-            className="outfit-button"
-            style={{ marginLeft: '10px' }}
-            onClick={handleSaveChanges}
-          >
-            Save Changes
+        <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+          <button className="outfit-button" onClick={handleTitleSave}>Save Title</button>
+          <button className="outfit-button" onClick={() => setEditMode(!editMode)}>
+            {editMode ? 'Cancel Edit' : 'Edit Trip'}
           </button>
-        )}
+          {editMode && (
+            <button className="outfit-button" onClick={handleSaveChanges}>
+              Save Changes
+            </button>
+          )}
+        </div>
       </div>
 
       {editMode && (
@@ -167,7 +166,7 @@ function TravelboardPage() {
               background: '#fff'
             }}
             >
-              <h4 style={{ texRtAlign: 'center', marginBottom: '10px' }}>{date}</h4>
+              <h4 style={{ texRtAlign: 'center'}}>{date}</h4>
 
               {editMode ? (
                 <select
@@ -184,6 +183,7 @@ function TravelboardPage() {
                 </select>
               ) : outfit ? (
                     <div
+                    className='image-container'
                       style={{ cursor: 'pointer' }}
                       onClick={() => {
                         navigate(`/editOutfit/${outfit.id}`, {
@@ -191,6 +191,7 @@ function TravelboardPage() {
                         });
                       }}
                     >
+                      <h2 className="outfit-title">{outfit.outfitName}</h2>
                       <img src={outfit.topImageUrl} alt="Top" style={{ width: '100%' }} />
                       <img src={outfit.bottomImageUrl} alt="Bottom" style={{ width: '100%' }} />
                       <img src={outfit.shoesImageUrl} alt="Shoes" style={{ width: '100%' }} />
