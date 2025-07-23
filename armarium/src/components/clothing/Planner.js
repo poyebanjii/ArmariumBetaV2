@@ -11,6 +11,7 @@ import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
 import { useLocation } from 'react-router-dom';
 import Joyride from 'react-joyride';
+import '../styles/Planner.css';
 
 function Planner() {
   const auth = getAuth();
@@ -26,6 +27,9 @@ function Planner() {
 
   const location = useLocation();
 
+  const [showModal, setShowModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Fetch user and outfits
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -38,10 +42,18 @@ function Planner() {
     return () => unsubscribe();
   }, []);
 
-    const finishTour = async () => {
-      localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
-      setRunTour(false);
-    };
+  const finishTour = async () => {
+    localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
+    setRunTour(false);
+  };
+
+  const selectedOutfit = outfits.find(
+    (o) => o.id === selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')]
+  );
+
+  const filteredOutfits = outfits.filter((o) =>
+    o.outfitName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
 
   const fetchOutfits = async (currentUser) => {
@@ -115,7 +127,7 @@ function Planner() {
             content: 'You can click this to choose which outfit you want to wear for that day.',
           },
           {
-            target: '.outfit-button:nth-of-type(1)', // First button (Delete)
+            target: '.outfit-button:nth-of-type(1)', 
             content: 'Once you are all done planning out your outfits you can save the planner with this button.',
           },
         ]);
@@ -181,27 +193,14 @@ function Planner() {
             Assign Outfit for: <span style={{ color: '#007bff' }}>{format(selectedDate, 'yyyy-MM-dd')}</span>
           </h3>
 
-          <select
-            onChange={(e) => handleAssignOutfit(e.target.value)}
-            value={selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')] || ''}
-            style={{
-              width: '100%',
-              padding: '10px',
-              fontSize: '1rem',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              marginBottom: '20px',
-            }}
-            className='outfit-assign'
-          >
-            <option value="">-- Select Outfit --</option>
-            {outfits.map((outfit) => (
-              <option key={outfit.id} value={outfit.id}>
-                {outfit.outfitName || `Outfit ${outfit.id}`}
-              </option>
-            ))}
-          </select>
-          
+        <button onClick={() => setShowModal(true)} className="outfit-button">
+          {'Select Outfit'}
+        </button>
+
+          <button onClick={() => handleAssignOutfit(null)} className="outfit-button">
+            Remove Outfit
+          </button>
+
           {selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')] && (
             <div
               style={{
@@ -259,6 +258,48 @@ function Planner() {
           }}
         />
       </div>
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Select an Outfit</h3>
+            <input
+              type="text"
+              placeholder="Search outfits..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+
+            <div className="outfit-grid">
+              {filteredOutfits.map((outfit) => (
+                <div
+                  key={outfit.id}
+                  className="outfit-card"
+                  onClick={() => {
+                    handleAssignOutfit(outfit.id);
+                    setShowModal(false);
+                    setSearchTerm('');
+                  }}
+                >
+                  <h4>{outfit.outfitName || `Outfit ${outfit.id}`}</h4>
+                  <div className="outfit-images">
+                    {['topImageUrl', 'bottomImageUrl', 'shoesImageUrl'].map((key) =>
+                      outfit[key] ? (
+                        <img key={key} src={outfit[key]} alt={key} className="outfit-img" />
+                      ) : null
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button onClick={() => setShowModal(false)} className="outfit-button">
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );
