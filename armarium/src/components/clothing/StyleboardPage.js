@@ -103,7 +103,7 @@ function StyleboardPage() {
   return (
     <div>
       <Navbar />
-      <button onClick={() => navigate(-1)} style={{ marginBottom: '20px' }}>Back to Styleboards</button>
+      <button onClick={() => navigate(-1)} style={{ marginBottom: '20px' }} className="back-button">← Back to Styleboards</button>
 
       <div className="center">
         <button
