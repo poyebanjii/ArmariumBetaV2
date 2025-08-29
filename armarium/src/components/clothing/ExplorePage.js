@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getAuth } from 'firebase/auth';
-import { doc, setDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, deleteDoc, getDoc, collection, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../backend/firebaseConfig'; 
+import StarRating from '../utils/StarRating';
 import Navbar from '../Navbar';
 import '../styles/ExplorePage.css';
 
@@ -11,9 +12,39 @@ function ExplorePage() {
   const navigate = useNavigate();
   const { styleboard } = location.state || {};
   const [isBookmarked, setIsBookmarked] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [avgRating, setAvgRating] = useState(null);
+  const [ratingCount, setRatingCount] = useState(0);
 
   const auth = getAuth();
   const user = auth.currentUser;
+
+  useEffect(() => {
+    const fetchRatings = async () => {
+      if (!styleboard) return;
+      try {
+        const ratingsRef = collection(db, `Styleboards/${styleboard.id}/Ratings`);
+        const snapshot = await getDocs(ratingsRef);
+
+        let total = 0;
+        let count = 0;
+        snapshot.forEach(doc => {
+          total += doc.data().rating;
+          count++;
+          if (doc.id === user?.uid) {
+            setRating(doc.data().rating); 
+          }
+        });
+
+        setAvgRating(count > 0 ? (total / count).toFixed(1) : null);
+        setRatingCount(count);
+      } catch (err) {
+        console.error("Error fetching ratings:", err);
+      }
+    };
+
+    fetchRatings();
+  }, [styleboard, user]);
 
   useEffect(() => {
     const checkBookmarkStatus = async () => {
@@ -67,6 +98,48 @@ function ExplorePage() {
     }
   };
 
+  const handleRate = async (value) => {
+    if (!user) {
+      alert("You must be logged in to rate.");
+      return;
+    }
+
+    if (styleboard.ownerId === user.uid) {
+      alert("You cannot rate your own styleboard.");
+      return;
+    }
+
+    try {
+      const ratingRef = doc(db, `Styleboards/${styleboard.id}/Ratings/${user.uid}`);
+      await setDoc(ratingRef, {
+        rating: value,
+        ratedAt: new Date().toISOString(),
+      });
+
+      setRating(value);
+
+      // Refresh avgerage.
+      const ratingsRef = collection(db, `Styleboards/${styleboard.id}/Ratings`);
+      const snapshot = await getDocs(ratingsRef);
+      let total = 0, count = 0;
+      snapshot.forEach(doc => {
+        total += doc.data().rating;
+        count++;
+      });
+      setAvgRating((total / count).toFixed(1));
+      setRatingCount(count);
+
+      const sbRef = doc(db, `Styleboards/${styleboard.id}`);
+      await updateDoc(sbRef, {
+        averageRating: total / count,
+        ratingCount: count,
+      });
+
+    } catch (err) {
+      console.error("Error saving rating:", err);
+    }
+  };
+
   if (!styleboard) {
     return <p>No styleboard data found.</p>;
   }
@@ -84,6 +157,11 @@ function ExplorePage() {
         <h1>{styleboard.styleboardName}</h1>
       </div>
       
+      <div className="rating-section">
+        <h3>Rate this Styleboard</h3>
+        <StarRating key={rating} rating={rating} onRate={handleRate} />
+        <p>Average Rating: {avgRating ? `${avgRating} ⭐ (${ratingCount} ratings)` : "No ratings yet"}</p>
+      </div>
       <div className="bookmark-container">
         <img
           src={isBookmarked ? "bookmark.png" : "unbookmark.png"} 

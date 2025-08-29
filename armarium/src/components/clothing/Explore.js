@@ -15,6 +15,9 @@ function Explore() {
   const [runTour, setRunTour] = useState(false);
   const [steps, setSteps] = useState([]);
   const location = useLocation();
+  const [rating, setRating] = useState(0);
+  const [avgRating, setAvgRating] = useState(null);
+  const [ratingCount, setRatingCount] = useState(0);
 
   const finishTour = async () => {
     localStorage.setItem('wardrobeTutorialCompleted', 'true'); 
