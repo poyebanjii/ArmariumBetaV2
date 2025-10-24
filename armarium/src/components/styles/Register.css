@@ -1,12 +1,15 @@
 .Register-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #f5f5f5;
-    font-family: Arial, sans-serif;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  min-height: 125vh; /* ✅ allows scrolling when keyboard opens */
+  background-color: #f5f5f5;
+  font-family: Arial, sans-serif;
+  padding: 0rem 1rem 2rem;
+  box-sizing: border-box;
+}
 
 .Register-box {
     background-color: white;
@@ -16,6 +19,7 @@
     width: 300px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    height: auto;
 }
 
 

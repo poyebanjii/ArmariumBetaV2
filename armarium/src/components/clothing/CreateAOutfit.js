@@ -349,6 +349,7 @@ function Outfit() {
   const toggleOneLock = () => {
     setIsLocked(prevState => {
       const newState = { ...prevState, all: !prevState.all };
+      setShowLockDropdown(false)
       
       // If toggling to 'all locked', make sure individual locks are disabled
       if (newState.all) {
