@@ -157,11 +157,15 @@ function ExplorePage() {
         <h1>{styleboard.styleboardName}</h1>
       </div>
       
-      <div className="rating-section">
-        <h3>Rate this Styleboard</h3>
+    <div className="rating-section">
+      <h3>Rate this Styleboard</h3>
+      <div className="rating-stars">
         <StarRating key={rating} rating={rating} onRate={handleRate} />
-        <p>Average Rating: {avgRating ? `${avgRating} ⭐ (${ratingCount} ratings)` : "No ratings yet"}</p>
+        <p className="avg-rating-text">
+          {avgRating ? `Average Rating: ${avgRating} ⭐ (${ratingCount} ratings)` : "No ratings yet"}
+        </p>
       </div>
+    </div>
       <div className="bookmark-container">
         <img
           src={isBookmarked ? "bookmark.png" : "unbookmark.png"} 
