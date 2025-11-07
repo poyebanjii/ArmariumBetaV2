@@ -9,7 +9,7 @@ import { db } from '../backend/firebaseConfig';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { format } from 'date-fns';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate, } from 'react-router-dom';
 import Joyride from 'react-joyride';
 import '../styles/Planner.css';
 
@@ -26,6 +26,7 @@ function Planner() {
   const [steps, setSteps] = useState([]);
 
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -87,6 +88,17 @@ function Planner() {
     const date = ranges.selection.startDate;
     setSelectedDate(date);
   };
+
+  const handleGoToCreateOutfit = (date) => {
+    // Passes in the informtion to the outfit page
+    navigate('/outfits', {
+      state: {
+        selectedDate: selectedDate.toISOString(), 
+        fromPlanner: true,
+      },
+    });
+  };
+  
 
   const handleAssignOutfit = (outfitId) => {
     const formattedDate = format(selectedDate, 'yyyy-MM-dd');
@@ -197,9 +209,13 @@ function Planner() {
           {'Select Outfit'}
         </button>
 
-          <button onClick={() => handleAssignOutfit(null)} className="outfit-button">
-            Remove Outfit
-          </button>
+        <button onClick={handleGoToCreateOutfit} className="outfit-button">
+          Create Outfit
+        </button>
+
+        <button onClick={() => handleAssignOutfit(null)} className="outfit-button">
+          Remove Outfit
+        </button>
 
           {selectedOutfitsByDate[format(selectedDate, 'yyyy-MM-dd')] && (
             <div
@@ -243,6 +259,7 @@ function Planner() {
               Save Planner
             </button>
           </div>
+          
         </div>
 
         <Joyride

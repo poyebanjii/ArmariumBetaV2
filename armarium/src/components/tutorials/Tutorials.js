@@ -10,7 +10,7 @@ function Tutorials() {
   const user = auth.currentUser;
 
   const tutorialPages = [
-      {
+    {
       title: 'Create Outfit',
       description: 'Walk through creating an outfit using your wardrobe.',
       route: '/outfits',

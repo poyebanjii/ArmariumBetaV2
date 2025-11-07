@@ -4,7 +4,7 @@ import '../styles/CreateAOutfit.css';
 import '../styles/Modal.css';
 import Navbar from '../Navbar';
 import Loader from '../Loader';
-import { collection, getDoc, getDocs, addDoc, getFirestore, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDoc, getDocs, addDoc, getFirestore, doc, updateDoc, setDoc } from 'firebase/firestore';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { auth, db, storage } from '../backend/firebaseConfig';
@@ -159,6 +159,10 @@ function Outfit() {
     }
   }, [location]);
 
+  useEffect(() => {
+  console.log('Current location state:', location.state);
+}, [location.state]);
+
   const fetchData = async (user) => {
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, DELAY));
@@ -242,54 +246,50 @@ function Outfit() {
   const saveOutfit = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
-  
+
     if (!user) {
       alert('Please log in to save your outfit.');
       return;
     }
-  
+
     try {
-      setIsLoading(true); 
-      // Save top image
-      const topImage = tops[topIndex];
-      const topImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/tops/${Date.now()}_${topIndex}.jpg`);
-      await uploadBytes(topImageRef, await fetch(topImage).then((r) => r.blob()));
-      const topImageUrl = await getDownloadURL(topImageRef);
-  
-      // Save bottom image
-      const bottomImage = bottoms[bottomIndex];
-      const bottomImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/bottoms/${Date.now()}_${bottomIndex}.jpg`);
-      await uploadBytes(bottomImageRef, await fetch(bottomImage).then((r) => r.blob()));
-      const bottomImageUrl = await getDownloadURL(bottomImageRef);
-  
-      // Save shoes image
-      const shoesImage = shoes[shoesIndex];
-      const shoesImageRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/shoes/${Date.now()}_${shoesIndex}.jpg`);
-      await uploadBytes(shoesImageRef, await fetch(shoesImage).then((r) => r.blob()));
-      const shoesImageUrl = await getDownloadURL(shoesImageRef);
-  
-      // Save top layers
-      const topLayerUrls = [];
-      for (let i = 0; i < selectedTopLayers.length; i++) {
-        const topLayerImage = selectedTopLayers[i];
-        const topLayerRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/toplayers/${Date.now()}_${i}.jpg`);
-        await uploadBytes(topLayerRef, await fetch(topLayerImage).then((r) => r.blob()));
-        const topLayerUrl = await getDownloadURL(topLayerRef);
-        topLayerUrls.push(topLayerUrl);
-      }
-  
-      // Save accessories
-      const accessoryUrls = [];
-      for (let i = 0; i < selectedAccessories.length; i++) {
-        const accessoryImage = selectedAccessories[i];
-        const accessoryRef = ref(storage, `Users/Outfits/${user.uid}/${outfitName}/accessories/${Date.now()}_${i}.jpg`);
-        await uploadBytes(accessoryRef, await fetch(accessoryImage).then((r) => r.blob()));
-        const accessoryUrl = await getDownloadURL(accessoryRef);
-        accessoryUrls.push(accessoryUrl);
-      }
-  
-      // Save outfit data to Firestore
-      await addDoc(collection(db, `Users/${user.uid}/Outfits`), {
+      setIsLoading(true);
+
+      // Save images to Firebase Storage
+      const uploadImage = async (url, path) => {
+        const imageRef = ref(storage, path);
+        await uploadBytes(imageRef, await fetch(url).then((r) => r.blob()));
+        return await getDownloadURL(imageRef);
+      };
+
+      const topImageUrl = await uploadImage(
+        tops[topIndex],
+        `Users/Outfits/${user.uid}/${outfitName}/tops/${Date.now()}_${topIndex}.jpg`
+      );
+      const bottomImageUrl = await uploadImage(
+        bottoms[bottomIndex],
+        `Users/Outfits/${user.uid}/${outfitName}/bottoms/${Date.now()}_${bottomIndex}.jpg`
+      );
+      const shoesImageUrl = await uploadImage(
+        shoes[shoesIndex],
+        `Users/Outfits/${user.uid}/${outfitName}/shoes/${Date.now()}_${shoesIndex}.jpg`
+      );
+
+      // Upload optional arrays
+      const topLayerUrls = await Promise.all(
+        selectedTopLayers.map(async (img, i) =>
+          uploadImage(img, `Users/Outfits/${user.uid}/${outfitName}/toplayers/${Date.now()}_${i}.jpg`)
+        )
+      );
+
+      const accessoryUrls = await Promise.all(
+        selectedAccessories.map(async (img, i) =>
+          uploadImage(img, `Users/Outfits/${user.uid}/${outfitName}/accessories/${Date.now()}_${i}.jpg`)
+        )
+      );
+
+      // Save outfit data
+      const docRef = await addDoc(collection(db, `Users/${user.uid}/Outfits`), {
         topImageUrl,
         bottomImageUrl,
         shoesImageUrl,
@@ -298,8 +298,35 @@ function Outfit() {
         outfitName,
         timestamp: new Date(),
       });
-  
-      setIsLoading(false); 
+
+      // ✅ If we came from the planner, assign this new outfit to that date
+      if (location.state?.fromPlanner && location.state?.selectedDate) {
+        const plannerRef = doc(db, `Users/${user.uid}/DailyPlanner`, 'OutfitsByDate');
+        const plannerSnap = await getDoc(plannerRef);
+        const existingData = plannerSnap.exists() ? plannerSnap.data() : {};
+
+        const selectedDate = new Date(location.state.selectedDate);
+        const formattedDate = selectedDate.toISOString().split('T')[0]; // yyyy-MM-dd
+
+        await setDoc(
+          plannerRef,
+          {
+            outfits: {
+              ...(existingData.outfits || {}),
+              [formattedDate]: docRef.id, // Use the new outfit ID
+            },
+          },
+          { merge: true }
+        );
+
+        alert('Outfit created and assigned to your planner!');
+        navigate(`/planner/${user.uid}`); // Navigate back to planner
+      } else {
+        alert('Outfit saved successfully!');
+      }
+
+      // Cleanup
+      setIsLoading(false);
       setShowModal(false);
       setOutfitName('');
       setSelectedTopLayers([]);
@@ -307,6 +334,7 @@ function Outfit() {
     } catch (error) {
       console.error('Error saving outfit:', error);
       alert('Error saving outfit. Please try again.');
+      setIsLoading(false);
     }
   };
 
